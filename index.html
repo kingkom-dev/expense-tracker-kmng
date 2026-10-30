@@ -19,11 +19,18 @@
             body { background: white; color: black; }
         }
         .print-only { display: none; }
+        
+        /* Fix Styling Input Date Native di iOS / Mobile */
+        input[type="date"] {
+            min-height: 42px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 pb-20 md:pb-6 font-sans">
 
-    <!-- Loading Screen (Fix Flashing Login Form) -->
+    <!-- Loading Screen -->
     <div id="loadingApp" class="fixed inset-0 bg-indigo-950 flex flex-col items-center justify-center p-4 z-50 text-white space-y-3">
         <i class="fa-solid fa-circle-notch fa-spin text-4xl text-teal-400"></i>
         <p class="text-sm font-medium text-slate-200">Loading Expense Tracker KMNG...</p>
@@ -34,7 +41,7 @@
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.6.0</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.6.1</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -77,22 +84,25 @@
 
     <!-- Modal Add Transaction Item -->
     <div id="transactionModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4">
-            <h3 class="text-lg font-bold text-indigo-950"><i class="fa-solid fa-receipt text-teal-600"></i> <span data-i18n="addTxTitle">Add Transaction Detail</span></h3>
+        <div class="bg-white rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-bold text-indigo-950 flex items-center gap-2"><i class="fa-solid fa-receipt text-teal-600"></i> <span data-i18n="addTxTitle">Add Transaction Detail</span></h3>
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
-                <div class="grid grid-cols-2 gap-2">
+                
+                <!-- GRID INPUT TANGGAL & KATEGORI LEBIH RAPI & KONSISTEN -->
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="dateLabel">Date</label>
-                        <input type="date" id="itemDate" required class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
+                        <input type="date" id="itemDate" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none text-slate-700">
                     </div>
                     <div>
                         <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="categoryLabel">Category</label>
-                        <select id="itemCategory" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white">
+                        <select id="itemCategory" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none text-slate-700 h-[42px]">
                             <!-- Dynamic Options Based on Language -->
                         </select>
                     </div>
                 </div>
+
                 <div>
                     <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="amountLabel">Amount (Rp)</label>
                     <input type="text" id="itemAmountFormatted" oninput="formatCurrencyInput(this)" required class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
@@ -103,11 +113,9 @@
                     <input type="text" id="itemNote" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
                 
-                <!-- PEMISAHAN TOMBOL UPLOAD FILE DARI MEMORI VS KAMERA LANGSUNG -->
                 <div>
                     <label class="block text-xs font-medium mb-1.5 text-slate-700" data-i18n="receiptImgLabel">Receipt Photo</label>
                     
-                    <!-- Hidden Input Files untuk Opsi Berbeda -->
                     <input type="file" id="itemReceiptImgCamera" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="hidden">
                     <input type="file" id="itemReceiptImgFile" accept="image/*" onchange="previewItemImage(event)" class="hidden">
 
@@ -149,26 +157,32 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- Header -->
-        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white p-4 shadow-sm sticky top-0 z-10 no-print">
-            <!-- MENINGKATKAN LEBAR DESKTOP DARI MAX-W-4XL MENJADI MAX-W-6XL -->
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <div>
-                    <h1 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-receipt text-teal-300"></i> Expense Tracker KMNG</h1>
-                    <span class="text-[10px] bg-white/20 text-teal-100 px-2 py-0.5 rounded-full font-medium">v1.6.0</span>
+        <!-- HEADER PROPORSI KONSISTEN & RAPI DI MOBILE -->
+        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3.5 shadow-sm sticky top-0 z-10 no-print">
+            <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
+                
+                <!-- LOGO, JUDUL, DAN BADGE VERSI SEJAJAR LURUS -->
+                <div class="flex items-center gap-2 min-w-0">
+                    <i class="fa-solid fa-receipt text-teal-300 text-lg sm:text-xl shrink-0"></i>
+                    <h1 class="text-base sm:text-lg font-bold truncate whitespace-nowrap">Expense Tracker KMNG</h1>
+                    <span class="text-[9px] sm:text-[10px] bg-white/20 text-teal-100 px-1.5 py-0.5 rounded-full font-medium shrink-0">v1.6.1</span>
                 </div>
-                <div class="flex items-center gap-3">
-                    <!-- Language Switcher (Default EN) -->
-                    <div class="bg-white/10 p-1 rounded-xl text-xs font-bold flex gap-1 border border-white/20">
-                        <button onclick="setLanguage('en')" id="lang-en" class="px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition">EN</button>
-                        <button onclick="setLanguage('id')" id="lang-id" class="px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition">ID</button>
+
+                <div class="flex items-center gap-2 shrink-0">
+                    <!-- Language Switcher -->
+                    <div class="bg-white/10 p-1 rounded-xl text-xs font-bold flex gap-0.5 border border-white/20">
+                        <button onclick="setLanguage('en')" id="lang-en" class="px-1.5 sm:px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition">EN</button>
+                        <button onclick="setLanguage('id')" id="lang-id" class="px-1.5 sm:px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition">ID</button>
                     </div>
-                    <button onclick="logout()" class="text-sm bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-xl transition border border-white/20"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logoutBtn">Logout</span></button>
+                    <button onclick="logout()" class="text-xs sm:text-sm bg-white/15 hover:bg-white/25 px-2.5 sm:px-3 py-1.5 rounded-xl transition border border-white/20 flex items-center gap-1">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span class="hidden sm:inline" data-i18n="logoutBtn">Logout</span>
+                    </button>
                 </div>
             </div>
         </header>
 
-        <!-- Main Body Desktop Optimized (max-w-6xl) -->
+        <!-- Main Body Desktop Optimized -->
         <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
             <!-- Navigation Tabs -->
             <div class="no-print bg-white p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 md:relative fixed bottom-0 left-0 right-0 z-30">
@@ -268,7 +282,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.6.0
+            Expense Tracker KMNG &bull; Version 1.6.1
         </footer>
     </div>
 
@@ -296,9 +310,8 @@
         let itemsData = [];
         let isLoginMode = true;
         let currentItemImage = "";
-        let currentLang = "en"; // DEFAULT EN
+        let currentLang = "en";
 
-        // Categories Map
         const categoriesList = {
             en: [
                 { value: "Fuel", label: "Fuel" },
@@ -322,7 +335,6 @@
             ]
         };
 
-        // Dictionary I18N
         const i18n = {
             en: {
                 loginTitle: "App Login",
@@ -424,10 +436,9 @@
 
         window.setLanguage = (lang) => {
             currentLang = lang;
-            document.getElementById('lang-en').className = lang === 'en' ? 'px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
-            document.getElementById('lang-id').className = lang === 'id' ? 'px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
+            document.getElementById('lang-en').className = lang === 'en' ? 'px-1.5 sm:px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-1.5 sm:px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
+            document.getElementById('lang-id').className = lang === 'id' ? 'px-1.5 sm:px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-1.5 sm:px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
 
-            // Update UI Teks Statis
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (i18n[lang][key]) {
@@ -435,7 +446,6 @@
                 }
             });
 
-            // Update Category Dropdown Options
             const catSelect = document.getElementById('itemCategory');
             catSelect.innerHTML = '';
             categoriesList[lang].forEach(c => {
@@ -445,7 +455,6 @@
                 catSelect.appendChild(opt);
             });
 
-            // Update Placeholders / Hints
             document.getElementById('authEmail').placeholder = i18n[lang].emailPlaceholder;
             document.getElementById('authPassword').placeholder = i18n[lang].passPlaceholder;
             document.getElementById('projectName').placeholder = i18n[lang].projectNamePlaceholder;
@@ -454,7 +463,6 @@
             document.getElementById('itemAmountFormatted').placeholder = i18n[lang].amountPlaceholder;
             document.getElementById('itemNote').placeholder = i18n[lang].descriptionPlaceholder;
 
-            // Re-render Dynamic Content
             renderProjectList();
             const curProjId = document.getElementById('currentProjectId').value;
             if (curProjId) renderProjectItems(curProjId);
@@ -505,7 +513,6 @@
 
         window.logout = () => signOut(auth);
 
-        // Fix Flashing Login Form
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             document.getElementById('loadingApp').classList.add('hidden');
@@ -610,7 +617,6 @@
             }
         };
 
-        // RENDER LIST EXPENSES (AKSI EXPORT & DELETE DIPINDAHKAN KE KANAN)
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -644,7 +650,6 @@
                         <span class="font-bold text-teal-600 text-base">Rp ${totalAmount.toLocaleString('id-ID')}</span>
                     </div>
 
-                    <!-- BARIS BAWAH: BADGE TRANSACTIONS DI KIRI, TOMBOL EXPORT & DELETE DI KANAN -->
                     <div class="flex justify-between items-center pt-1">
                         <span class="text-[11px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded-md font-semibold border border-teal-100">${pItems.length} ${i18n[currentLang].txCount}</span>
                         <div class="flex items-center gap-1.5">
@@ -795,7 +800,6 @@
             });
         }
 
-        // EXPORT EXCEL DENGAN GAMBAR STRUK LEBIH BESAR & JELAS
         window.exportSingleProject = async (projectId) => {
             const proj = projectsData.find(p => p.id === projectId);
             const pItems = itemsData.filter(i => i.projectId === projectId);
@@ -824,7 +828,7 @@
                 { width: 20 },
                 { width: 18 },
                 { width: 25 },
-                { width: 35 } // Diperlebar agar gambar tidak terpotong
+                { width: 35 }
             ];
 
             pItems.sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -843,15 +847,14 @@
                 ]);
 
                 if (item.receipt && item.receipt.startsWith("data:image")) {
-                    row.height = 145; // Ditingkatkan agar muat gambar ukuran besar
+                    row.height = 145;
 
                     try {
                         const dims = await getImageDimensions(item.receipt);
-                        const maxHeight = 180; // Gambar diperbesar hingga tinggi max 180px
+                        const maxHeight = 180;
                         let imgWidth = dims.width;
                         let imgHeight = dims.height;
 
-                        // Proporsi Aspek Rasio Otomatis
                         const ratio = imgWidth / imgHeight;
                         imgHeight = maxHeight;
                         imgWidth = Math.round(maxHeight * ratio);
