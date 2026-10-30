@@ -79,7 +79,7 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.8.1</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.8.2</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -340,7 +340,7 @@
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight">Expense Tracker</h1>
                         <span class="text-base sm:text-xl font-bold tracking-tight text-teal-200">KMNG</span>
-                        <span class="text-[9px] text-teal-200/80 font-medium tracking-wider mt-0.5">v1.8.1</span>
+                        <span class="text-[9px] text-teal-200/80 font-medium tracking-wider mt-0.5">v1.8.2</span>
                     </div>
                 </div>
 
@@ -452,7 +452,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.8.1
+            Expense Tracker KMNG &bull; Version 1.8.2
         </footer>
     </div>
 
@@ -712,7 +712,6 @@
             await saveUserSettings();
         };
 
-        /* TEMA MODE DIPERBAIKI (DISIMPAN DI LOCALSTORAGE) */
         window.toggleDarkMode = async () => {
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
@@ -745,7 +744,6 @@
         async function loadUserSettings() {
             if (!currentUser) return;
             
-            // Load theme local
             const localTheme = localStorage.getItem('theme');
             if (localTheme === 'dark') {
                 document.documentElement.classList.add('dark');
@@ -754,24 +752,38 @@
                 updateThemeButtonUI(false);
             }
 
-            const snap = await getDoc(doc(db, "users", currentUser.uid));
-            if (snap.exists()) {
-                const data = snap.data();
-                userProfileDoc = data;
-                if (data.customCategories) customCategories = data.customCategories;
-                if (data.currency) {
-                    currentCurrency = data.currency;
-                    localStorage.setItem('currency', data.currency);
-                    document.getElementById('currencySettingSelect').value = data.currency;
+            try {
+                const snap = await getDoc(doc(db, "users", currentUser.uid));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    userProfileDoc = data;
+                    if (data.customCategories) customCategories = data.customCategories;
+                    if (data.currency) {
+                        currentCurrency = data.currency;
+                        localStorage.setItem('currency', data.currency);
+                        document.getElementById('currencySettingSelect').value = data.currency;
+                    }
+                    if (data.photoURL) {
+                        updateAvatarDisplay(data.photoURL);
+                    } else {
+                        updateAvatarDisplay(currentUser.photoURL);
+                    }
+                } else {
+                    updateAvatarDisplay(currentUser.photoURL);
                 }
-                if (data.photoURL) {
-                    updateAvatarDisplay(data.photoURL);
-                }
+            } catch (err) {
+                console.log("Not user doc yet, fallback to auth profile.");
+                updateAvatarDisplay(currentUser.photoURL);
             }
             renderCategoryOptions();
         }
 
+        /* FUNGSI INISIAL AVATAR DIPERBAIKI (TIDAK LAGI DEFAULT KE U SAAT REFRESH) */
         function updateAvatarDisplay(photoUrl) {
+            const firstChar = (currentUser.displayName || currentUser.email || "U").charAt(0).toUpperCase();
+            document.getElementById('userAvatarPlaceholder').innerText = firstChar;
+            document.getElementById('headerAvatarText').innerText = firstChar;
+
             if (photoUrl) {
                 document.getElementById('userAvatarImg').src = photoUrl;
                 document.getElementById('userAvatarImg').classList.remove('hidden');
@@ -781,9 +793,11 @@
                 document.getElementById('headerAvatarImg').classList.remove('hidden');
                 document.getElementById('headerAvatarText').classList.add('hidden');
             } else {
-                const firstChar = (currentUser.displayName || currentUser.email || "U").charAt(0).toUpperCase();
-                document.getElementById('userAvatarPlaceholder').innerText = firstChar;
-                document.getElementById('headerAvatarText').innerText = firstChar;
+                document.getElementById('userAvatarImg').classList.add('hidden');
+                document.getElementById('userAvatarPlaceholder').classList.remove('hidden');
+
+                document.getElementById('headerAvatarImg').classList.add('hidden');
+                document.getElementById('headerAvatarText').classList.remove('hidden');
             }
         }
 
@@ -820,7 +834,7 @@
             document.getElementById('profileSettingsModal').classList.add('hidden');
         };
 
-        /* UPLOAD AVATAR DIPERBAIKI (KOMPRESI LEBIH KECIL + DISIMPAN DI FIRESTORE & AUTH) */
+        /* UPLOAD AVATAR DENGAN PENANGANAN ERROR & DOKUMEN FIRESTORE */
         window.uploadUserAvatar = (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -838,7 +852,6 @@
                     const photoBase64 = canvas.toDataURL('image/jpeg', 0.5);
                     
                     try {
-                        // Simpan di Firestore agar tidak dibatasi oleh auth photoURL
                         await setDoc(doc(db, "users", currentUser.uid), { photoURL: photoBase64 }, { merge: true });
                         userProfileDoc.photoURL = photoBase64;
                         updateAvatarDisplay(photoBase64);
@@ -859,6 +872,7 @@
                 const newName = document.getElementById('profileFullName').value;
                 await updateProfile(auth.currentUser, { displayName: newName });
                 await setDoc(doc(db, "users", currentUser.uid), { displayName: newName }, { merge: true });
+                updateAvatarDisplay(userProfileDoc.photoURL || currentUser.photoURL);
                 alert(currentLang === 'id' ? "Nama profil berhasil diperbarui!" : "Profile name updated successfully!");
                 openProfileSettingsModal();
             } catch (err) {
@@ -1028,7 +1042,6 @@
             }
         };
 
-        /* MENDENGARKAN FIRESTORE REALTIME BERDASARKAN USERID AKUN */
         function listenToData() {
             if (!currentUser) return;
 
