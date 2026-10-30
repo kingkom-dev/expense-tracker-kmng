@@ -6,6 +6,11 @@
     <title>Expense Tracker KMNG</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- ExcelJS (Export Excel with Images) -->
@@ -29,7 +34,6 @@
             min-height: 40px !important;
             max-height: 40px !important;
             border-radius: 0.75rem !important;
-            background-color: #ffffff !important;
             font-size: 13px !important;
             display: block !important;
             width: 100% !important;
@@ -54,7 +58,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 pb-20 md:pb-6 font-sans">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 pb-20 md:pb-6 font-sans transition-colors duration-200">
 
     <!-- Loading Screen -->
     <div id="loadingApp" class="fixed inset-0 bg-indigo-950 flex flex-col items-center justify-center p-4 z-50 text-white space-y-3">
@@ -64,70 +68,169 @@
 
     <!-- Auth Section (Login/Register Modal) -->
     <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-40 hidden">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
-                <h2 id="authTitle" class="text-2xl font-bold text-indigo-900" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.7.0</span></p>
+                <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.8.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="emailLabel">Email Address</label>
-                    <input type="email" id="authEmail" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition">
+                    <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="emailLabel">Email Address</label>
+                    <input type="email" id="authEmail" required class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition">
                 </div>
                 <div class="mb-2">
-                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="passLabel">Password</label>
-                    <input type="password" id="authPassword" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition">
+                    <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="passLabel">Password</label>
+                    <input type="password" id="authPassword" required class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition">
                 </div>
                 <div class="text-right mb-5">
-                    <button type="button" onclick="handleForgotPassword()" class="text-xs text-teal-600 hover:underline font-medium" data-i18n="forgotPassBtn">Forgot Password?</button>
+                    <button type="button" onclick="handleForgotPassword()" class="text-xs text-teal-600 dark:text-teal-400 hover:underline font-medium" data-i18n="forgotPassBtn">Forgot Password?</button>
                 </div>
                 <button type="submit" id="authBtn" class="w-full bg-gradient-to-r from-indigo-900 to-teal-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition shadow-sm" data-i18n="loginBtn">Login</button>
             </form>
             <div class="mt-4 text-center text-sm">
-                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-teal-600 hover:text-teal-700 font-medium underline" data-i18n="toggleRegister">Don't have an account? Register</button>
+                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-teal-600 dark:text-teal-400 hover:text-teal-700 font-medium underline" data-i18n="toggleRegister">Don't have an account? Register</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Profile & Settings (Opsi B) -->
+    <!-- Modal My Profile & Settings -->
     <div id="profileSettingsModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-xl p-5 w-full max-w-md space-y-5">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-base font-bold text-indigo-950 flex items-center gap-2">
-                    <i class="fa-solid fa-user-gear text-teal-600"></i> <span data-i18n="profileSettingsTitle">Profile & Settings</span>
-                </h3>
-                <button onclick="closeProfileSettingsModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
+            
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
+                <!-- Navigation Tabs Profile / Settings -->
+                <div class="flex gap-4">
+                    <button onclick="switchProfileTab('profile')" id="btnTabProfile" class="text-base font-bold text-teal-600 dark:text-teal-400 border-b-2 border-teal-600 pb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-user"></i> <span data-i18n="tabProfile">My Profile</span>
+                    </button>
+                    <button onclick="switchProfileTab('settings')" id="btnTabSettings" class="text-base font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-gear"></i> <span data-i18n="tabSettings">Settings</span>
+                    </button>
+                </div>
+                <button onclick="closeProfileSettingsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <!-- Profile Info Section -->
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                <div class="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm" id="userAvatarText">
-                    U
+            <!-- SECTION TAB 1: MY PROFILE -->
+            <div id="profileTabContent" class="space-y-4">
+                <!-- Avatar & Edit Photo -->
+                <div class="flex flex-col items-center justify-center space-y-2 py-2">
+                    <div class="relative">
+                        <img id="userAvatarImg" src="" class="w-20 h-20 rounded-full object-cover border-4 border-teal-500 shadow-md hidden">
+                        <div id="userAvatarPlaceholder" class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-900 to-teal-600 text-white flex items-center justify-center font-bold text-2xl shadow-md">
+                            U
+                        </div>
+                        <button onclick="document.getElementById('avatarFileInput').click()" class="absolute bottom-0 right-0 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 p-2 rounded-full border border-slate-200 dark:border-slate-600 shadow hover:bg-slate-100 transition text-xs" title="Edit Avatar">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                        <input type="file" id="avatarFileInput" accept="image/*" onchange="uploadUserAvatar(event)" class="hidden">
+                    </div>
+                    <span class="text-xs text-slate-400" data-i18n="changeAvatarHint">Click camera icon to change avatar</span>
                 </div>
-                <div class="min-w-0 flex-1">
-                    <h4 class="font-bold text-indigo-950 text-sm truncate" id="profileEmailText">user@example.com</h4>
-                    <p class="text-xs text-slate-400" data-i18n="accountActive">Active Account</p>
-                </div>
-            </div>
 
-            <!-- Settings Section -->
-            <div class="space-y-3">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="settingsHeader">Preferences</label>
-                
-                <div class="flex justify-between items-center p-3 bg-white border border-slate-200 rounded-xl">
-                    <span class="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <i class="fa-solid fa-globe text-teal-600"></i> <span data-i18n="languageLabel">Language</span>
-                    </span>
-                    <div class="bg-slate-100 p-1 rounded-lg text-xs font-bold flex gap-1 border border-slate-200">
-                        <button onclick="setLanguage('en')" id="modal-lang-en" class="px-2 py-1 rounded-md bg-white text-indigo-950 shadow-sm transition">EN</button>
-                        <button onclick="setLanguage('id')" id="modal-lang-id" class="px-2 py-1 rounded-md text-slate-600 hover:bg-white transition">ID</button>
+                <!-- User Stats Card -->
+                <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700 text-center">
+                    <div>
+                        <p class="text-[11px] text-slate-400" data-i18n="totalRecordedTx">Total Transactions</p>
+                        <h4 id="statTotalTx" class="font-bold text-sm text-indigo-950 dark:text-teal-300">0</h4>
+                    </div>
+                    <div>
+                        <p class="text-[11px] text-slate-400" data-i18n="joinedDateLabel">Joined Date</p>
+                        <h4 id="statJoinedDate" class="font-bold text-sm text-indigo-950 dark:text-teal-300">-</h4>
                     </div>
                 </div>
+
+                <!-- Update Full Name Form -->
+                <form onsubmit="saveProfileInfo(event)" class="space-y-3 pt-1">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" data-i18n="fullNameLabel">Full Name</label>
+                        <input type="text" id="profileFullName" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" data-i18n="emailLabel">Email Login</label>
+                        <input type="email" id="profileEmailDisplay" disabled class="w-full p-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl text-sm outline-none cursor-not-allowed">
+                    </div>
+                    <button type="submit" id="saveProfileBtn" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition" data-i18n="updateProfileBtn">Update Profile Name</button>
+                </form>
+
+                <!-- Change Password Accordion -->
+                <div class="border-t dark:border-slate-700 pt-3">
+                    <button onclick="toggleChangePassSection()" class="text-xs font-bold text-teal-600 dark:text-teal-400 flex items-center justify-between w-full">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-key"></i> <span data-i18n="changePasswordHeader">Change Password</span></span>
+                        <i id="changePassArrow" class="fa-solid fa-chevron-down transition-transform"></i>
+                    </button>
+                    
+                    <form id="changePassForm" onsubmit="handleChangePassword(event)" class="space-y-3 mt-3 hidden">
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-600 dark:text-slate-300 mb-1" data-i18n="newPassLabel">New Password</label>
+                            <input type="password" id="newPasswordInput" required minlength="6" class="w-full p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-xs outline-none">
+                        </div>
+                        <button type="submit" id="changePassBtn" class="w-full py-2 bg-indigo-900 hover:bg-indigo-950 text-white rounded-xl text-xs font-semibold transition" data-i18n="saveNewPassBtn">Save New Password</button>
+                    </form>
+                </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="pt-2 border-t space-y-2">
-                <button onclick="logout()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition border border-rose-100">
+            <!-- SECTION TAB 2: SETTINGS -->
+            <div id="settingsTabContent" class="space-y-4 hidden">
+                <!-- Language Setting -->
+                <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                    <div>
+                        <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="languageLabel">Language</h4>
+                        <p class="text-[10px] text-slate-400" data-i18n="languageDesc">Choose interface language</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 p-1 rounded-lg text-xs font-bold flex gap-1 border border-slate-200 dark:border-slate-600">
+                        <button onclick="setLanguage('en')" id="modal-lang-en" class="px-2.5 py-1 rounded-md bg-teal-600 text-white shadow-sm transition">EN</button>
+                        <button onclick="setLanguage('id')" id="modal-lang-id" class="px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition">ID</button>
+                    </div>
+                </div>
+
+                <!-- Currency Setting -->
+                <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
+                    <div>
+                        <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="currencyLabel">Default Currency Format</h4>
+                        <p class="text-[10px] text-slate-400" data-i18n="currencyDesc">Select default currency symbol</p>
+                    </div>
+                    <select id="currencySettingSelect" onchange="changeCurrencySetting(this.value)" class="w-full p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-xs outline-none">
+                        <option value="Rp">IDR - Rupiah (Rp)</option>
+                        <option value="$">USD - Dollar ($)</option>
+                        <option value="€">EUR - Euro (€)</option>
+                        <option value="S$">SGD - Singapore Dollar (S$)</option>
+                    </select>
+                </div>
+
+                <!-- Custom Categories Setting -->
+                <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
+                    <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="customCategoryLabel">Custom Categories</h4>
+                    <div class="flex gap-2">
+                        <input type="text" id="newCategoryInput" placeholder="Add custom category..." class="w-full p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-xs outline-none">
+                        <button onclick="addCustomCategory()" class="px-3 py-2 bg-teal-600 text-white rounded-xl text-xs font-bold hover:bg-teal-700 transition shrink-0"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="customCategoryList" class="flex flex-wrap gap-1.5 pt-1"></div>
+                </div>
+
+                <!-- Theme Light / Dark Mode -->
+                <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                    <div>
+                        <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="themeLabel">App Appearance</h4>
+                        <p class="text-[10px] text-slate-400" data-i18n="themeDesc">Switch Light / Dark theme</p>
+                    </div>
+                    <button onclick="toggleDarkMode()" id="themeToggleBtn" class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-700 dark:text-teal-300 flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-moon"></i> <span>Dark</span>
+                    </button>
+                </div>
+
+                <!-- Backup / Export All Data -->
+                <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
+                    <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="exportBackupLabel">Export & Backup Data</h4>
+                    <p class="text-[10px] text-slate-400" data-i18n="exportBackupDesc">Download all recorded transactions as Excel spreadsheet</p>
+                    <button onclick="exportAllUserData()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-sm">
+                        <i class="fa-solid fa-file-excel"></i> <span data-i18n="exportAllBtn">Export All Data (Excel)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logout Button (Fixed Footer of Modal) -->
+            <div class="pt-2 border-t dark:border-slate-700">
+                <button onclick="logout()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition border border-rose-100 dark:border-rose-900/50">
                     <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logoutBtn">Logout Account</span>
                 </button>
             </div>
@@ -136,20 +239,20 @@
 
     <!-- Modal Create / Edit Expense Project -->
     <div id="projectModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4">
-            <h3 id="projectModalTitle" class="text-lg font-bold text-indigo-950" data-i18n="addExpenseTitle">Add New Expense (Project)</h3>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 border border-slate-100 dark:border-slate-700">
+            <h3 id="projectModalTitle" class="text-lg font-bold text-indigo-950 dark:text-teal-400" data-i18n="addExpenseTitle">Add New Expense (Project)</h3>
             <form id="projectForm" onsubmit="saveProject(event)" class="space-y-3">
                 <input type="hidden" id="editProjectId">
                 <div>
-                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="projectNameLabel">Expense / Project Name</label>
-                    <input type="text" id="projectName" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none">
+                    <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="projectNameLabel">Expense / Project Name</label>
+                    <input type="text" id="projectName" required class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="noteLabel">Notes (Optional)</label>
-                    <input type="text" id="projectNote" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none">
+                    <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="noteLabel">Notes (Optional)</label>
+                    <input type="text" id="projectNote" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition" data-i18n="cancelBtn">Cancel</button>
+                    <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition" data-i18n="cancelBtn">Cancel</button>
                     <button type="submit" id="saveProjectBtn" class="px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 transition shadow-sm" data-i18n="saveBtn">Save</button>
                 </div>
             </form>
@@ -158,54 +261,54 @@
 
     <!-- Modal Add Transaction Item -->
     <div id="transactionModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 class="text-lg font-bold text-indigo-950 flex items-center gap-2"><i class="fa-solid fa-receipt text-teal-600"></i> <span data-i18n="addTxTitle">Add Transaction Detail</span></h3>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
+            <h3 class="text-lg font-bold text-indigo-950 dark:text-teal-400 flex items-center gap-2"><i class="fa-solid fa-receipt text-teal-600"></i> <span data-i18n="addTxTitle">Add Transaction Detail</span></h3>
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
                 
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
-                        <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="dateLabel">Date</label>
-                        <input type="date" id="itemDate" required class="mobile-input-fix px-3 border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-slate-700 shadow-sm">
+                        <label class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="dateLabel">Date</label>
+                        <input type="date" id="itemDate" required class="mobile-input-fix px-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none shadow-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="categoryLabel">Category</label>
+                        <label class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="categoryLabel">Category</label>
                         <div class="select-custom-wrapper">
-                            <select id="itemCategory" class="mobile-input-fix px-3 border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-slate-700 shadow-sm pr-7">
+                            <select id="itemCategory" class="mobile-input-fix px-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none shadow-sm pr-7">
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="amountLabel">Amount (Rp)</label>
-                    <input type="text" id="itemAmountFormatted" oninput="formatCurrencyInput(this)" required class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
+                    <label class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="amountLabel">Amount</label>
+                    <input type="text" id="itemAmountFormatted" oninput="formatCurrencyInput(this)" required class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                     <input type="hidden" id="itemAmount">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="descriptionLabel">Description</label>
-                    <input type="text" id="itemNote" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
+                    <label class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="descriptionLabel">Description</label>
+                    <input type="text" id="itemNote" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
                 
                 <div>
-                    <label class="block text-xs font-medium mb-1.5 text-slate-700" data-i18n="receiptImgLabel">Receipt Photo</label>
+                    <label class="block text-xs font-medium mb-1.5 text-slate-700 dark:text-slate-300" data-i18n="receiptImgLabel">Receipt Photo</label>
                     <input type="file" id="itemReceiptImgCamera" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="hidden">
                     <input type="file" id="itemReceiptImgFile" accept="image/*" onchange="previewItemImage(event)" class="hidden">
 
                     <div class="grid grid-cols-2 gap-2">
-                        <button type="button" onclick="document.getElementById('itemReceiptImgCamera').click()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-indigo-950 font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-200">
+                        <button type="button" onclick="document.getElementById('itemReceiptImgCamera').click()" class="w-full py-2.5 px-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-indigo-950 dark:text-slate-200 font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-200 dark:border-slate-600">
                             <i class="fa-solid fa-camera text-teal-600 text-sm"></i> <span data-i18n="takePhotoBtn">Take Photo</span>
                         </button>
-                        <button type="button" onclick="document.getElementById('itemReceiptImgFile').click()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-indigo-950 font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-200">
+                        <button type="button" onclick="document.getElementById('itemReceiptImgFile').click()" class="w-full py-2.5 px-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-indigo-950 dark:text-slate-200 font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-200 dark:border-slate-600">
                             <i class="fa-solid fa-folder-open text-purple-600 text-sm"></i> <span data-i18n="uploadFileBtn">Upload File</span>
                         </button>
                     </div>
 
-                    <img id="itemImgPreview" class="mt-2.5 h-28 object-cover rounded-xl hidden border border-slate-200 w-full">
+                    <img id="itemImgPreview" class="mt-2.5 h-28 object-cover rounded-xl hidden border border-slate-200 dark:border-slate-600 w-full">
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition" data-i18n="cancelBtn">Cancel</button>
+                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition" data-i18n="cancelBtn">Cancel</button>
                     <button type="submit" id="saveItemBtn" class="px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 transition shadow-sm" data-i18n="saveBtn">Save</button>
                 </div>
             </form>
@@ -214,12 +317,12 @@
 
     <!-- Modal Popup Viewing Struk Bon Gambar -->
     <div id="receiptModal" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative border border-slate-100">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-indigo-950 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-teal-600"></i> <span data-i18n="receiptTitle">Receipt Attachment</span></h3>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative border border-slate-100 dark:border-slate-700">
+            <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2">
+                <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-teal-600"></i> <span data-i18n="receiptTitle">Receipt Attachment</span></h3>
                 <button onclick="closeReceiptModal()" class="text-slate-400 hover:text-red-500 p-1 text-lg font-bold transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="max-h-[75vh] overflow-y-auto flex justify-center bg-slate-50 p-2 rounded-xl border border-slate-200">
+            <div class="max-h-[75vh] overflow-y-auto flex justify-center bg-slate-50 dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
                 <img id="modalReceiptImg" src="" alt="Struk Bon" class="max-w-full h-auto rounded-lg shadow-sm">
             </div>
             <div class="text-right">
@@ -240,14 +343,15 @@
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight">Expense Tracker</h1>
                         <span class="text-base sm:text-xl font-bold tracking-tight text-teal-200">KMNG</span>
-                        <span class="text-[9px] text-teal-200/80 font-medium tracking-wider mt-0.5">v1.7.0</span>
+                        <span class="text-[9px] text-teal-200/80 font-medium tracking-wider mt-0.5">v1.8.0</span>
                     </div>
                 </div>
 
-                <!-- AVATAR PROFILE BUTTON (OPSI B) -->
+                <!-- AVATAR PROFILE BUTTON -->
                 <div class="flex items-center shrink-0">
-                    <button onclick="openProfileSettingsModal()" class="w-10 h-10 rounded-full bg-teal-500/30 hover:bg-teal-500/50 border-2 border-teal-300/80 flex items-center justify-center font-bold text-sm text-white shadow-sm transition" id="headerAvatarBtn">
-                        <i class="fa-solid fa-user text-xs"></i>
+                    <button onclick="openProfileSettingsModal()" class="w-10 h-10 rounded-full bg-teal-500/30 hover:bg-teal-500/50 border-2 border-teal-300/80 flex items-center justify-center font-bold text-sm text-white shadow-sm transition overflow-hidden" id="headerAvatarBtn">
+                        <img id="headerAvatarImg" src="" class="w-full h-full object-cover hidden">
+                        <span id="headerAvatarText">U</span>
                     </button>
                 </div>
             </div>
@@ -256,7 +360,7 @@
         <!-- Main Body -->
         <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
             <!-- Navigation Tabs -->
-            <div class="no-print bg-white p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 md:relative fixed bottom-0 left-0 right-0 z-30">
+            <div class="no-print bg-white dark:bg-slate-800 p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 dark:border-slate-700 md:relative fixed bottom-0 left-0 right-0 z-30">
                 <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
                 <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> <span data-i18n="expensesTab">Expenses</span></button>
             </div>
@@ -264,34 +368,34 @@
             <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
             <section id="view-dashboard" class="space-y-5">
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-500">
+                    <div class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-500">
                         <p class="text-xs text-slate-400 font-medium" data-i18n="dashTotalLabel">Total Expenses</p>
-                        <h3 id="dashTotal" class="text-lg lg:text-xl font-bold text-indigo-950 mt-1">Rp 0</h3>
+                        <h3 id="dashTotal" class="text-lg lg:text-xl font-bold text-indigo-950 dark:text-slate-100 mt-1">Rp 0</h3>
                     </div>
-                    <div class="bg-white p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-emerald-500">
+                    <div class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-emerald-500">
                         <p class="text-xs text-slate-400 font-medium" data-i18n="dashMonthLabel">This Month</p>
-                        <h3 id="dashThisMonth" class="text-lg lg:text-xl font-bold text-indigo-950 mt-1">Rp 0</h3>
+                        <h3 id="dashThisMonth" class="text-lg lg:text-xl font-bold text-indigo-950 dark:text-slate-100 mt-1">Rp 0</h3>
                     </div>
-                    <div class="bg-white p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-purple-500">
+                    <div class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-purple-500">
                         <p class="text-xs text-slate-400 font-medium" data-i18n="dashReceiptCount">Total Receipts</p>
-                        <h3 id="dashCount" class="text-lg lg:text-xl font-bold text-indigo-950 mt-1">0 Transactions</h3>
+                        <h3 id="dashCount" class="text-lg lg:text-xl font-bold text-indigo-950 dark:text-slate-100 mt-1">0 Transactions</h3>
                     </div>
-                    <div class="bg-white p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-indigo-600">
+                    <div class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-indigo-600">
                         <p class="text-xs text-slate-400 font-medium" data-i18n="dashProjCount">Total Projects</p>
-                        <h3 id="dashProjects" class="text-lg lg:text-xl font-bold text-indigo-950 mt-1">0 Projects</h3>
+                        <h3 id="dashProjects" class="text-lg lg:text-xl font-bold text-indigo-950 dark:text-slate-100 mt-1">0 Projects</h3>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-                        <h3 class="font-bold text-indigo-950 text-sm border-b pb-2 flex items-center gap-2">
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-3">
+                        <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm border-b dark:border-slate-700 pb-2 flex items-center gap-2">
                             <i class="fa-solid fa-tags text-teal-500"></i> <span data-i18n="catBreakdownTitle">Expenses by Category</span>
                         </h3>
                         <div id="categoryBreakdown" class="space-y-3 text-sm"></div>
                     </div>
 
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-                        <h3 class="font-bold text-indigo-950 text-sm border-b pb-2 flex items-center gap-2">
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-3">
+                        <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm border-b dark:border-slate-700 pb-2 flex items-center gap-2">
                             <i class="fa-solid fa-folder-tree text-purple-600"></i> <span data-i18n="projBreakdownTitle">Summary by Project</span>
                         </h3>
                         <div id="projectBreakdown" class="space-y-2.5 text-sm max-h-72 overflow-y-auto"></div>
@@ -307,34 +411,34 @@
                     </button>
                 </div>
 
-                <div class="bg-white p-3 rounded-2xl shadow-sm flex items-center gap-2 border border-slate-200/80">
+                <div class="bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm flex items-center gap-2 border border-slate-200/80 dark:border-slate-700">
                     <i class="fa-solid fa-magnifying-glass text-slate-400 pl-2"></i>
-                    <input type="text" id="searchExpenseInput" oninput="renderProjectList()" class="w-full p-1.5 text-sm outline-none text-slate-700">
+                    <input type="text" id="searchExpenseInput" oninput="renderProjectList()" class="w-full p-1.5 text-sm outline-none text-slate-700 dark:text-slate-200 bg-transparent">
                 </div>
 
                 <div class="space-y-3">
-                    <h3 class="font-bold text-indigo-950 text-sm border-b border-slate-200 pb-1" data-i18n="expenseListHeader">Expenses List</h3>
+                    <h3 class="font-bold text-indigo-950 dark:text-slate-200 text-sm border-b border-slate-200 dark:border-slate-700 pb-1" data-i18n="expenseListHeader">Expenses List</h3>
                     <div id="projectListContainer" class="space-y-3"></div>
                 </div>
             </section>
 
             <!-- VIEW 3: PROJECT DETAIL & RINCIAN TRANSAKSI -->
             <section id="view-project-detail" class="hidden space-y-4">
-                <button onclick="switchTab('expenses')" class="text-sm text-teal-600 font-semibold flex items-center gap-1 hover:underline">
+                <button onclick="switchTab('expenses')" class="text-sm text-teal-600 dark:text-teal-400 font-semibold flex items-center gap-1 hover:underline">
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-600 flex justify-between items-start">
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 flex justify-between items-start">
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <h2 id="detailProjectTitle" class="text-xl font-bold text-indigo-950">Project Name</h2>
-                            <button onclick="exportCurrentDetailProject()" class="text-slate-500 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-50 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition border border-slate-200/80" title="Export Excel">
+                            <h2 id="detailProjectTitle" class="text-xl font-bold text-indigo-950 dark:text-slate-100">Project Name</h2>
+                            <button onclick="exportCurrentDetailProject()" class="text-slate-500 dark:text-slate-300 hover:text-emerald-700 bg-slate-100 dark:bg-slate-700 hover:bg-emerald-50 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition border border-slate-200/80 dark:border-slate-600" title="Export Excel">
                                 <i class="fa-solid fa-file-excel text-emerald-600"></i> Export
                             </button>
                         </div>
                         <p id="detailProjectNote" class="text-xs text-slate-400 mt-1">Notes...</p>
                     </div>
-                    <span id="detailProjectTotal" class="text-xl font-bold text-teal-600">Rp 0</span>
+                    <span id="detailProjectTotal" class="text-xl font-bold text-teal-600 dark:text-teal-400">Rp 0</span>
                 </div>
 
                 <div>
@@ -344,22 +448,22 @@
                 </div>
 
                 <div class="space-y-2">
-                    <h3 class="font-bold text-indigo-950 text-sm border-b border-slate-200 pb-1" data-i18n="txListHeader">Transaction Details List</h3>
+                    <h3 class="font-bold text-indigo-950 dark:text-slate-200 text-sm border-b border-slate-200 dark:border-slate-700 pb-1" data-i18n="txListHeader">Transaction Details List</h3>
                     <div id="itemListContainer" class="space-y-2"></div>
                 </div>
             </section>
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.7.0
+            Expense Tracker KMNG &bull; Version 1.8.0
         </footer>
     </div>
 
     <!-- Firebase Modular SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, updatePassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 		const firebaseConfig = {
 			apiKey: "AIzaSyCl1prA-wQZQzSkMNU9_JsSUKmf_CuXp5c",
@@ -375,33 +479,18 @@
         const db = getFirestore(app);
 
         let currentUser = null;
+        let userProfileDoc = {};
         let projectsData = [];
         let itemsData = [];
         let isLoginMode = true;
         let currentItemImage = "";
         let currentLang = "en";
+        let currentCurrency = "Rp";
+        let customCategories = [];
 
-        const categoriesList = {
-            en: [
-                { value: "Fuel", label: "Fuel" },
-                { value: "Meal", label: "Meal" },
-                { value: "Toll", label: "Toll" },
-                { value: "Parking", label: "Parking" },
-                { value: "Hotel / Lodging", label: "Hotel / Lodging" },
-                { value: "Transport / Ticket", label: "Transport / Ticket" },
-                { value: "Office Supplies", label: "Office Supplies" },
-                { value: "Others", label: "Others" }
-            ],
-            id: [
-                { value: "Bensin", label: "Bensin" },
-                { value: "Makan", label: "Makan" },
-                { value: "Tol", label: "Tol" },
-                { value: "Parkir", label: "Parkir" },
-                { value: "Akomodasi / Hotel", label: "Akomodasi / Hotel" },
-                { value: "Transportasi / Tiket", label: "Transportasi / Tiket" },
-                { value: "ATK & Operasional", label: "ATK & Operasional" },
-                { value: "Lainnya", label: "Lainnya" }
-            ]
+        const defaultCategories = {
+            en: ["Fuel", "Meal", "Toll", "Parking", "Hotel / Lodging", "Transport / Ticket", "Office Supplies", "Others"],
+            id: ["Bensin", "Makan", "Tol", "Parkir", "Akomodasi / Hotel", "Transportasi / Tiket", "ATK & Operasional", "Lainnya"]
         };
 
         const i18n = {
@@ -414,10 +503,26 @@
                 loginBtn: "Login",
                 toggleRegister: "Don't have an account? Register",
                 forgotPassBtn: "Forgot Password?",
-                profileSettingsTitle: "Profile & Settings",
-                accountActive: "Active Account",
-                settingsHeader: "Preferences",
+                tabProfile: "My Profile",
+                tabSettings: "Settings",
+                changeAvatarHint: "Click camera icon to change avatar",
+                totalRecordedTx: "Total Transactions",
+                joinedDateLabel: "Joined Date",
+                fullNameLabel: "Full Name",
+                updateProfileBtn: "Update Profile Name",
+                changePasswordHeader: "Change Password",
+                newPassLabel: "New Password",
+                saveNewPassBtn: "Save New Password",
                 languageLabel: "Language",
+                languageDesc: "Choose interface language",
+                currencyLabel: "Default Currency Format",
+                currencyDesc: "Select default currency symbol",
+                customCategoryLabel: "Custom Categories",
+                themeLabel: "App Appearance",
+                themeDesc: "Switch Light / Dark theme",
+                exportBackupLabel: "Export & Backup Data",
+                exportBackupDesc: "Download all recorded transactions as Excel spreadsheet",
+                exportAllBtn: "Export All Data (Excel)",
                 addExpenseTitle: "Add New Expense (Project)",
                 projectNameLabel: "Expense / Project Name",
                 projectNamePlaceholder: "e.g. Wifi Deployment, Out of Town Trip, etc.",
@@ -428,7 +533,7 @@
                 addTxTitle: "Add Transaction Detail",
                 dateLabel: "Date",
                 categoryLabel: "Category",
-                amountLabel: "Amount (Rp)",
+                amountLabel: "Amount",
                 amountPlaceholder: "0",
                 descriptionLabel: "Description",
                 descriptionPlaceholder: "e.g. Fuel receipt, Parking fee, etc.",
@@ -467,10 +572,26 @@
                 loginBtn: "Masuk",
                 toggleRegister: "Belum punya akun? Daftar",
                 forgotPassBtn: "Lupa Password?",
-                profileSettingsTitle: "Profil & Pengaturan",
-                accountActive: "Akun Aktif",
-                settingsHeader: "Pengaturan",
+                tabProfile: "Profil Saya",
+                tabSettings: "Pengaturan",
+                changeAvatarHint: "Klik ikon kamera untuk mengganti foto profil",
+                totalRecordedTx: "Total Transaksi",
+                joinedDateLabel: "Tanggal Bergabung",
+                fullNameLabel: "Nama Lengkap",
+                updateProfileBtn: "Update Nama Profil",
+                changePasswordHeader: "Ubah Password",
+                newPassLabel: "Password Baru",
+                saveNewPassBtn: "Simpan Password Baru",
                 languageLabel: "Bahasa",
+                languageDesc: "Pilih bahasa tampilan",
+                currencyLabel: "Format Mata Uang Utamamu",
+                currencyDesc: "Pilih simbol mata uang bawaan",
+                customCategoryLabel: "Kategori Kustom",
+                themeLabel: "Tampilan Aplikasi",
+                themeDesc: "Ubah tema Terang / Gelap",
+                exportBackupLabel: "Ekspor & Backup Data",
+                exportBackupDesc: "Unduh seluruh data transaksi dalam file Excel",
+                exportAllBtn: "Ekspor Seluruh Data (Excel)",
                 addExpenseTitle: "Add New Expense (Project)",
                 projectNameLabel: "Nama Expense / Project",
                 projectNamePlaceholder: "Contoh: Project Wifi Jakarta, Dinas Bandung, dll.",
@@ -481,7 +602,7 @@
                 addTxTitle: "Tambah Rincian Transaksi",
                 dateLabel: "Tanggal",
                 categoryLabel: "Kategori",
-                amountLabel: "Jumlah (Rp)",
+                amountLabel: "Jumlah",
                 amountPlaceholder: "0",
                 descriptionLabel: "Keterangan",
                 descriptionPlaceholder: "Isi pertamax, parkir mall, dll.",
@@ -515,8 +636,8 @@
 
         window.setLanguage = (lang) => {
             currentLang = lang;
-            document.getElementById('modal-lang-en').className = lang === 'en' ? 'px-2 py-1 rounded-md bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-1 rounded-md text-slate-600 hover:bg-white transition';
-            document.getElementById('modal-lang-id').className = lang === 'id' ? 'px-2 py-1 rounded-md bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-1 rounded-md text-slate-600 hover:bg-white transition';
+            document.getElementById('modal-lang-en').className = lang === 'en' ? 'px-2.5 py-1 rounded-md bg-teal-600 text-white shadow-sm transition' : 'px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition';
+            document.getElementById('modal-lang-id').className = lang === 'id' ? 'px-2.5 py-1 rounded-md bg-teal-600 text-white shadow-sm transition' : 'px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition';
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -525,14 +646,7 @@
                 }
             });
 
-            const catSelect = document.getElementById('itemCategory');
-            catSelect.innerHTML = '';
-            categoriesList[lang].forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.value;
-                opt.innerText = c.label;
-                catSelect.appendChild(opt);
-            });
+            renderCategoryOptions();
 
             document.getElementById('authEmail').placeholder = i18n[lang].emailPlaceholder;
             document.getElementById('authPassword').placeholder = i18n[lang].passPlaceholder;
@@ -547,16 +661,208 @@
             if (curProjId) renderProjectItems(curProjId);
         };
 
+        function renderCategoryOptions() {
+            const catSelect = document.getElementById('itemCategory');
+            catSelect.innerHTML = '';
+            
+            const list = [...defaultCategories[currentLang], ...customCategories];
+            list.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.innerText = c;
+                catSelect.appendChild(opt);
+            });
+
+            renderCustomCategoryBadges();
+        }
+
+        function renderCustomCategoryBadges() {
+            const container = document.getElementById('customCategoryList');
+            container.innerHTML = '';
+            customCategories.forEach((cat, idx) => {
+                const badge = document.createElement('span');
+                badge.className = "text-[11px] bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-200 px-2 py-0.5 rounded-md font-medium flex items-center gap-1 border border-teal-200 dark:border-teal-700";
+                badge.innerHTML = `${cat} <button onclick="deleteCustomCategory(${idx})" class="text-teal-600 dark:text-teal-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>`;
+                container.appendChild(badge);
+            });
+        }
+
+        window.addCustomCategory = async () => {
+            const input = document.getElementById('newCategoryInput');
+            const val = input.value.trim();
+            if (!val) return;
+            if (!customCategories.includes(val)) {
+                customCategories.push(val);
+                input.value = "";
+                renderCategoryOptions();
+                await saveUserSettings();
+            }
+        };
+
+        window.deleteCustomCategory = async (index) => {
+            customCategories.splice(index, 1);
+            renderCategoryOptions();
+            await saveUserSettings();
+        };
+
+        window.changeCurrencySetting = async (val) => {
+            currentCurrency = val;
+            renderProjectList();
+            renderDashboard();
+            const curProjId = document.getElementById('currentProjectId').value;
+            if (curProjId) renderProjectItems(curProjId);
+            await saveUserSettings();
+        };
+
+        window.toggleDarkMode = async () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            const btn = document.getElementById('themeToggleBtn');
+            btn.innerHTML = isDark ? `<i class="fa-solid fa-sun text-amber-400"></i> <span>Light</span>` : `<i class="fa-solid fa-moon"></i> <span>Dark</span>`;
+            await saveUserSettings();
+        };
+
+        async function saveUserSettings() {
+            if (!currentUser) return;
+            const isDark = document.documentElement.classList.contains('dark');
+            await setDoc(doc(db, "users", currentUser.uid), {
+                customCategories,
+                currency: currentCurrency,
+                isDarkMode: isDark
+            }, { merge: true });
+        }
+
+        async function loadUserSettings() {
+            if (!currentUser) return;
+            const snap = await getDoc(doc(db, "users", currentUser.uid));
+            if (snap.exists()) {
+                const data = snap.data();
+                userProfileDoc = data;
+                if (data.customCategories) customCategories = data.customCategories;
+                if (data.currency) {
+                    currentCurrency = data.currency;
+                    document.getElementById('currencySettingSelect').value = data.currency;
+                }
+                if (data.isDarkMode) {
+                    document.documentElement.classList.add('dark');
+                    document.getElementById('themeToggleBtn').innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i> <span>Light</span>`;
+                }
+            }
+            renderCategoryOptions();
+        }
+
+        window.switchProfileTab = (tab) => {
+            if (tab === 'profile') {
+                document.getElementById('profileTabContent').classList.remove('hidden');
+                document.getElementById('settingsTabContent').classList.add('hidden');
+                document.getElementById('btnTabProfile').className = "text-base font-bold text-teal-600 dark:text-teal-400 border-b-2 border-teal-600 pb-1 flex items-center gap-2";
+                document.getElementById('btnTabSettings').className = "text-base font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pb-1 flex items-center gap-2";
+            } else {
+                document.getElementById('profileTabContent').classList.add('hidden');
+                document.getElementById('settingsTabContent').classList.remove('hidden');
+                document.getElementById('btnTabSettings').className = "text-base font-bold text-teal-600 dark:text-teal-400 border-b-2 border-teal-600 pb-1 flex items-center gap-2";
+                document.getElementById('btnTabProfile').className = "text-base font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pb-1 flex items-center gap-2";
+            }
+        };
+
         window.openProfileSettingsModal = () => {
             document.getElementById('profileSettingsModal').classList.remove('hidden');
-            if (currentUser && currentUser.email) {
-                document.getElementById('profileEmailText').innerText = currentUser.email;
-                document.getElementById('userAvatarText').innerText = currentUser.email.charAt(0).toUpperCase();
+            switchProfileTab('profile');
+            if (currentUser) {
+                document.getElementById('profileEmailDisplay').value = currentUser.email || "";
+                document.getElementById('profileFullName').value = currentUser.displayName || "";
+                
+                // Stats
+                document.getElementById('statTotalTx').innerText = itemsData.length;
+                const joinedDate = currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime).toLocaleDateString() : "-";
+                document.getElementById('statJoinedDate').innerText = joinedDate;
+
+                // Avatar
+                if (currentUser.photoURL) {
+                    document.getElementById('userAvatarImg').src = currentUser.photoURL;
+                    document.getElementById('userAvatarImg').classList.remove('hidden');
+                    document.getElementById('userAvatarPlaceholder').classList.add('hidden');
+
+                    document.getElementById('headerAvatarImg').src = currentUser.photoURL;
+                    document.getElementById('headerAvatarImg').classList.remove('hidden');
+                    document.getElementById('headerAvatarText').classList.add('hidden');
+                } else {
+                    const firstChar = (currentUser.displayName || currentUser.email || "U").charAt(0).toUpperCase();
+                    document.getElementById('userAvatarPlaceholder').innerText = firstChar;
+                    document.getElementById('headerAvatarText').innerText = firstChar;
+                }
             }
         };
 
         window.closeProfileSettingsModal = () => {
             document.getElementById('profileSettingsModal').classList.add('hidden');
+        };
+
+        window.uploadUserAvatar = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 200;
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const photoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    try {
+                        await updateProfile(auth.currentUser, { photoURL: photoBase64 });
+                        openProfileSettingsModal();
+                    } catch (err) { alert("Error upload avatar: " + err.message); }
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.saveProfileInfo = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveProfileBtn');
+            btn.disabled = true;
+            btn.innerText = "Saving...";
+            try {
+                const newName = document.getElementById('profileFullName').value;
+                await updateProfile(auth.currentUser, { displayName: newName });
+                alert(currentLang === 'id' ? "Nama profil berhasil diperbarui!" : "Profile name updated successfully!");
+                openProfileSettingsModal();
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = i18n[currentLang].updateProfileBtn;
+            }
+        };
+
+        window.toggleChangePassSection = () => {
+            const form = document.getElementById('changePassForm');
+            const arrow = document.getElementById('changePassArrow');
+            form.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        };
+
+        window.handleChangePassword = async (e) => {
+            e.preventDefault();
+            const newPass = document.getElementById('newPasswordInput').value;
+            const btn = document.getElementById('changePassBtn');
+            btn.disabled = true;
+            try {
+                await updatePassword(auth.currentUser, newPass);
+                alert(currentLang === 'id' ? "Password berhasil diubah!" : "Password changed successfully!");
+                document.getElementById('changePassForm').reset();
+                toggleChangePassSection();
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+            }
         };
 
         window.handleForgotPassword = async () => {
@@ -565,15 +871,58 @@
                 alert(currentLang === 'id' ? "Silakan masukkan email Anda pada kolom Email terlebih dahulu!" : "Please enter your email address in the Email field first!");
                 return;
             }
-
             try {
                 await sendPasswordResetEmail(auth, email);
                 alert(currentLang === 'id' 
-                    ? `Email instruksi reset password telah dikirim ke: ${email}. Silakan periksa kotak masuk/spam email Anda.` 
-                    : `Password reset instructions have been sent to: ${email}. Please check your inbox/spam folder.`);
-            } catch (err) {
-                alert("Error: " + err.message);
+                    ? `Email instruksi reset password telah dikirim ke: ${email}.` 
+                    : `Password reset instructions have been sent to: ${email}.`);
+            } catch (err) { alert("Error: " + err.message); }
+        };
+
+        window.exportAllUserData = async () => {
+            if (itemsData.length === 0) {
+                alert(currentLang === 'id' ? "Belum ada data transaksi untuk diekspor!" : "No transactions data to export!");
+                return;
             }
+
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('All_Expenses');
+
+            const headers = currentLang === 'id' 
+                ? ["No", "Proyek", "Tanggal", "Kategori", `Nominal (${currentCurrency})`, "Keterangan"]
+                : ["No", "Project", "Date", "Category", `Amount (${currentCurrency})`, "Description"];
+
+            worksheet.addRow(headers);
+            const headerRow = worksheet.getRow(1);
+            headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '0D9488' } };
+
+            worksheet.columns = [
+                { width: 6 },
+                { width: 22 },
+                { width: 14 },
+                { width: 20 },
+                { width: 18 },
+                { width: 30 }
+            ];
+
+            const sorted = [...itemsData].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            sorted.forEach((item, index) => {
+                const proj = projectsData.find(p => p.id === item.projectId);
+                worksheet.addRow([
+                    index + 1,
+                    proj ? proj.name : item.project || "",
+                    item.date,
+                    item.category,
+                    item.amount,
+                    item.note || ""
+                ]);
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, `Expense_Tracker_All_Backup_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
         document.getElementById('itemDate').valueAsDate = new Date();
@@ -624,13 +973,14 @@
             signOut(auth);
         };
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             document.getElementById('loadingApp').classList.add('hidden');
             if (user) {
                 document.getElementById('authContainer').classList.add('hidden');
                 document.getElementById('appContent').classList.remove('hidden');
-                document.getElementById('headerAvatarBtn').innerText = user.email ? user.email.charAt(0).toUpperCase() : "U";
+                
+                await loadUserSettings();
                 setLanguage(currentLang);
                 listenToData();
             } else {
@@ -645,8 +995,8 @@
             });
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
             if (tabName !== 'project-detail') {
-                document.getElementById('tab-dashboard').className = tabName === 'dashboard' ? 'tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
-                document.getElementById('tab-expenses').className = tabName === 'expenses' ? 'tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
+                document.getElementById('tab-dashboard').className = tabName === 'dashboard' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
+                document.getElementById('tab-expenses').className = tabName === 'expenses' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
             }
         };
 
@@ -729,6 +1079,7 @@
             }
         };
 
+        /* SORT EXPENSES LIST TERBARU DI ATAS */
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -743,7 +1094,7 @@
             const filtered = sortedProjects.filter(p => p.name.toLowerCase().includes(search));
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 text-center text-slate-400 rounded-2xl shadow-sm border border-slate-100">${i18n[currentLang].noProjMsg}</div>`;
+                container.innerHTML = `<div class="bg-white dark:bg-slate-800 p-6 text-center text-slate-400 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">${i18n[currentLang].noProjMsg}</div>`;
                 return;
             }
 
@@ -752,7 +1103,7 @@
                 const totalAmount = pItems.reduce((acc, curr) => acc + curr.amount, 0);
 
                 const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-500 cursor-pointer hover:shadow-md transition space-y-3";
+                card.className = "bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-500 cursor-pointer hover:shadow-md transition space-y-3";
                 
                 card.onclick = () => openProjectDetail(p.id);
 
@@ -760,19 +1111,19 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <div class="flex items-center gap-1.5">
-                                <h4 class="font-bold text-indigo-950 text-base">${p.name}</h4>
+                                <h4 class="font-bold text-indigo-950 dark:text-slate-100 text-base">${p.name}</h4>
                                 <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="p-1 text-slate-300 hover:text-teal-600 rounded text-[10px] transition" title="Edit"><i class="fa-solid fa-pen"></i></button>
                             </div>
                             <p class="text-xs text-slate-400 mt-0.5">${p.note || i18n[currentLang].noNotes}</p>
                         </div>
-                        <span class="font-bold text-teal-600 text-base">Rp ${totalAmount.toLocaleString('id-ID')}</span>
+                        <span class="font-bold text-teal-600 dark:text-teal-400 text-base">${currentCurrency} ${totalAmount.toLocaleString('id-ID')}</span>
                     </div>
 
                     <div class="flex justify-between items-center pt-1">
-                        <span class="text-[11px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded-md font-semibold border border-teal-100">${pItems.length} ${i18n[currentLang].txCount}</span>
+                        <span class="text-[11px] bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-md font-semibold border border-teal-100 dark:border-teal-700">${pItems.length} ${i18n[currentLang].txCount}</span>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="event.stopPropagation(); exportSingleProject('${p.id}')" class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 font-medium text-[11px] flex items-center gap-1 transition" title="Export Excel"><i class="fa-solid fa-file-excel text-emerald-600"></i> Export</button>
-                            <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 font-medium text-[11px] flex items-center gap-1 transition" title="Delete"><i class="fa-solid fa-trash"></i> Delete</button>
+                            <button onclick="event.stopPropagation(); exportSingleProject('${p.id}')" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 font-medium text-[11px] flex items-center gap-1 transition" title="Export Excel"><i class="fa-solid fa-file-excel text-emerald-600"></i> Export</button>
+                            <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-100 font-medium text-[11px] flex items-center gap-1 transition" title="Delete"><i class="fa-solid fa-trash"></i> Delete</button>
                         </div>
                     </div>
                 `;
@@ -862,16 +1213,17 @@
             }
         };
 
+        /* SORT DETAIL TRANSACTIONS TERBARU DI ATAS */
         function renderProjectItems(projectId) {
             const pItems = itemsData.filter(i => i.projectId === projectId);
             const total = pItems.reduce((acc, curr) => acc + curr.amount, 0);
-            document.getElementById('detailProjectTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('detailProjectTotal').innerText = `${currentCurrency} ${total.toLocaleString('id-ID')}`;
 
             const container = document.getElementById('itemListContainer');
             container.innerHTML = '';
 
             if (pItems.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 text-center text-xs text-slate-400 rounded-2xl shadow-sm border border-slate-100">${i18n[currentLang].noTxMsg}</div>`;
+                container.innerHTML = `<div class="bg-white dark:bg-slate-800 p-6 text-center text-xs text-slate-400 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">${i18n[currentLang].noTxMsg}</div>`;
                 return;
             }
 
@@ -885,14 +1237,14 @@
 
             pItems.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-3.5 rounded-2xl shadow-sm flex justify-between items-center text-xs border border-slate-100";
+                card.className = "bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm flex justify-between items-center text-xs border border-slate-100 dark:border-slate-700";
                 card.innerHTML = `
                     <div class="space-y-0.5">
-                        <span class="font-bold text-indigo-950 text-sm">${item.category} - Rp ${item.amount.toLocaleString('id-ID')}</span>
+                        <span class="font-bold text-indigo-950 dark:text-slate-100 text-sm">${item.category} - ${currentCurrency} ${item.amount.toLocaleString('id-ID')}</span>
                         <p class="text-slate-400">${item.date} ${item.note ? '| ' + item.note : ''}</p>
-                        ${item.receipt ? `<button onclick="openReceiptModal('${item.receipt}')" class="text-teal-600 hover:underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> ${i18n[currentLang].viewReceipt}</button>` : ''}
+                        ${item.receipt ? `<button onclick="openReceiptModal('${item.receipt}')" class="text-teal-600 dark:text-teal-400 hover:underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> ${i18n[currentLang].viewReceipt}</button>` : ''}
                     </div>
-                    <button onclick="deleteItem('${item.id}')" class="text-slate-300 hover:text-rose-500 p-2 hover:bg-rose-50 rounded-lg transition"><i class="fa-solid fa-trash text-sm"></i></button>
+                    <button onclick="deleteItem('${item.id}')" class="text-slate-300 hover:text-rose-500 p-2 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-lg transition"><i class="fa-solid fa-trash text-sm"></i></button>
                 `;
                 container.appendChild(card);
             });
@@ -937,8 +1289,8 @@
             const worksheet = workbook.addWorksheet('Expenses');
 
             const headers = currentLang === 'id' 
-                ? ["No", "Proyek", "Tanggal", "Kategori", "Nominal (Rp)", "Keterangan", "Foto Struk / Bon"]
-                : ["No", "Project", "Date", "Category", "Amount (Rp)", "Description", "Receipt Image"];
+                ? ["No", "Proyek", "Tanggal", "Kategori", `Nominal (${currentCurrency})`, "Keterangan", "Foto Struk / Bon"]
+                : ["No", "Project", "Date", "Category", `Amount (${currentCurrency})`, "Description", "Receipt Image"];
 
             worksheet.addRow(headers);
             const headerRow = worksheet.getRow(1);
@@ -1011,8 +1363,8 @@
             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             const thisMonthTotal = itemsData.filter(i => i.date && i.date.startsWith(currentMonthStr)).reduce((acc, curr) => acc + curr.amount, 0);
 
-            document.getElementById('dashTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
-            document.getElementById('dashThisMonth').innerText = `Rp ${thisMonthTotal.toLocaleString('id-ID')}`;
+            document.getElementById('dashTotal').innerText = `${currentCurrency} ${total.toLocaleString('id-ID')}`;
+            document.getElementById('dashThisMonth').innerText = `${currentCurrency} ${thisMonthTotal.toLocaleString('id-ID')}`;
             document.getElementById('dashCount').innerText = `${itemsData.length} ${i18n[currentLang].txCount}`;
             document.getElementById('dashProjects').innerText = `${projectsData.length} Projects`;
 
@@ -1026,9 +1378,9 @@
                     <div>
                         <div class="flex justify-between text-xs font-semibold mb-1">
                             <span>${cat}</span>
-                            <span>Rp ${catMap[cat].toLocaleString('id-ID')} (${percent}%)</span>
+                            <span>${currentCurrency} ${catMap[cat].toLocaleString('id-ID')} (${percent}%)</span>
                         </div>
-                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                             <div class="bg-teal-500 h-2 rounded-full" style="width: ${percent}%"></div>
                         </div>
                     </div>
@@ -1040,9 +1392,9 @@
             projectsData.forEach(p => {
                 const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
                 projContainer.innerHTML += `
-                    <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="font-medium text-xs text-slate-700">${p.name}</span>
-                        <span class="font-bold text-xs text-indigo-950">Rp ${pTotal.toLocaleString('id-ID')}</span>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="font-medium text-xs text-slate-700 dark:text-slate-300">${p.name}</span>
+                        <span class="font-bold text-xs text-indigo-950 dark:text-teal-300">${currentCurrency} ${pTotal.toLocaleString('id-ID')}</span>
                     </div>
                 `;
             });
