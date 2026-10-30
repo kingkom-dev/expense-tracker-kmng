@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Expense Tracker KMNG</title>
-    <!-- Script Auto-apply Theme sebelum render agar tidak flickering -->
+    <!-- Script Pre-render Theme & Avatar untuk Mencegah Flashing & Huruf U -->
     <script>
+        // Auto-apply Dark Mode
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
@@ -79,7 +80,7 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.8.2</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.8.3</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -330,23 +331,25 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER DENGAN OPSI B (AVATAR PROFILE & SETTINGS) -->
-        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-4 sm:py-5 shadow-md sticky top-0 z-10 no-print">
+        <!-- HEADER DENGAN LEBAR VERTIKAL KECIL / RAMPING -->
+        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-2.5 sm:py-3 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
-                <!-- LOGO DAN JUDUL 2 BARIS -->
-                <div class="flex items-center gap-3 min-w-0">
-                    <i class="fa-solid fa-receipt text-teal-300 text-2xl sm:text-3xl shrink-0"></i>
+                <!-- LOGO DAN JUDUL RAMPING -->
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <i class="fa-solid fa-receipt text-teal-300 text-xl sm:text-2xl shrink-0"></i>
                     <div class="flex flex-col leading-tight">
-                        <h1 class="text-base sm:text-xl font-bold tracking-tight">Expense Tracker</h1>
-                        <span class="text-base sm:text-xl font-bold tracking-tight text-teal-200">KMNG</span>
-                        <span class="text-[9px] text-teal-200/80 font-medium tracking-wider mt-0.5">v1.8.2</span>
+                        <div class="flex items-center gap-1.5">
+                            <h1 class="text-sm sm:text-lg font-bold tracking-tight">Expense Tracker</h1>
+                            <span class="text-sm sm:text-lg font-bold tracking-tight text-teal-200">KMNG</span>
+                        </div>
+                        <span class="text-[8px] sm:text-[9px] text-teal-200/80 font-medium tracking-wider">v1.8.3</span>
                     </div>
                 </div>
 
                 <!-- AVATAR PROFILE BUTTON -->
                 <div class="flex items-center shrink-0">
-                    <button onclick="openProfileSettingsModal()" class="w-10 h-10 rounded-full bg-teal-500/30 hover:bg-teal-500/50 border-2 border-teal-300/80 flex items-center justify-center font-bold text-sm text-white shadow-sm transition overflow-hidden" id="headerAvatarBtn">
+                    <button onclick="openProfileSettingsModal()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-teal-500/30 hover:bg-teal-500/50 border-2 border-teal-300/80 flex items-center justify-center font-bold text-xs sm:text-sm text-white shadow-sm transition overflow-hidden" id="headerAvatarBtn">
                         <img id="headerAvatarImg" src="" class="w-full h-full object-cover hidden">
                         <span id="headerAvatarText">U</span>
                     </button>
@@ -452,7 +455,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.8.2
+            Expense Tracker KMNG &bull; Version 1.8.3
         </footer>
     </div>
 
@@ -764,6 +767,7 @@
                         document.getElementById('currencySettingSelect').value = data.currency;
                     }
                     if (data.photoURL) {
+                        localStorage.setItem('user_photo_url', data.photoURL);
                         updateAvatarDisplay(data.photoURL);
                     } else {
                         updateAvatarDisplay(currentUser.photoURL);
@@ -772,24 +776,31 @@
                     updateAvatarDisplay(currentUser.photoURL);
                 }
             } catch (err) {
-                console.log("Not user doc yet, fallback to auth profile.");
                 updateAvatarDisplay(currentUser.photoURL);
             }
             renderCategoryOptions();
         }
 
-        /* FUNGSI INISIAL AVATAR DIPERBAIKI (TIDAK LAGI DEFAULT KE U SAAT REFRESH) */
+        /* PERBAIKAN AVATAR & MENCEGAH HURUF U ATAU FLASHING SAAT REFRESH */
         function updateAvatarDisplay(photoUrl) {
-            const firstChar = (currentUser.displayName || currentUser.email || "U").charAt(0).toUpperCase();
-            document.getElementById('userAvatarPlaceholder').innerText = firstChar;
-            document.getElementById('headerAvatarText').innerText = firstChar;
+            const storedName = currentUser ? (currentUser.displayName || currentUser.email) : localStorage.getItem('user_initial_name');
+            let initial = "U";
+            if (storedName && storedName.length > 0) {
+                initial = storedName.charAt(0).toUpperCase();
+                localStorage.setItem('user_initial_name', storedName);
+            }
 
-            if (photoUrl) {
-                document.getElementById('userAvatarImg').src = photoUrl;
+            document.getElementById('userAvatarPlaceholder').innerText = initial;
+            document.getElementById('headerAvatarText').innerText = initial;
+
+            const finalPhoto = photoUrl || localStorage.getItem('user_photo_url');
+
+            if (finalPhoto && finalPhoto.length > 10) {
+                document.getElementById('userAvatarImg').src = finalPhoto;
                 document.getElementById('userAvatarImg').classList.remove('hidden');
                 document.getElementById('userAvatarPlaceholder').classList.add('hidden');
 
-                document.getElementById('headerAvatarImg').src = photoUrl;
+                document.getElementById('headerAvatarImg').src = finalPhoto;
                 document.getElementById('headerAvatarImg').classList.remove('hidden');
                 document.getElementById('headerAvatarText').classList.add('hidden');
             } else {
@@ -834,7 +845,6 @@
             document.getElementById('profileSettingsModal').classList.add('hidden');
         };
 
-        /* UPLOAD AVATAR DENGAN PENANGANAN ERROR & DOKUMEN FIRESTORE */
         window.uploadUserAvatar = (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -854,6 +864,7 @@
                     try {
                         await setDoc(doc(db, "users", currentUser.uid), { photoURL: photoBase64 }, { merge: true });
                         userProfileDoc.photoURL = photoBase64;
+                        localStorage.setItem('user_photo_url', photoBase64);
                         updateAvatarDisplay(photoBase64);
                         alert(currentLang === 'id' ? "Foto profil berhasil diperbarui!" : "Profile picture updated successfully!");
                     } catch (err) { alert("Error upload avatar: " + err.message); }
@@ -872,6 +883,7 @@
                 const newName = document.getElementById('profileFullName').value;
                 await updateProfile(auth.currentUser, { displayName: newName });
                 await setDoc(doc(db, "users", currentUser.uid), { displayName: newName }, { merge: true });
+                localStorage.setItem('user_initial_name', newName);
                 updateAvatarDisplay(userProfileDoc.photoURL || currentUser.photoURL);
                 alert(currentLang === 'id' ? "Nama profil berhasil diperbarui!" : "Profile name updated successfully!");
                 openProfileSettingsModal();
@@ -1011,6 +1023,8 @@
         };
 
         window.logout = () => {
+            localStorage.removeItem('user_photo_url');
+            localStorage.removeItem('user_initial_name');
             closeProfileSettingsModal();
             signOut(auth);
         };
@@ -1019,6 +1033,9 @@
             currentUser = user;
             document.getElementById('loadingApp').classList.add('hidden');
             if (user) {
+                if (user.displayName || user.email) {
+                    localStorage.setItem('user_initial_name', user.displayName || user.email);
+                }
                 document.getElementById('authContainer').classList.add('hidden');
                 document.getElementById('appContent').classList.remove('hidden');
                 
