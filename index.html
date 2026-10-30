@@ -34,7 +34,7 @@
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.5.1</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.6.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -102,11 +102,27 @@
                     <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="descriptionLabel">Description</label>
                     <input type="text" id="itemNote" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
+                
+                <!-- PEMISAHAN TOMBOL UPLOAD FILE DARI MEMORI VS KAMERA LANGSUNG -->
                 <div>
-                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="receiptImgLabel">Receipt Photo</label>
-                    <input type="file" id="itemReceiptImg" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="w-full text-xs text-slate-500">
-                    <img id="itemImgPreview" class="mt-2 h-24 object-cover rounded-lg hidden border border-slate-200">
+                    <label class="block text-xs font-medium mb-1.5 text-slate-700" data-i18n="receiptImgLabel">Receipt Photo</label>
+                    
+                    <!-- Hidden Input Files untuk Opsi Berbeda -->
+                    <input type="file" id="itemReceiptImgCamera" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="hidden">
+                    <input type="file" id="itemReceiptImgFile" accept="image/*" onchange="previewItemImage(event)" class="hidden">
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="document.getElementById('itemReceiptImgCamera').click()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-indigo-950 font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-200">
+                            <i class="fa-solid fa-camera text-teal-600 text-sm"></i> <span data-i18n="takePhotoBtn">Take Photo</span>
+                        </button>
+                        <button type="button" onclick="document.getElementById('itemReceiptImgFile').click()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-indigo-950 font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition border border-slate-200">
+                            <i class="fa-solid fa-folder-open text-purple-600 text-sm"></i> <span data-i18n="uploadFileBtn">Upload File</span>
+                        </button>
+                    </div>
+
+                    <img id="itemImgPreview" class="mt-2.5 h-28 object-cover rounded-xl hidden border border-slate-200 w-full">
                 </div>
+
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition" data-i18n="cancelBtn">Cancel</button>
                     <button type="submit" id="saveItemBtn" class="px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 transition shadow-sm" data-i18n="saveBtn">Save</button>
@@ -135,10 +151,11 @@
     <div id="appContent" class="hidden">
         <!-- Header -->
         <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white p-4 shadow-sm sticky top-0 z-10 no-print">
-            <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <!-- MENINGKATKAN LEBAR DESKTOP DARI MAX-W-4XL MENJADI MAX-W-6XL -->
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-receipt text-teal-300"></i> Expense Tracker KMNG</h1>
-                    <span class="text-[10px] bg-white/20 text-teal-100 px-2 py-0.5 rounded-full font-medium">v1.5.1</span>
+                    <span class="text-[10px] bg-white/20 text-teal-100 px-2 py-0.5 rounded-full font-medium">v1.6.0</span>
                 </div>
                 <div class="flex items-center gap-3">
                     <!-- Language Switcher (Default EN) -->
@@ -151,8 +168,8 @@
             </div>
         </header>
 
-        <!-- Main Body -->
-        <main class="max-w-4xl mx-auto p-4 space-y-6">
+        <!-- Main Body Desktop Optimized (max-w-6xl) -->
+        <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
             <!-- Navigation Tabs -->
             <div class="no-print bg-white p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 md:relative fixed bottom-0 left-0 right-0 z-30">
                 <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
@@ -160,39 +177,39 @@
             </div>
 
             <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
-            <section id="view-dashboard" class="space-y-4">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-500">
+            <section id="view-dashboard" class="space-y-5">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-500">
                         <p class="text-xs text-slate-400 font-medium" data-i18n="dashTotalLabel">Total Expenses</p>
-                        <h3 id="dashTotal" class="text-lg font-bold text-indigo-950 mt-1">Rp 0</h3>
+                        <h3 id="dashTotal" class="text-lg lg:text-xl font-bold text-indigo-950 mt-1">Rp 0</h3>
                     </div>
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-emerald-500">
+                    <div class="bg-white p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-emerald-500">
                         <p class="text-xs text-slate-400 font-medium" data-i18n="dashMonthLabel">This Month</p>
-                        <h3 id="dashThisMonth" class="text-lg font-bold text-indigo-950 mt-1">Rp 0</h3>
+                        <h3 id="dashThisMonth" class="text-lg lg:text-xl font-bold text-indigo-950 mt-1">Rp 0</h3>
                     </div>
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-purple-500">
+                    <div class="bg-white p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-purple-500">
                         <p class="text-xs text-slate-400 font-medium" data-i18n="dashReceiptCount">Total Receipts</p>
-                        <h3 id="dashCount" class="text-lg font-bold text-indigo-950 mt-1">0 Transactions</h3>
+                        <h3 id="dashCount" class="text-lg lg:text-xl font-bold text-indigo-950 mt-1">0 Transactions</h3>
                     </div>
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-indigo-600">
+                    <div class="bg-white p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-indigo-600">
                         <p class="text-xs text-slate-400 font-medium" data-i18n="dashProjCount">Total Projects</p>
-                        <h3 id="dashProjects" class="text-lg font-bold text-indigo-950 mt-1">0 Projects</h3>
+                        <h3 id="dashProjects" class="text-lg lg:text-xl font-bold text-indigo-950 mt-1">0 Projects</h3>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
                         <h3 class="font-bold text-indigo-950 text-sm border-b pb-2 flex items-center gap-2">
                             <i class="fa-solid fa-tags text-teal-500"></i> <span data-i18n="catBreakdownTitle">Expenses by Category</span>
                         </h3>
-                        <div id="categoryBreakdown" class="space-y-2.5 text-sm"></div>
+                        <div id="categoryBreakdown" class="space-y-3 text-sm"></div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
                         <h3 class="font-bold text-indigo-950 text-sm border-b pb-2 flex items-center gap-2">
                             <i class="fa-solid fa-folder-tree text-purple-600"></i> <span data-i18n="projBreakdownTitle">Summary by Project</span>
                         </h3>
-                        <div id="projectBreakdown" class="space-y-2 text-sm max-h-56 overflow-y-auto"></div>
+                        <div id="projectBreakdown" class="space-y-2.5 text-sm max-h-72 overflow-y-auto"></div>
                     </div>
                 </div>
             </section>
@@ -200,7 +217,7 @@
             <!-- VIEW 2: EXPENSES PAGE -->
             <section id="view-expenses" class="hidden space-y-4">
                 <div>
-                    <button onclick="openProjectModal()" class="w-full bg-teal-600 text-white py-3 rounded-2xl font-bold shadow-sm hover:bg-teal-700 transition flex items-center justify-center gap-2">
+                    <button onclick="openProjectModal()" class="w-full bg-teal-600 text-white py-3.5 rounded-2xl font-bold shadow-sm hover:bg-teal-700 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-plus-circle text-lg"></i> + <span data-i18n="addExpenseBtn">+ Add New Expense (Project)</span>
                     </button>
                 </div>
@@ -222,24 +239,23 @@
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <!-- Info Banner Proyek (Tombol Export Rapi Samping Judul) -->
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-600 flex justify-between items-start">
+                <!-- Info Banner Proyek -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-600 flex justify-between items-start">
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <h2 id="detailProjectTitle" class="text-xl font-bold text-indigo-950">Project Name</h2>
-                            <!-- TOMBOL EXPORT DESAIN BADGE MINIMALIS -->
-                            <button onclick="exportCurrentDetailProject()" class="text-slate-500 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-50 px-2 py-0.5 rounded-md text-[11px] font-semibold flex items-center gap-1 transition border border-slate-200/80" title="Export Excel">
+                            <button onclick="exportCurrentDetailProject()" class="text-slate-500 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-50 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition border border-slate-200/80" title="Export Excel">
                                 <i class="fa-solid fa-file-excel text-emerald-600"></i> Export
                             </button>
                         </div>
                         <p id="detailProjectNote" class="text-xs text-slate-400 mt-1">Notes...</p>
                     </div>
-                    <span id="detailProjectTotal" class="text-lg font-bold text-teal-600">Rp 0</span>
+                    <span id="detailProjectTotal" class="text-xl font-bold text-teal-600">Rp 0</span>
                 </div>
 
                 <!-- TOMBOL ADD TRANSACTION FULL WIDTH -->
                 <div>
-                    <button onclick="openTransactionModal()" class="w-full bg-teal-600 text-white py-3 rounded-2xl font-bold shadow-sm hover:bg-teal-700 transition flex items-center justify-center gap-2 text-sm">
+                    <button onclick="openTransactionModal()" class="w-full bg-teal-600 text-white py-3.5 rounded-2xl font-bold shadow-sm hover:bg-teal-700 transition flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-circle-plus text-base"></i> + <span data-i18n="addTxBtn">Add Transaction</span>
                     </button>
                 </div>
@@ -252,7 +268,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.5.1
+            Expense Tracker KMNG &bull; Version 1.6.0
         </footer>
     </div>
 
@@ -331,6 +347,8 @@
                 descriptionLabel: "Description",
                 descriptionPlaceholder: "e.g. Fuel receipt, Parking fee, etc.",
                 receiptImgLabel: "Receipt Photo",
+                takePhotoBtn: "Take Photo",
+                uploadFileBtn: "Upload File",
                 receiptTitle: "Receipt Attachment",
                 closeBtn: "Close",
                 logoutBtn: "Logout",
@@ -377,6 +395,8 @@
                 descriptionLabel: "Keterangan",
                 descriptionPlaceholder: "Isi pertamax, parkir mall, dll.",
                 receiptImgLabel: "Foto Struk / Bon",
+                takePhotoBtn: "Ambil Foto",
+                uploadFileBtn: "Unggah File",
                 receiptTitle: "Struk / Bon Pembayaran",
                 closeBtn: "Tutup",
                 logoutBtn: "Keluar",
@@ -590,7 +610,7 @@
             }
         };
 
-        // RENDER LIST EXPENSES (AKSI EXPORT & DELETE SEJAJAR DENGAN TRANSACTIONS)
+        // RENDER LIST EXPENSES (AKSI EXPORT & DELETE DIPINDAHKAN KE KANAN)
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -608,7 +628,7 @@
                 const totalAmount = pItems.reduce((acc, curr) => acc + curr.amount, 0);
 
                 const card = document.createElement('div');
-                card.className = "bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-500 cursor-pointer hover:shadow-md transition";
+                card.className = "bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-500 cursor-pointer hover:shadow-md transition space-y-3";
                 
                 card.onclick = () => openProjectDetail(p.id);
 
@@ -620,15 +640,17 @@
                                 <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="p-1 text-slate-300 hover:text-teal-600 rounded text-[10px] transition" title="Edit"><i class="fa-solid fa-pen"></i></button>
                             </div>
                             <p class="text-xs text-slate-400 mt-0.5">${p.note || i18n[currentLang].noNotes}</p>
-                            
-                            <!-- BARIS SEJAJAR: TRANSACTIONS BADGE + TOMBOL EXPORT & DELETE -->
-                            <div class="flex items-center gap-2 mt-2">
-                                <span class="text-[11px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded-md font-semibold border border-teal-100">${pItems.length} ${i18n[currentLang].txCount}</span>
-                                <button onclick="event.stopPropagation(); exportSingleProject('${p.id}')" class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 font-medium text-[11px] flex items-center gap-1 transition" title="Export Excel"><i class="fa-solid fa-file-excel text-emerald-600"></i> Export</button>
-                                <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="px-2 py-0.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 font-medium text-[11px] flex items-center gap-1 transition" title="Delete"><i class="fa-solid fa-trash"></i> Delete</button>
-                            </div>
                         </div>
                         <span class="font-bold text-teal-600 text-base">Rp ${totalAmount.toLocaleString('id-ID')}</span>
+                    </div>
+
+                    <!-- BARIS BAWAH: BADGE TRANSACTIONS DI KIRI, TOMBOL EXPORT & DELETE DI KANAN -->
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-[11px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded-md font-semibold border border-teal-100">${pItems.length} ${i18n[currentLang].txCount}</span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="event.stopPropagation(); exportSingleProject('${p.id}')" class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 font-medium text-[11px] flex items-center gap-1 transition" title="Export Excel"><i class="fa-solid fa-file-excel text-emerald-600"></i> Export</button>
+                            <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 font-medium text-[11px] flex items-center gap-1 transition" title="Delete"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -669,13 +691,13 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 600;
+                    const MAX_WIDTH = 800;
                     const scaleSize = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scaleSize;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    currentItemImage = canvas.toDataURL('image/jpeg', 0.6);
+                    currentItemImage = canvas.toDataURL('image/jpeg', 0.7);
                     document.getElementById('itemImgPreview').src = currentItemImage;
                     document.getElementById('itemImgPreview').classList.remove('hidden');
                 };
@@ -749,7 +771,7 @@
 
         window.deleteItem = async (id) => {
             if (confirm(currentLang === 'id' ? "Hapus rincian transaksi ini?" : "Delete this transaction item?")) {
-                await deleteDoc(doc(doc, "expenses", id));
+                await deleteDoc(doc(db, "expenses", id));
             }
         };
 
@@ -760,7 +782,6 @@
             }
         };
 
-        // HELPER MEMBACA DIMENSI GAMBAR UTK PROPORSI DI EXCEL
         function getImageDimensions(base64) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -768,13 +789,13 @@
                     resolve({ width: img.width, height: img.height });
                 };
                 img.onerror = () => {
-                    resolve({ width: 100, height: 100 });
+                    resolve({ width: 200, height: 200 });
                 };
                 img.src = base64;
             });
         }
 
-        // EXPORT EXCEL PROPORSI GAMBAR SESUAI
+        // EXPORT EXCEL DENGAN GAMBAR STRUK LEBIH BESAR & JELAS
         window.exportSingleProject = async (projectId) => {
             const proj = projectsData.find(p => p.id === projectId);
             const pItems = itemsData.filter(i => i.projectId === projectId);
@@ -803,7 +824,7 @@
                 { width: 20 },
                 { width: 18 },
                 { width: 25 },
-                { width: 22 }
+                { width: 35 } // Diperlebar agar gambar tidak terpotong
             ];
 
             pItems.sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -822,26 +843,18 @@
                 ]);
 
                 if (item.receipt && item.receipt.startsWith("data:image")) {
-                    row.height = 80; // Set tinggi baris excel secukupnya
+                    row.height = 145; // Ditingkatkan agar muat gambar ukuran besar
 
                     try {
                         const dims = await getImageDimensions(item.receipt);
-                        const maxBoxSize = 95;
+                        const maxHeight = 180; // Gambar diperbesar hingga tinggi max 180px
                         let imgWidth = dims.width;
                         let imgHeight = dims.height;
 
-                        // Kalkulasi Proporsi Aspect Ratio
-                        if (imgWidth > imgHeight) {
-                            if (imgWidth > maxBoxSize) {
-                                imgHeight = Math.round((imgHeight * maxBoxSize) / imgWidth);
-                                imgWidth = maxBoxSize;
-                            }
-                        } else {
-                            if (imgHeight > maxBoxSize) {
-                                imgWidth = Math.round((imgWidth * maxBoxSize) / imgHeight);
-                                imgHeight = maxBoxSize;
-                            }
-                        }
+                        // Proporsi Aspek Rasio Otomatis
+                        const ratio = imgWidth / imgHeight;
+                        imgHeight = maxHeight;
+                        imgWidth = Math.round(maxHeight * ratio);
 
                         const imageId = workbook.addImage({
                             base64: item.receipt,
@@ -856,7 +869,7 @@
                         console.error("Error embedding image:", e);
                     }
                 } else {
-                    row.height = 22;
+                    row.height = 24;
                 }
             }
 
@@ -900,7 +913,7 @@
             projectsData.forEach(p => {
                 const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
                 projContainer.innerHTML += `
-                    <div class="flex justify-between items-center p-2 bg-slate-50 rounded-xl border border-slate-100">
+                    <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-xl border border-slate-100">
                         <span class="font-medium text-xs text-slate-700">${p.name}</span>
                         <span class="font-bold text-xs text-indigo-950">Rp ${pTotal.toLocaleString('id-ID')}</span>
                     </div>
