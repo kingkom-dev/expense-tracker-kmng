@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS (Export Excel) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- ExcelJS (Export Excel with Images) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <!-- FileSaver JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         @media print {
             .no-print { display: none !important; }
@@ -21,26 +23,32 @@
 </head>
 <body class="bg-slate-50 text-slate-800 pb-20 md:pb-6 font-sans">
 
+    <!-- Loading Screen (Fix Flashing Login Form) -->
+    <div id="loadingApp" class="fixed inset-0 bg-indigo-950 flex flex-col items-center justify-center p-4 z-50 text-white space-y-3">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-teal-400"></i>
+        <p class="text-sm font-medium text-slate-200">Loading Expense Tracker KMNG...</p>
+    </div>
+
     <!-- Auth Section (Login/Register Modal) -->
-    <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-50">
+    <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-40 hidden">
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100">
             <div class="text-center mb-6">
-                <h2 id="authTitle" class="text-2xl font-bold text-indigo-900" data-i18n="loginTitle">Masuk Aplikasi</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.4.1</span></p>
+                <h2 id="authTitle" class="text-2xl font-bold text-indigo-900" data-i18n="loginTitle">App Login</h2>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.5.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="emailLabel">Email</label>
+                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="emailLabel">Email Address</label>
                     <input type="email" id="authEmail" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition">
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="passLabel">Password</label>
                     <input type="password" id="authPassword" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition">
                 </div>
-                <button type="submit" id="authBtn" class="w-full bg-gradient-to-r from-indigo-900 to-teal-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition shadow-sm" data-i18n="loginBtn">Masuk</button>
+                <button type="submit" id="authBtn" class="w-full bg-gradient-to-r from-indigo-900 to-teal-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition shadow-sm" data-i18n="loginBtn">Login</button>
             </form>
             <div class="mt-4 text-center text-sm">
-                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-teal-600 hover:text-teal-700 font-medium underline" data-i18n="toggleRegister">Belum punya akun? Daftar</button>
+                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-teal-600 hover:text-teal-700 font-medium underline" data-i18n="toggleRegister">Don't have an account? Register</button>
             </div>
         </div>
     </div>
@@ -52,15 +60,15 @@
             <form id="projectForm" onsubmit="saveProject(event)" class="space-y-3">
                 <input type="hidden" id="editProjectId">
                 <div>
-                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="projectNameLabel">Nama Expense / Project</label>
+                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="projectNameLabel">Expense / Project Name</label>
                     <input type="text" id="projectName" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="noteLabel">Catatan (Opsional)</label>
+                    <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="noteLabel">Notes (Optional)</label>
                     <input type="text" id="projectNote" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition" data-i18n="cancelBtn">Batal</button>
+                    <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition" data-i18n="cancelBtn">Cancel</button>
                     <button type="submit" id="saveProjectBtn" class="px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 transition shadow-sm" data-i18n="saveBtn">Save</button>
                 </div>
             </form>
@@ -70,44 +78,37 @@
     <!-- Modal Add Transaction Item -->
     <div id="transactionModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4">
-            <h3 class="text-lg font-bold text-indigo-950"><i class="fa-solid fa-receipt text-teal-600"></i> <span data-i18n="addTxTitle">Tambah Rincian Transaksi</span></h3>
+            <h3 class="text-lg font-bold text-indigo-950"><i class="fa-solid fa-receipt text-teal-600"></i> <span data-i18n="addTxTitle">Add Transaction Detail</span></h3>
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="dateLabel">Tanggal</label>
+                        <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="dateLabel">Date</label>
                         <input type="date" id="itemDate" required class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="categoryLabel">Kategori</label>
+                        <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="categoryLabel">Category</label>
                         <select id="itemCategory" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white">
-                            <option value="Bensin">Bensin / Fuel</option>
-                            <option value="Makan">Makan / Meal</option>
-                            <option value="Tol">Tol / Toll</option>
-                            <option value="Parkir">Parkir / Parking</option>
-                            <option value="Akomodasi / Hotel">Akomodasi / Hotel</option>
-                            <option value="Transportasi / Tiket">Transportasi / Ticket</option>
-                            <option value="ATK & Operasional">ATK & Operasional</option>
-                            <option value="Lainnya">Lainnya / Others</option>
+                            <!-- Dynamic Options Based on Language -->
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="amountLabel">Jumlah (Rp)</label>
+                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="amountLabel">Amount (Rp)</label>
                     <input type="text" id="itemAmountFormatted" oninput="formatCurrencyInput(this)" required class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                     <input type="hidden" id="itemAmount">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="descriptionLabel">Keterangan</label>
+                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="descriptionLabel">Description</label>
                     <input type="text" id="itemNote" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="receiptImgLabel">Foto Struk / Bon</label>
+                    <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="receiptImgLabel">Receipt Photo</label>
                     <input type="file" id="itemReceiptImg" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="w-full text-xs text-slate-500">
                     <img id="itemImgPreview" class="mt-2 h-24 object-cover rounded-lg hidden border border-slate-200">
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition" data-i18n="cancelBtn">Batal</button>
+                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition" data-i18n="cancelBtn">Cancel</button>
                     <button type="submit" id="saveItemBtn" class="px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 transition shadow-sm" data-i18n="saveBtn">Save</button>
                 </div>
             </form>
@@ -118,42 +119,42 @@
     <div id="receiptModal" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-2xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative border border-slate-100">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-indigo-950 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-teal-600"></i> <span data-i18n="receiptTitle">Struk / Bon Pembayaran</span></h3>
+                <h3 class="font-bold text-indigo-950 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-teal-600"></i> <span data-i18n="receiptTitle">Receipt Attachment</span></h3>
                 <button onclick="closeReceiptModal()" class="text-slate-400 hover:text-red-500 p-1 text-lg font-bold transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="max-h-[75vh] overflow-y-auto flex justify-center bg-slate-50 p-2 rounded-xl border border-slate-200">
                 <img id="modalReceiptImg" src="" alt="Struk Bon" class="max-w-full h-auto rounded-lg shadow-sm">
             </div>
             <div class="text-right">
-                <button onclick="closeReceiptModal()" class="px-4 py-1.5 bg-slate-700 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition" data-i18n="closeBtn">Tutup</button>
+                <button onclick="closeReceiptModal()" class="px-4 py-1.5 bg-slate-700 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition" data-i18n="closeBtn">Close</button>
             </div>
         </div>
     </div>
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- Header Gradasi Deep Purple - Teal (DaysiTech Palette) -->
+        <!-- Header Gradasi Deep Purple - Teal -->
         <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white p-4 shadow-sm sticky top-0 z-10 no-print">
             <div class="max-w-4xl mx-auto flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-receipt text-teal-300"></i> Expense Tracker KMNG</h1>
-                    <span class="text-[10px] bg-white/20 text-teal-100 px-2 py-0.5 rounded-full font-medium">v1.4.1</span>
+                    <span class="text-[10px] bg-white/20 text-teal-100 px-2 py-0.5 rounded-full font-medium">v1.5.0</span>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- Language Switcher Soft -->
+                    <!-- Language Switcher (Default EN) -->
                     <div class="bg-white/10 p-1 rounded-xl text-xs font-bold flex gap-1 border border-white/20">
-                        <button onclick="setLanguage('id')" id="lang-id" class="px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition">ID</button>
-                        <button onclick="setLanguage('en')" id="lang-en" class="px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition">EN</button>
+                        <button onclick="setLanguage('en')" id="lang-en" class="px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition">EN</button>
+                        <button onclick="setLanguage('id')" id="lang-id" class="px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition">ID</button>
                     </div>
-                    <button onclick="logout()" class="text-sm bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-xl transition border border-white/20"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logoutBtn">Keluar</span></button>
+                    <button onclick="logout()" class="text-sm bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-xl transition border border-white/20"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logoutBtn">Logout</span></button>
                 </div>
             </div>
         </header>
 
         <!-- Main Body -->
         <main class="max-w-4xl mx-auto p-4 space-y-6">
-            <!-- Navigation Tabs Soft -->
-            <div class="no-print bg-white p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 md:relative fixed bottom-0 left-0 right-0 z-40">
+            <!-- Navigation Tabs -->
+            <div class="no-print bg-white p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 md:relative fixed bottom-0 left-0 right-0 z-30">
                 <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
                 <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> <span data-i18n="expensesTab">Expenses</span></button>
             </div>
@@ -162,34 +163,34 @@
             <section id="view-dashboard" class="space-y-4">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-500">
-                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashTotalLabel">Total Pengeluaran</p>
+                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashTotalLabel">Total Expenses</p>
                         <h3 id="dashTotal" class="text-lg font-bold text-indigo-950 mt-1">Rp 0</h3>
                     </div>
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-emerald-500">
-                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashMonthLabel">Bulan Ini</p>
+                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashMonthLabel">This Month</p>
                         <h3 id="dashThisMonth" class="text-lg font-bold text-indigo-950 mt-1">Rp 0</h3>
                     </div>
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-purple-500">
-                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashReceiptCount">Total Bon</p>
-                        <h3 id="dashCount" class="text-lg font-bold text-indigo-950 mt-1">0 Transaksi</h3>
+                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashReceiptCount">Total Receipts</p>
+                        <h3 id="dashCount" class="text-lg font-bold text-indigo-950 mt-1">0 Transactions</h3>
                     </div>
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-indigo-600">
-                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashProjCount">Total Project</p>
-                        <h3 id="dashProjects" class="text-lg font-bold text-indigo-950 mt-1">0 Project</h3>
+                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashProjCount">Total Projects</p>
+                        <h3 id="dashProjects" class="text-lg font-bold text-indigo-950 mt-1">0 Projects</h3>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
                         <h3 class="font-bold text-indigo-950 text-sm border-b pb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-tags text-teal-500"></i> <span data-i18n="catBreakdownTitle">Pengeluaran per Kategori</span>
+                            <i class="fa-solid fa-tags text-teal-500"></i> <span data-i18n="catBreakdownTitle">Expenses by Category</span>
                         </h3>
                         <div id="categoryBreakdown" class="space-y-2.5 text-sm"></div>
                     </div>
 
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
                         <h3 class="font-bold text-indigo-950 text-sm border-b pb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-folder-tree text-purple-600"></i> <span data-i18n="projBreakdownTitle">Ringkasan per Project</span>
+                            <i class="fa-solid fa-folder-tree text-purple-600"></i> <span data-i18n="projBreakdownTitle">Summary by Project</span>
                         </h3>
                         <div id="projectBreakdown" class="space-y-2 text-sm max-h-56 overflow-y-auto"></div>
                     </div>
@@ -210,7 +211,7 @@
                 </div>
 
                 <div class="space-y-3">
-                    <h3 class="font-bold text-indigo-950 text-sm border-b border-slate-200 pb-1" data-i18n="expenseListHeader">Daftar Expenses</h3>
+                    <h3 class="font-bold text-indigo-950 text-sm border-b border-slate-200 pb-1" data-i18n="expenseListHeader">Expenses List</h3>
                     <div id="projectListContainer" class="space-y-3"></div>
                 </div>
             </section>
@@ -218,20 +219,20 @@
             <!-- VIEW 3: PROJECT DETAIL & RINCIAN TRANSAKSI -->
             <section id="view-project-detail" class="hidden space-y-4">
                 <button onclick="switchTab('expenses')" class="text-sm text-teal-600 font-semibold flex items-center gap-1 hover:underline">
-                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Kembali ke Daftar Expenses</span>
+                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <!-- Info Banner Proyek (Tombol Export Tanpa Border/BG Hijau) -->
+                <!-- Info Banner Proyek (Tombol Export Cuma Icon Excel) -->
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-600 flex justify-between items-start">
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <h2 id="detailProjectTitle" class="text-xl font-bold text-indigo-950">Project Name</h2>
-                            <!-- TOMBOL EXPORT KECIL TANPA BORDER/BACKGROUND HIJAU -->
-                            <button onclick="exportCurrentDetailProject()" class="text-slate-400 hover:text-teal-600 font-medium text-xs flex items-center gap-1 transition px-1 py-0.5" title="Export Excel">
-                                <i class="fa-solid fa-file-excel text-sm"></i> Export
+                            <!-- HANYA IKON EXCEL CUTE -->
+                            <button onclick="exportCurrentDetailProject()" class="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition text-base" title="Export Excel">
+                                <i class="fa-solid fa-file-excel"></i>
                             </button>
                         </div>
-                        <p id="detailProjectNote" class="text-xs text-slate-400 mt-1">Catatan...</p>
+                        <p id="detailProjectNote" class="text-xs text-slate-400 mt-1">Notes...</p>
                     </div>
                     <span id="detailProjectTotal" class="text-lg font-bold text-teal-600">Rp 0</span>
                 </div>
@@ -244,14 +245,14 @@
                 </div>
 
                 <div class="space-y-2">
-                    <h3 class="font-bold text-indigo-950 text-sm border-b border-slate-200 pb-1" data-i18n="txListHeader">List Rincian Transaksi</h3>
+                    <h3 class="font-bold text-indigo-950 text-sm border-b border-slate-200 pb-1" data-i18n="txListHeader">Transaction Details List</h3>
                     <div id="itemListContainer" class="space-y-2"></div>
                 </div>
             </section>
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.4.1
+            Expense Tracker KMNG &bull; Version 1.5.0
         </footer>
     </div>
 
@@ -279,56 +280,34 @@
         let itemsData = [];
         let isLoginMode = true;
         let currentItemImage = "";
-        let currentLang = "id";
+        let currentLang = "en"; // DEFAULT EN
 
-        // Dictionary I18N Lengkap dengan Tempat Hint/Placeholder Bahasa ID / EN
+        // Categories Map
+        const categoriesList = {
+            en: [
+                { value: "Fuel", label: "Fuel" },
+                { value: "Meal", label: "Meal" },
+                { value: "Toll", label: "Toll" },
+                { value: "Parking", label: "Parking" },
+                { value: "Hotel / Lodging", label: "Hotel / Lodging" },
+                { value: "Transport / Ticket", label: "Transport / Ticket" },
+                { value: "Office Supplies", label: "Office Supplies" },
+                { value: "Others", label: "Others" }
+            ],
+            id: [
+                { value: "Bensin", label: "Bensin" },
+                { value: "Makan", label: "Makan" },
+                { value: "Tol", label: "Tol" },
+                { value: "Parkir", label: "Parkir" },
+                { value: "Akomodasi / Hotel", label: "Akomodasi / Hotel" },
+                { value: "Transportasi / Tiket", label: "Transportasi / Tiket" },
+                { value: "ATK & Operasional", label: "ATK & Operasional" },
+                { value: "Lainnya", label: "Lainnya" }
+            ]
+        };
+
+        // Dictionary I18N
         const i18n = {
-            id: {
-                loginTitle: "Masuk Aplikasi",
-                emailLabel: "Email",
-                emailPlaceholder: "Masukkan email anda",
-                passLabel: "Password",
-                passPlaceholder: "Masukkan password",
-                loginBtn: "Masuk",
-                toggleRegister: "Belum punya akun? Daftar",
-                addExpenseTitle: "Add New Expense (Project)",
-                projectNameLabel: "Nama Expense / Project",
-                projectNamePlaceholder: "Contoh: Project Wifi Jakarta, Dinas Bandung, dll.",
-                noteLabel: "Catatan (Opsional)",
-                notePlaceholder: "Catatan singkat proyek...",
-                cancelBtn: "Batal",
-                saveBtn: "Save",
-                addTxTitle: "Tambah Rincian Transaksi",
-                dateLabel: "Tanggal",
-                categoryLabel: "Kategori",
-                amountLabel: "Jumlah (Rp)",
-                amountPlaceholder: "0",
-                descriptionLabel: "Keterangan",
-                descriptionPlaceholder: "Isi pertamax, parkir mall, dll.",
-                receiptImgLabel: "Foto Struk / Bon",
-                receiptTitle: "Struk / Bon Pembayaran",
-                closeBtn: "Tutup",
-                logoutBtn: "Keluar",
-                homeTab: "Home",
-                expensesTab: "Expenses",
-                dashTotalLabel: "Total Pengeluaran",
-                dashMonthLabel: "Bulan Ini",
-                dashReceiptCount: "Total Bon",
-                dashProjCount: "Total Project",
-                catBreakdownTitle: "Pengeluaran per Kategori",
-                projBreakdownTitle: "Ringkasan per Project",
-                addExpenseBtn: "Add New Expense (Project)",
-                searchPlaceholder: "Cari nama expense / project...",
-                expenseListHeader: "Daftar Expenses",
-                backToExpenses: "Kembali ke Daftar Expenses",
-                addTxBtn: "Add Transaction",
-                txListHeader: "List Rincian Transaksi",
-                noNotes: "Tidak ada catatan",
-                txCount: "Transaksi",
-                viewReceipt: "Lihat Struk Bon",
-                noProjMsg: "Belum ada Expense/Project. Klik tombol di atas untuk membuat.",
-                noTxMsg: "Belum ada rincian transaksi untuk proyek ini. Klik + Add Transaction untuk menambahkan."
-            },
             en: {
                 loginTitle: "App Login",
                 emailLabel: "Email Address",
@@ -374,13 +353,59 @@
                 viewReceipt: "View Receipt",
                 noProjMsg: "No Expenses/Projects found. Click the button above to create one.",
                 noTxMsg: "No transaction details for this project yet. Click + Add Transaction to add."
+            },
+            id: {
+                loginTitle: "Masuk Aplikasi",
+                emailLabel: "Email",
+                emailPlaceholder: "Masukkan email anda",
+                passLabel: "Password",
+                passPlaceholder: "Masukkan password",
+                loginBtn: "Masuk",
+                toggleRegister: "Belum punya akun? Daftar",
+                addExpenseTitle: "Add New Expense (Project)",
+                projectNameLabel: "Nama Expense / Project",
+                projectNamePlaceholder: "Contoh: Project Wifi Jakarta, Dinas Bandung, dll.",
+                noteLabel: "Catatan (Opsional)",
+                notePlaceholder: "Catatan singkat proyek...",
+                cancelBtn: "Batal",
+                saveBtn: "Save",
+                addTxTitle: "Tambah Rincian Transaksi",
+                dateLabel: "Tanggal",
+                categoryLabel: "Kategori",
+                amountLabel: "Jumlah (Rp)",
+                amountPlaceholder: "0",
+                descriptionLabel: "Keterangan",
+                descriptionPlaceholder: "Isi pertamax, parkir mall, dll.",
+                receiptImgLabel: "Foto Struk / Bon",
+                receiptTitle: "Struk / Bon Pembayaran",
+                closeBtn: "Tutup",
+                logoutBtn: "Keluar",
+                homeTab: "Home",
+                expensesTab: "Expenses",
+                dashTotalLabel: "Total Pengeluaran",
+                dashMonthLabel: "Bulan Ini",
+                dashReceiptCount: "Total Bon",
+                dashProjCount: "Total Project",
+                catBreakdownTitle: "Pengeluaran per Kategori",
+                projBreakdownTitle: "Ringkasan per Project",
+                addExpenseBtn: "Add New Expense (Project)",
+                searchPlaceholder: "Cari nama expense / project...",
+                expenseListHeader: "Daftar Expenses",
+                backToExpenses: "Kembali ke Daftar Expenses",
+                addTxBtn: "Add Transaction",
+                txListHeader: "List Rincian Transaksi",
+                noNotes: "Tidak ada catatan",
+                txCount: "Transaksi",
+                viewReceipt: "Lihat Struk Bon",
+                noProjMsg: "Belum ada Expense/Project. Klik tombol di atas untuk membuat.",
+                noTxMsg: "Belum ada rincian transaksi untuk proyek ini. Klik + Add Transaction untuk menambahkan."
             }
         };
 
         window.setLanguage = (lang) => {
             currentLang = lang;
-            document.getElementById('lang-id').className = lang === 'id' ? 'px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
             document.getElementById('lang-en').className = lang === 'en' ? 'px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
+            document.getElementById('lang-id').className = lang === 'id' ? 'px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
 
             // Update UI Teks Statis
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -390,7 +415,17 @@
                 }
             });
 
-            // Update Placeholders / Hints Dalam Kolom
+            // Update Category Dropdown Options
+            const catSelect = document.getElementById('itemCategory');
+            catSelect.innerHTML = '';
+            categoriesList[lang].forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.value;
+                opt.innerText = c.label;
+                catSelect.appendChild(opt);
+            });
+
+            // Update Placeholders / Hints
             document.getElementById('authEmail').placeholder = i18n[lang].emailPlaceholder;
             document.getElementById('authPassword').placeholder = i18n[lang].passPlaceholder;
             document.getElementById('projectName').placeholder = i18n[lang].projectNamePlaceholder;
@@ -450,8 +485,10 @@
 
         window.logout = () => signOut(auth);
 
+        // Fix Flashing Login Form
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
+            document.getElementById('loadingApp').classList.add('hidden');
             if (user) {
                 document.getElementById('authContainer').classList.add('hidden');
                 document.getElementById('appContent').classList.remove('hidden');
@@ -553,7 +590,6 @@
             }
         };
 
-        // Render List Expenses (Tombol Edit Dibuat Lebih Kecil & Halus)
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -578,7 +614,6 @@
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
-                            <!-- NAMA PROJECT + TOMBOL EDIT KECIL DI SEBELAHNYA -->
                             <div class="flex items-center gap-1.5">
                                 <h4 class="font-bold text-indigo-950 text-base">${p.name}</h4>
                                 <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="p-1 text-slate-300 hover:text-teal-600 rounded text-[10px] transition" title="Edit"><i class="fa-solid fa-pen"></i></button>
@@ -722,7 +757,8 @@
             }
         };
 
-        window.exportSingleProject = (projectId) => {
+        // EXPORT EXCEL DENGAN GAMBAR STRUK (ExcelJS) & HEADER BAHASA TERPISAH
+        window.exportSingleProject = async (projectId) => {
             const proj = projectsData.find(p => p.id === projectId);
             const pItems = itemsData.filter(i => i.projectId === projectId);
 
@@ -731,19 +767,64 @@
                 return;
             }
 
-            const exportData = pItems.map((item, index) => ({
-                "No": index + 1,
-                "Proyek / Project": proj ? proj.name : "",
-                "Tanggal / Date": item.date,
-                "Kategori / Category": item.category,
-                "Nominal / Amount (Rp)": item.amount,
-                "Keterangan / Description": item.note
-            }));
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Expenses');
 
-            const ws = XLSX.utils.json_to_sheet(exportData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reimburse");
-            XLSX.writeFile(wb, `Reimburse_${proj ? proj.name : 'Project'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            // Header Sesuai Bahasa Aktif
+            const headers = currentLang === 'id' 
+                ? ["No", "Proyek", "Tanggal", "Kategori", "Nominal (Rp)", "Keterangan", "Foto Struk / Bon"]
+                : ["No", "Project", "Date", "Category", "Amount (Rp)", "Description", "Receipt Image"];
+
+            worksheet.addRow(headers);
+            const headerRow = worksheet.getRow(1);
+            headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '0D9488' } };
+
+            worksheet.columns = [
+                { width: 6 },
+                { width: 22 },
+                { width: 14 },
+                { width: 20 },
+                { width: 18 },
+                { width: 25 },
+                { width: 22 }
+            ];
+
+            pItems.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+            for (let index = 0; index < pItems.length; index++) {
+                const item = pItems[index];
+                const rowIndex = index + 2;
+                
+                const row = worksheet.addRow([
+                    index + 1,
+                    proj ? proj.name : "",
+                    item.date,
+                    item.category,
+                    item.amount,
+                    item.note || ""
+                ]);
+                row.height = item.receipt ? 75 : 22;
+
+                if (item.receipt && item.receipt.startsWith("data:image")) {
+                    try {
+                        const imageId = workbook.addImage({
+                            base64: item.receipt,
+                            extension: 'jpeg',
+                        });
+                        worksheet.addImage(imageId, {
+                            tl: { col: 6, row: rowIndex - 1 },
+                            ext: { width: 90, height: 90 }
+                        });
+                    } catch (e) {
+                        console.error("Failed to add image to Excel", e);
+                    }
+                }
+            }
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, `Expense_Report_${proj ? proj.name : 'Project'}_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
         function renderDashboard() {
@@ -755,7 +836,7 @@
             document.getElementById('dashTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
             document.getElementById('dashThisMonth').innerText = `Rp ${thisMonthTotal.toLocaleString('id-ID')}`;
             document.getElementById('dashCount').innerText = `${itemsData.length} ${i18n[currentLang].txCount}`;
-            document.getElementById('dashProjects').innerText = `${projectsData.length} Project`;
+            document.getElementById('dashProjects').innerText = `${projectsData.length} Projects`;
 
             const catMap = {};
             itemsData.forEach(item => { catMap[item.category] = (catMap[item.category] || 0) + item.amount; });
