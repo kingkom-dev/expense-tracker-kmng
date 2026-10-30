@@ -68,7 +68,7 @@
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.6.3</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.6.5</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -116,7 +116,6 @@
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
                 
-                <!-- FIX KOTAK TANGGAL DAN KATEGORI DI HP (SEJAJAR SIMETRIS 100%) -->
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
                         <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="dateLabel">Date</label>
@@ -186,18 +185,20 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER PROPORSI DAN LOGOUT DIBUAT PAS KECIL DAN RAPI DI MOBILE -->
-        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-3 py-2.5 shadow-sm sticky top-0 z-10 no-print">
+        <!-- HEADER DENGAN JUDUL DIBESARKAN & VERSION DIBAWAH JUDUL -->
+        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-3.5 py-3 shadow-sm sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
-                <!-- LOGO + JUDUL + BADGE VERSI DALAM SATU BARIS -->
-                <div class="flex items-center gap-1.5 min-w-0">
-                    <i class="fa-solid fa-receipt text-teal-300 text-sm sm:text-lg shrink-0"></i>
-                    <h1 class="text-xs sm:text-base font-bold truncate tracking-tight">Expense Tracker KMNG</h1>
-                    <span class="text-[8px] sm:text-[9px] bg-white/20 text-teal-100 px-1.5 py-0.5 rounded-full font-medium shrink-0">v1.6.3</span>
+                <!-- LOGO DAN JUDUL + VERSION DIBAWAHNYA -->
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <i class="fa-solid fa-receipt text-teal-300 text-xl sm:text-2xl shrink-0"></i>
+                    <div class="flex flex-col leading-tight">
+                        <h1 class="text-sm sm:text-lg font-bold truncate tracking-wide">Expense Tracker KMNG</h1>
+                        <span class="text-[9px] text-teal-200/90 font-medium tracking-wider">v1.6.5</span>
+                    </div>
                 </div>
 
-                <!-- TOMBOL BAHASA DAN LOGOUT KECIL PROPORSI -->
+                <!-- TOMBOL BAHASA DAN LOGOUT -->
                 <div class="flex items-center gap-1.5 shrink-0">
                     <div class="bg-white/10 p-0.5 rounded-lg text-[10px] font-bold flex gap-0.5 border border-white/20">
                         <button onclick="setLanguage('en')" id="lang-en" class="px-1.5 py-0.5 rounded-md bg-white text-indigo-950 shadow-sm transition">EN</button>
@@ -311,7 +312,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.6.3
+            Expense Tracker KMNG &bull; Version 1.6.5
         </footer>
     </div>
 
@@ -646,12 +647,20 @@
             }
         };
 
+        /* SORT EXPENSES LIST TERBARU DI ATAS */
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
             container.innerHTML = '';
 
-            const filtered = projectsData.filter(p => p.name.toLowerCase().includes(search));
+            // URUTKAN PROYEK BERDASARKAN WAKTU BUAT (CREATEDAT) TERBARU KE TERLAMA
+            const sortedProjects = [...projectsData].sort((a, b) => {
+                const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return timeB - timeA;
+            });
+
+            const filtered = sortedProjects.filter(p => p.name.toLowerCase().includes(search));
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="bg-white p-6 text-center text-slate-400 rounded-2xl shadow-sm border border-slate-100">${i18n[currentLang].noProjMsg}</div>`;
@@ -773,6 +782,7 @@
             }
         };
 
+        /* SORT DETAIL TRANSACTIONS TERBARU DI ATAS */
         function renderProjectItems(projectId) {
             const pItems = itemsData.filter(i => i.projectId === projectId);
             const total = pItems.reduce((acc, curr) => acc + curr.amount, 0);
@@ -786,7 +796,14 @@
                 return;
             }
 
-            pItems.sort((a,b) => new Date(b.date) - new Date(a.date));
+            // URUTKAN RINCIAN TRANSAKSI BERDASARKAN TANGGAL & CREATEDAT (TERBARU PALING ATAS)
+            pItems.sort((a, b) => {
+                const dateDiff = new Date(b.date) - new Date(a.date);
+                if (dateDiff !== 0) return dateDiff;
+                const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return timeB - timeA;
+            });
 
             pItems.forEach(item => {
                 const card = document.createElement('div');
