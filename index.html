@@ -26,7 +26,7 @@
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-blue-600">Masuk Aplikasi</h2>
-                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.3.0</span></p>
+                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.3.1</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -61,7 +61,7 @@
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-100">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">Save</button>
+                    <button type="submit" id="saveProjectBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition">Save</button>
                 </div>
             </form>
         </div>
@@ -74,7 +74,7 @@
             <div class="max-w-4xl mx-auto flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-receipt"></i> Expense Tracker KMNG</h1>
-                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.3.0</span>
+                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.3.1</span>
                 </div>
                 <button onclick="logout()" class="text-sm bg-blue-700 px-3 py-1.5 rounded hover:bg-blue-800 transition"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
             </div>
@@ -126,9 +126,8 @@
                 </div>
             </section>
 
-            <!-- VIEW 2: EXPENSES PAGE (ATAS: TOMBOL ADD, TENGAH: SEARCH, BAWAH: LIST) -->
+            <!-- VIEW 2: EXPENSES PAGE -->
             <section id="view-expenses" class="hidden space-y-4">
-                
                 <!-- 1. ATAS: TOMBOL ADD NEW EXPENSE -->
                 <div>
                     <button onclick="openProjectModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2">
@@ -142,12 +141,10 @@
                     <input type="text" id="searchExpenseInput" oninput="renderProjectList()" placeholder="Cari nama expense / project..." class="w-full p-2 text-sm outline-none">
                 </div>
 
-                <!-- 3. BAWAH: LIST EXPENSES YANG BISA DI-EDIT, EXPORT, DAN DELETE -->
+                <!-- 3. BAWAH: LIST EXPENSES -->
                 <div class="space-y-3">
                     <h3 class="font-bold text-gray-700 text-sm border-b pb-1">Daftar Expenses</h3>
-                    <div id="projectListContainer" class="space-y-3">
-                        <!-- Dynamic Project List -->
-                    </div>
+                    <div id="projectListContainer" class="space-y-3"></div>
                 </div>
             </section>
 
@@ -216,7 +213,7 @@
         </main>
 
         <footer class="text-center text-xs text-gray-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.3.0
+            Expense Tracker KMNG &bull; Version 1.3.1
         </footer>
     </div>
 
@@ -226,7 +223,7 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-       const firebaseConfig = {
+      const firebaseConfig = {
 		apiKey: "AIzaSyCl1prA-wQZQzSkMNU9_JsSUKmf_CuXp5c",
 		authDomain: "expense-tracker-komang.firebaseapp.com",
 		projectId: "expense-tracker-komang",
@@ -247,7 +244,7 @@
 
         document.getElementById('itemDate').valueAsDate = new Date();
 
-        // Auth
+        // Bind Global Functions to Window
         window.toggleAuthMode = () => {
             isLoginMode = !isLoginMode;
             document.getElementById('authTitle').innerText = isLoginMode ? 'Masuk Aplikasi' : 'Daftar Akun';
@@ -282,7 +279,6 @@
             }
         });
 
-        // Tabs Navigation
         window.switchTab = (tabName) => {
             ['dashboard', 'expenses', 'project-detail'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
@@ -294,18 +290,15 @@
             }
         };
 
-        // Realtime Firebase Listener
         function listenToData() {
-            // Listen Projects
             const qProj = query(collection(db, "projects"), where("userId", "==", currentUser.uid));
             onSnapshot(qProj, (snapshot) => {
                 projectsData = [];
                 snapshot.forEach(doc => projectsData.push({ id: doc.id, ...doc.data() }));
                 renderProjectList();
                 renderDashboard();
-            });
+            }, (err) => console.error("Project Listen Error:", err));
 
-            // Listen Transaction Items
             const qItems = query(collection(db, "expenses"), where("userId", "==", currentUser.uid));
             onSnapshot(qItems, (snapshot) => {
                 itemsData = [];
@@ -314,10 +307,9 @@
                 renderDashboard();
                 const curProjId = document.getElementById('currentProjectId').value;
                 if (curProjId) renderProjectItems(curProjId);
-            });
+            }, (err) => console.error("Expense Listen Error:", err));
         }
 
-        // Project Modal & Operations
         window.openProjectModal = (id = null) => {
             document.getElementById('projectModal').classList.remove('hidden');
             if (id) {
@@ -339,27 +331,37 @@
 
         window.saveProject = async (e) => {
             e.preventDefault();
-            const editId = document.getElementById('editProjectId').value;
-            const name = document.getElementById('projectName').value;
-            const note = document.getElementById('projectNote').value;
+            const saveBtn = document.getElementById('saveProjectBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerText = "Saving...";
 
-            if (editId) {
-                await updateDoc(doc(db, "projects", editId), { name, note });
-            } else {
-                await addDoc(collection(db, "projects"), {
-                    userId: currentUser.uid,
-                    name,
-                    note,
-                    createdAt: new Date().toISOString()
-                });
+            try {
+                const editId = document.getElementById('editProjectId').value;
+                const name = document.getElementById('projectName').value;
+                const note = document.getElementById('projectNote').value;
+
+                if (editId) {
+                    await updateDoc(doc(db, "projects", editId), { name, note });
+                } else {
+                    await addDoc(collection(db, "projects"), {
+                        userId: currentUser.uid,
+                        name: name,
+                        note: note,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                closeProjectModal();
+            } catch (err) {
+                alert("Gagal menyimpan project: " + err.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = "Save";
             }
-            closeProjectModal();
         };
 
         window.deleteProject = async (id) => {
             if (confirm("Hapus Expense/Project ini beserta seluruh rincian identifikasinya?")) {
                 await deleteDoc(doc(db, "projects", id));
-                // Delete related items
                 const related = itemsData.filter(i => i.projectId === id);
                 for (let item of related) {
                     await deleteDoc(doc(db, "expenses", item.id));
@@ -367,7 +369,6 @@
             }
         };
 
-        // Render List Expenses / Projects
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -410,7 +411,6 @@
             });
         };
 
-        // Project Detail & Item Operations
         window.openProjectDetail = (projectId) => {
             const proj = projectsData.find(p => p.id === projectId);
             if (!proj) return;
@@ -507,7 +507,6 @@
             }
         };
 
-        // Export Single Project to Excel
         window.exportSingleProject = (projectId) => {
             const proj = projectsData.find(p => p.id === projectId);
             const pItems = itemsData.filter(i => i.projectId === projectId);
@@ -532,7 +531,6 @@
             XLSX.writeFile(wb, `Reimburse_${proj.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
-        // Dashboard Analytics
         function renderDashboard() {
             const total = itemsData.reduce((acc, curr) => acc + curr.amount, 0);
             const now = new Date();
@@ -544,7 +542,6 @@
             document.getElementById('dashCount').innerText = `${itemsData.length} Transaksi`;
             document.getElementById('dashProjects').innerText = `${projectsData.length} Project`;
 
-            // Breakdown Category
             const catMap = {};
             itemsData.forEach(item => { catMap[item.category] = (catMap[item.category] || 0) + item.amount; });
             const catContainer = document.getElementById('categoryBreakdown');
@@ -564,7 +561,6 @@
                 `;
             });
 
-            // Breakdown Project
             const projContainer = document.getElementById('projectBreakdown');
             projContainer.innerHTML = '';
             projectsData.forEach(p => {
