@@ -28,7 +28,7 @@
             height: 40px !important;
             min-height: 40px !important;
             max-height: 40px !important;
-            border-radius: 0.75rem !important; /* rounded-xl */
+            border-radius: 0.75rem !important;
             background-color: #ffffff !important;
             font-size: 13px !important;
             display: block !important;
@@ -36,7 +36,6 @@
             box-sizing: border-box !important;
         }
 
-        /* Custom Arrow Icon untuk Select Kategori */
         .select-custom-wrapper {
             position: relative;
             width: 100%;
@@ -68,21 +67,69 @@
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.6.7</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.7.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="emailLabel">Email Address</label>
                     <input type="email" id="authEmail" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition">
                 </div>
-                <div class="mb-6">
+                <div class="mb-2">
                     <label class="block text-sm font-medium mb-1 text-slate-700" data-i18n="passLabel">Password</label>
                     <input type="password" id="authPassword" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition">
+                </div>
+                <div class="text-right mb-5">
+                    <button type="button" onclick="handleForgotPassword()" class="text-xs text-teal-600 hover:underline font-medium" data-i18n="forgotPassBtn">Forgot Password?</button>
                 </div>
                 <button type="submit" id="authBtn" class="w-full bg-gradient-to-r from-indigo-900 to-teal-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition shadow-sm" data-i18n="loginBtn">Login</button>
             </form>
             <div class="mt-4 text-center text-sm">
                 <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-teal-600 hover:text-teal-700 font-medium underline" data-i18n="toggleRegister">Don't have an account? Register</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Profile & Settings (Opsi B) -->
+    <div id="profileSettingsModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl p-5 w-full max-w-md space-y-5">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-bold text-indigo-950 flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-teal-600"></i> <span data-i18n="profileSettingsTitle">Profile & Settings</span>
+                </h3>
+                <button onclick="closeProfileSettingsModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <!-- Profile Info Section -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
+                <div class="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm" id="userAvatarText">
+                    U
+                </div>
+                <div class="min-w-0 flex-1">
+                    <h4 class="font-bold text-indigo-950 text-sm truncate" id="profileEmailText">user@example.com</h4>
+                    <p class="text-xs text-slate-400" data-i18n="accountActive">Active Account</p>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="space-y-3">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="settingsHeader">Preferences</label>
+                
+                <div class="flex justify-between items-center p-3 bg-white border border-slate-200 rounded-xl">
+                    <span class="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-globe text-teal-600"></i> <span data-i18n="languageLabel">Language</span>
+                    </span>
+                    <div class="bg-slate-100 p-1 rounded-lg text-xs font-bold flex gap-1 border border-slate-200">
+                        <button onclick="setLanguage('en')" id="modal-lang-en" class="px-2 py-1 rounded-md bg-white text-indigo-950 shadow-sm transition">EN</button>
+                        <button onclick="setLanguage('id')" id="modal-lang-id" class="px-2 py-1 rounded-md text-slate-600 hover:bg-white transition">ID</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 border-t space-y-2">
+                <button onclick="logout()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition border border-rose-100">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logoutBtn">Logout Account</span>
+                </button>
             </div>
         </div>
     </div>
@@ -125,7 +172,6 @@
                         <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="categoryLabel">Category</label>
                         <div class="select-custom-wrapper">
                             <select id="itemCategory" class="mobile-input-fix px-3 border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-slate-700 shadow-sm pr-7">
-                                <!-- Dynamic Options Based on Language -->
                             </select>
                         </div>
                     </div>
@@ -143,7 +189,6 @@
                 
                 <div>
                     <label class="block text-xs font-medium mb-1.5 text-slate-700" data-i18n="receiptImgLabel">Receipt Photo</label>
-                    
                     <input type="file" id="itemReceiptImgCamera" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="hidden">
                     <input type="file" id="itemReceiptImgFile" accept="image/*" onchange="previewItemImage(event)" class="hidden">
 
@@ -185,35 +230,30 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER LEBIH LEBAR KE BAWAH DENGAN JUDUL 2 BARIS (EXPENSE TRACKER \n KMNG) -->
+        <!-- HEADER DENGAN OPSI B (AVATAR PROFILE & SETTINGS) -->
         <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-4 sm:py-5 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
-                <!-- LOGO DAN JUDUL BERSIFAT 2 BARIS -->
+                <!-- LOGO DAN JUDUL 2 BARIS -->
                 <div class="flex items-center gap-3 min-w-0">
                     <i class="fa-solid fa-receipt text-teal-300 text-2xl sm:text-3xl shrink-0"></i>
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight">Expense Tracker</h1>
                         <span class="text-base sm:text-xl font-bold tracking-tight text-teal-200">KMNG</span>
-                        <span class="text-[9px] text-teal-200/80 font-medium tracking-wider mt-0.5">v1.6.7</span>
+                        <span class="text-[9px] text-teal-200/80 font-medium tracking-wider mt-0.5">v1.7.0</span>
                     </div>
                 </div>
 
-                <!-- TOMBOL BAHASA DAN LOGOUT -->
-                <div class="flex items-center gap-2 shrink-0">
-                    <div class="bg-white/10 p-1 rounded-xl text-xs font-bold flex gap-0.5 border border-white/20">
-                        <button onclick="setLanguage('en')" id="lang-en" class="px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition">EN</button>
-                        <button onclick="setLanguage('id')" id="lang-id" class="px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition">ID</button>
-                    </div>
-                    <button onclick="logout()" class="text-xs bg-white/15 hover:bg-white/25 px-2.5 py-1.5 rounded-xl transition border border-white/20 flex items-center gap-1 font-medium">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span class="hidden sm:inline" data-i18n="logoutBtn">Logout</span>
+                <!-- AVATAR PROFILE BUTTON (OPSI B) -->
+                <div class="flex items-center shrink-0">
+                    <button onclick="openProfileSettingsModal()" class="w-10 h-10 rounded-full bg-teal-500/30 hover:bg-teal-500/50 border-2 border-teal-300/80 flex items-center justify-center font-bold text-sm text-white shadow-sm transition" id="headerAvatarBtn">
+                        <i class="fa-solid fa-user text-xs"></i>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Main Body Desktop & Mobile Optimized -->
+        <!-- Main Body -->
         <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
             <!-- Navigation Tabs -->
             <div class="no-print bg-white p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 md:relative fixed bottom-0 left-0 right-0 z-30">
@@ -284,7 +324,6 @@
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <!-- Info Banner Proyek -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-teal-600 flex justify-between items-start">
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
@@ -298,7 +337,6 @@
                     <span id="detailProjectTotal" class="text-xl font-bold text-teal-600">Rp 0</span>
                 </div>
 
-                <!-- TOMBOL ADD TRANSACTION FULL WIDTH -->
                 <div>
                     <button onclick="openTransactionModal()" class="w-full bg-teal-600 text-white py-3.5 rounded-2xl font-bold shadow-sm hover:bg-teal-700 transition flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-circle-plus text-base"></i> + <span data-i18n="addTxBtn">Add Transaction</span>
@@ -313,14 +351,14 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.6.7
+            Expense Tracker KMNG &bull; Version 1.7.0
         </footer>
     </div>
 
     <!-- Firebase Modular SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 		const firebaseConfig = {
@@ -375,6 +413,11 @@
                 passPlaceholder: "Enter your password",
                 loginBtn: "Login",
                 toggleRegister: "Don't have an account? Register",
+                forgotPassBtn: "Forgot Password?",
+                profileSettingsTitle: "Profile & Settings",
+                accountActive: "Active Account",
+                settingsHeader: "Preferences",
+                languageLabel: "Language",
                 addExpenseTitle: "Add New Expense (Project)",
                 projectNameLabel: "Expense / Project Name",
                 projectNamePlaceholder: "e.g. Wifi Deployment, Out of Town Trip, etc.",
@@ -394,7 +437,7 @@
                 uploadFileBtn: "Upload File",
                 receiptTitle: "Receipt Attachment",
                 closeBtn: "Close",
-                logoutBtn: "Logout",
+                logoutBtn: "Logout Account",
                 homeTab: "Home",
                 expensesTab: "Expenses",
                 dashTotalLabel: "Total Expenses",
@@ -423,6 +466,11 @@
                 passPlaceholder: "Masukkan password",
                 loginBtn: "Masuk",
                 toggleRegister: "Belum punya akun? Daftar",
+                forgotPassBtn: "Lupa Password?",
+                profileSettingsTitle: "Profil & Pengaturan",
+                accountActive: "Akun Aktif",
+                settingsHeader: "Pengaturan",
+                languageLabel: "Bahasa",
                 addExpenseTitle: "Add New Expense (Project)",
                 projectNameLabel: "Nama Expense / Project",
                 projectNamePlaceholder: "Contoh: Project Wifi Jakarta, Dinas Bandung, dll.",
@@ -442,7 +490,7 @@
                 uploadFileBtn: "Unggah File",
                 receiptTitle: "Struk / Bon Pembayaran",
                 closeBtn: "Tutup",
-                logoutBtn: "Keluar",
+                logoutBtn: "Keluar Akun",
                 homeTab: "Home",
                 expensesTab: "Expenses",
                 dashTotalLabel: "Total Pengeluaran",
@@ -467,8 +515,8 @@
 
         window.setLanguage = (lang) => {
             currentLang = lang;
-            document.getElementById('lang-en').className = lang === 'en' ? 'px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
-            document.getElementById('lang-id').className = lang === 'id' ? 'px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition';
+            document.getElementById('modal-lang-en').className = lang === 'en' ? 'px-2 py-1 rounded-md bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-1 rounded-md text-slate-600 hover:bg-white transition';
+            document.getElementById('modal-lang-id').className = lang === 'id' ? 'px-2 py-1 rounded-md bg-white text-indigo-950 shadow-sm transition' : 'px-2 py-1 rounded-md text-slate-600 hover:bg-white transition';
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -497,6 +545,35 @@
             renderProjectList();
             const curProjId = document.getElementById('currentProjectId').value;
             if (curProjId) renderProjectItems(curProjId);
+        };
+
+        window.openProfileSettingsModal = () => {
+            document.getElementById('profileSettingsModal').classList.remove('hidden');
+            if (currentUser && currentUser.email) {
+                document.getElementById('profileEmailText').innerText = currentUser.email;
+                document.getElementById('userAvatarText').innerText = currentUser.email.charAt(0).toUpperCase();
+            }
+        };
+
+        window.closeProfileSettingsModal = () => {
+            document.getElementById('profileSettingsModal').classList.add('hidden');
+        };
+
+        window.handleForgotPassword = async () => {
+            const email = document.getElementById('authEmail').value;
+            if (!email) {
+                alert(currentLang === 'id' ? "Silakan masukkan email Anda pada kolom Email terlebih dahulu!" : "Please enter your email address in the Email field first!");
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert(currentLang === 'id' 
+                    ? `Email instruksi reset password telah dikirim ke: ${email}. Silakan periksa kotak masuk/spam email Anda.` 
+                    : `Password reset instructions have been sent to: ${email}. Please check your inbox/spam folder.`);
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
         };
 
         document.getElementById('itemDate').valueAsDate = new Date();
@@ -542,7 +619,10 @@
             } catch (err) { alert("Error Auth: " + err.message); }
         };
 
-        window.logout = () => signOut(auth);
+        window.logout = () => {
+            closeProfileSettingsModal();
+            signOut(auth);
+        };
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
@@ -550,6 +630,7 @@
             if (user) {
                 document.getElementById('authContainer').classList.add('hidden');
                 document.getElementById('appContent').classList.remove('hidden');
+                document.getElementById('headerAvatarBtn').innerText = user.email ? user.email.charAt(0).toUpperCase() : "U";
                 setLanguage(currentLang);
                 listenToData();
             } else {
@@ -648,7 +729,6 @@
             }
         };
 
-        /* SORT EXPENSES LIST TERBARU DI ATAS */
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -782,7 +862,6 @@
             }
         };
 
-        /* SORT DETAIL TRANSACTIONS TERBARU DI ATAS */
         function renderProjectItems(projectId) {
             const pItems = itemsData.filter(i => i.projectId === projectId);
             const total = pItems.reduce((acc, curr) => acc + curr.amount, 0);
