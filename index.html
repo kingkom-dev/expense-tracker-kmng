@@ -26,7 +26,7 @@
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-blue-600">Masuk Aplikasi</h2>
-                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.2.1</span></p>
+                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.3.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -45,14 +45,36 @@
         </div>
     </div>
 
-    <!-- Main Content (Hidden until Auth) -->
+    <!-- Modal Create / Edit Expense Project -->
+    <div id="projectModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-5 w-full max-w-md space-y-4">
+            <h3 id="projectModalTitle" class="text-lg font-bold text-gray-800">Add New Expense (Project)</h3>
+            <form id="projectForm" onsubmit="saveProject(event)" class="space-y-3">
+                <input type="hidden" id="editProjectId">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nama Expense / Project</label>
+                    <input type="text" id="projectName" placeholder="Contoh: Project Wifi Jakarta, Dinas Bandung, dll." required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Keterangan / Catatan (Opsional)</label>
+                    <input type="text" id="projectNote" placeholder="Catatan singkat..." class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-100">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <div id="appContent" class="hidden">
         <!-- Header -->
         <header class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-4xl mx-auto flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-receipt"></i> Expense Tracker KMNG</h1>
-                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.2.1</span>
+                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.3.0</span>
                 </div>
                 <button onclick="logout()" class="text-sm bg-blue-700 px-3 py-1.5 rounded hover:bg-blue-800 transition"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
             </div>
@@ -60,15 +82,14 @@
 
         <!-- Main Body -->
         <main class="max-w-4xl mx-auto p-4 space-y-6">
-            <!-- Main Navigation Tabs -->
+            <!-- Navigation Tabs -->
             <div class="no-print bg-white p-2 rounded-xl shadow flex justify-around border md:relative fixed bottom-0 left-0 right-0 z-40">
                 <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-blue-600 font-semibold" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> Home</button>
                 <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-gray-500 font-semibold" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> Expenses</button>
             </div>
 
-            <!-- VIEW 1: HOME / DASHBOARD SUMMARY -->
+            <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
             <section id="view-dashboard" class="space-y-4">
-                <!-- Top Summary Cards -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div class="bg-white p-3.5 rounded-xl shadow border-l-4 border-blue-500">
                         <p class="text-xs text-gray-500 font-medium">Total Pengeluaran</p>
@@ -83,76 +104,82 @@
                         <h3 id="dashCount" class="text-lg font-bold text-gray-800 mt-1">0 Transaksi</h3>
                     </div>
                     <div class="bg-white p-3.5 rounded-xl shadow border-l-4 border-purple-500">
-                        <p class="text-xs text-gray-500 font-medium">Rata-rata / Bon</p>
-                        <h3 id="dashAvg" class="text-lg font-bold text-gray-800 mt-1">Rp 0</h3>
+                        <p class="text-xs text-gray-500 font-medium">Total Project</p>
+                        <h3 id="dashProjects" class="text-lg font-bold text-gray-800 mt-1">0 Project</h3>
                     </div>
                 </div>
 
-                <!-- Breakdown per Kategori & Proyek -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Breakdown Kategori -->
                     <div class="bg-white p-4 rounded-xl shadow space-y-3">
                         <h3 class="font-bold text-gray-700 text-sm border-b pb-2 flex items-center gap-2">
                             <i class="fa-solid fa-tags text-blue-500"></i> Pengeluaran per Kategori
                         </h3>
-                        <div id="categoryBreakdown" class="space-y-2.5 text-sm">
-                            <!-- Dynamic Content -->
-                        </div>
+                        <div id="categoryBreakdown" class="space-y-2.5 text-sm"></div>
                     </div>
 
-                    <!-- Breakdown Proyek -->
                     <div class="bg-white p-4 rounded-xl shadow space-y-3">
                         <h3 class="font-bold text-gray-700 text-sm border-b pb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-folder-tree text-green-500"></i> Ringkasan per Proyek
+                            <i class="fa-solid fa-folder-tree text-green-500"></i> Ringkasan per Project
                         </h3>
-                        <div id="projectBreakdown" class="space-y-2 text-sm max-h-56 overflow-y-auto">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Expenses Widget -->
-                <div class="bg-white p-4 rounded-xl shadow space-y-3">
-                    <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-gray-700 text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-clock-rotate-left text-purple-500"></i> 5 Transaksi Terakhir
-                        </h3>
-                        <button onclick="switchTab('expenses'); switchSubTab('list');" class="text-xs text-blue-600 font-semibold hover:underline">Lihat Semua &rarr;</button>
-                    </div>
-                    <div id="recentExpensesList" class="space-y-2">
-                        <!-- Dynamic Content -->
+                        <div id="projectBreakdown" class="space-y-2 text-sm max-h-56 overflow-y-auto"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- VIEW 2: EXPENSES (CONTAINING FORM & LIST) -->
+            <!-- VIEW 2: EXPENSES PAGE (ATAS: TOMBOL ADD, TENGAH: SEARCH, BAWAH: LIST) -->
             <section id="view-expenses" class="hidden space-y-4">
-                <!-- Sub Navigation inside Expenses -->
-                <div class="bg-gray-200 p-1 rounded-xl flex gap-1 no-print">
-                    <button onclick="switchSubTab('form')" id="subtab-form" class="flex-1 py-2 rounded-lg font-semibold text-sm transition bg-white text-blue-600 shadow">
-                        <i class="fa-solid fa-plus-circle"></i> + New Expense
-                    </button>
-                    <button onclick="switchSubTab('list')" id="subtab-list" class="flex-1 py-2 rounded-lg font-semibold text-sm transition text-gray-600 hover:text-gray-800">
-                        <i class="fa-solid fa-list-ul"></i> List Expenses
+                
+                <!-- 1. ATAS: TOMBOL ADD NEW EXPENSE -->
+                <div>
+                    <button onclick="openProjectModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-lg"></i> + Add New Expense (Project)
                     </button>
                 </div>
 
-                <!-- SUB-VIEW A: NEW EXPENSE FORM -->
-                <div id="subview-form" class="bg-white p-4 rounded-xl shadow space-y-4">
-                    <h2 class="text-md font-bold text-gray-700 border-b pb-2">Tambah Expense Baru</h2>
-                    <form id="expenseForm" onsubmit="saveExpense(event)" class="space-y-4">
+                <!-- 2. TENGAH: FITUR SEARCH EXPENSES -->
+                <div class="bg-white p-3 rounded-xl shadow flex items-center gap-2 border">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400 pl-2"></i>
+                    <input type="text" id="searchExpenseInput" oninput="renderProjectList()" placeholder="Cari nama expense / project..." class="w-full p-2 text-sm outline-none">
+                </div>
+
+                <!-- 3. BAWAH: LIST EXPENSES YANG BISA DI-EDIT, EXPORT, DAN DELETE -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-gray-700 text-sm border-b pb-1">Daftar Expenses</h3>
+                    <div id="projectListContainer" class="space-y-3">
+                        <!-- Dynamic Project List -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 3: PROJECT DETAIL & INPUT TRANSAKSI -->
+            <section id="view-project-detail" class="hidden space-y-4">
+                <button onclick="switchTab('expenses')" class="text-sm text-blue-600 font-semibold flex items-center gap-1 hover:underline">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Expenses
+                </button>
+
+                <div class="bg-white p-4 rounded-xl shadow space-y-3 border-l-4 border-blue-600">
+                    <div class="flex justify-between items-start">
                         <div>
-                            <label class="block text-sm font-medium">Nama Proyek</label>
-                            <input type="text" id="project" placeholder="Contoh: Project Wifi Jakarta" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <h2 id="detailProjectTitle" class="text-xl font-bold text-gray-800">Project Name</h2>
+                            <p id="detailProjectNote" class="text-xs text-gray-500 mt-0.5">Catatan...</p>
                         </div>
+                        <span id="detailProjectTotal" class="text-lg font-bold text-blue-600">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Form Add Item/Receipt Transaksi -->
+                <div class="bg-white p-4 rounded-xl shadow space-y-3">
+                    <h3 class="font-bold text-gray-700 text-sm border-b pb-2">+ Tambah Rincian Bon / Transaksi</h3>
+                    <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
+                        <input type="hidden" id="currentProjectId">
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-sm font-medium">Tanggal</label>
-                                <input type="date" id="date" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <label class="block text-xs font-medium mb-1">Tanggal</label>
+                                <input type="date" id="itemDate" required class="w-full p-2 border rounded-lg text-sm">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium">Kategori</label>
-                                <select id="category" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <label class="block text-xs font-medium mb-1">Kategori</label>
+                                <select id="itemCategory" class="w-full p-2 border rounded-lg text-sm">
                                     <option value="Bensin">Bensin</option>
                                     <option value="Makan">Makan</option>
                                     <option value="Tol">Tol</option>
@@ -161,64 +188,35 @@
                                 </select>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium">Jumlah (Rp)</label>
-                            <input type="number" id="amount" placeholder="0" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Jumlah (Rp)</label>
+                                <input type="number" id="itemAmount" placeholder="0" required class="w-full p-2 border rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Keterangan / Catatan</label>
+                                <input type="text" id="itemNote" placeholder="Misal: Pertamax, Parkir" class="w-full p-2 border rounded-lg text-sm">
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium">Catatan / Keterangan</label>
-                            <input type="text" id="note" placeholder="Isi pertamax, parkir mall, dll." class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-medium mb-1">Foto Struk / Bon</label>
+                            <input type="file" id="itemReceiptImg" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="w-full text-xs">
+                            <img id="itemImgPreview" class="mt-2 h-24 object-cover rounded hidden border">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Foto Struk / Bon</label>
-                            <input type="file" id="receiptImg" accept="image/*" capture="environment" onchange="previewImage(event)" class="w-full text-sm">
-                            <img id="imgPreview" class="mt-2 h-32 object-cover rounded hidden border">
-                        </div>
-                        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"><i class="fa-solid fa-floppy-disk"></i> Simpan Expense</button>
+                        <button type="submit" class="w-full bg-green-600 text-white py-2.5 rounded-lg font-bold text-sm hover:bg-green-700"><i class="fa-solid fa-floppy-disk"></i> Simpan Transaksi</button>
                     </form>
                 </div>
 
-                <!-- SUB-VIEW B: LIST EXPENSES & EXPORT TOOLS -->
-                <div id="subview-list" class="hidden space-y-4">
-                    <!-- Export & Filter Card -->
-                    <div class="bg-white p-4 rounded-xl shadow space-y-3 no-print">
-                        <div class="flex justify-between items-center border-b pb-2">
-                            <h3 class="font-bold text-gray-700 text-sm">Filter & Ekspor Dokumen</h3>
-                            <div class="flex gap-2">
-                                <button onclick="exportToExcel()" class="bg-green-600 text-white px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5 hover:bg-green-700"><i class="fa-solid fa-file-excel"></i> Excel</button>
-                                <button onclick="window.print()" class="bg-gray-700 text-white px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5 hover:bg-gray-800"><i class="fa-solid fa-print"></i> Cetak / PDF</button>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="text" id="filterProject" placeholder="Cari Proyek..." oninput="renderHistory()" class="p-2 border rounded-lg text-sm">
-                            <select id="filterCategory" onchange="renderHistory()" class="p-2 border rounded-lg text-sm">
-                                <option value="">Semua Kategori</option>
-                                <option value="Bensin">Bensin</option>
-                                <option value="Makan">Makan</option>
-                                <option value="Tol">Tol</option>
-                                <option value="Parkir">Parkir</option>
-                                <option value="Lainnya">Lainnya</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Expenses Print Header (Only visible on Print/PDF) -->
-                    <div class="print-only mb-6 border-b-2 border-black pb-4">
-                        <h1 class="text-2xl font-bold">LAPORAN REIMBURSEMENT EXPENSES</h1>
-                        <p class="text-sm">Aplikasi: Expense Tracker KMNG (v1.2.1)</p>
-                        <p class="text-sm">Tanggal Cetak: <span id="printDate"></span></p>
-                    </div>
-
-                    <!-- Dynamic Expense List -->
-                    <div id="historyList" class="space-y-3">
-                        <!-- Dynamic Items -->
-                    </div>
+                <!-- Transaction Items List -->
+                <div class="space-y-2">
+                    <h3 class="font-bold text-gray-700 text-sm">Rincian Transaksi Proyek Ini</h3>
+                    <div id="itemListContainer" class="space-y-2"></div>
                 </div>
             </section>
         </main>
 
         <footer class="text-center text-xs text-gray-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.2.1
+            Expense Tracker KMNG &bull; Version 1.3.0
         </footer>
     </div>
 
@@ -226,10 +224,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Config
-        const firebaseConfig = {
+       const firebaseConfig = {
 		apiKey: "AIzaSyCl1prA-wQZQzSkMNU9_JsSUKmf_CuXp5c",
 		authDomain: "expense-tracker-komang.firebaseapp.com",
 		projectId: "expense-tracker-komang",
@@ -243,15 +240,14 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-        let expensesData = [];
+        let projectsData = [];
+        let itemsData = [];
         let isLoginMode = true;
-        let currentBase64Image = "";
+        let currentItemImage = "";
 
-        // Set Print Date & Default Date Input
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('printDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('itemDate').valueAsDate = new Date();
 
-        // Auth Logic
+        // Auth
         window.toggleAuthMode = () => {
             isLoginMode = !isLoginMode;
             document.getElementById('authTitle').innerText = isLoginMode ? 'Masuk Aplikasi' : 'Daftar Akun';
@@ -269,9 +265,7 @@
                 } else {
                     await createUserWithEmailAndPassword(auth, email, pass);
                 }
-            } catch (err) {
-                alert("Error Auth: " + err.message);
-            }
+            } catch (err) { alert("Error Auth: " + err.message); }
         };
 
         window.logout = () => signOut(auth);
@@ -281,53 +275,155 @@
             if (user) {
                 document.getElementById('authContainer').classList.add('hidden');
                 document.getElementById('appContent').classList.remove('hidden');
-                listenToExpenses();
+                listenToData();
             } else {
                 document.getElementById('authContainer').classList.remove('hidden');
                 document.getElementById('appContent').classList.add('hidden');
             }
         });
 
-        // Navigation Tabs (Main)
+        // Tabs Navigation
         window.switchTab = (tabName) => {
-            ['dashboard', 'expenses'].forEach(t => {
+            ['dashboard', 'expenses', 'project-detail'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).classList.replace('text-blue-600', 'text-gray-500');
             });
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabName}`).classList.replace('text-gray-500', 'text-blue-600');
-        };
-
-        // Sub Navigation inside Expenses
-        window.switchSubTab = (subTab) => {
-            if (subTab === 'form') {
-                document.getElementById('subview-form').classList.remove('hidden');
-                document.getElementById('subview-list').classList.add('hidden');
-                document.getElementById('subtab-form').className = "flex-1 py-2 rounded-lg font-semibold text-sm transition bg-white text-blue-600 shadow";
-                document.getElementById('subtab-list').className = "flex-1 py-2 rounded-lg font-semibold text-sm transition text-gray-600 hover:text-gray-800";
-            } else {
-                document.getElementById('subview-form').classList.add('hidden');
-                document.getElementById('subview-list').classList.remove('hidden');
-                document.getElementById('subtab-list').className = "flex-1 py-2 rounded-lg font-semibold text-sm transition bg-white text-blue-600 shadow";
-                document.getElementById('subtab-form').className = "flex-1 py-2 rounded-lg font-semibold text-sm transition text-gray-600 hover:text-gray-800";
+            if (tabName !== 'project-detail') {
+                document.getElementById('tab-dashboard').className = tabName === 'dashboard' ? 'tab-btn flex-1 py-2 text-center text-blue-600 font-semibold' : 'tab-btn flex-1 py-2 text-center text-gray-500 font-semibold';
+                document.getElementById('tab-expenses').className = tabName === 'expenses' ? 'tab-btn flex-1 py-2 text-center text-blue-600 font-semibold' : 'tab-btn flex-1 py-2 text-center text-gray-500 font-semibold';
             }
         };
 
         // Realtime Firebase Listener
-        function listenToExpenses() {
-            const q = query(collection(db, "expenses"), where("userId", "==", currentUser.uid));
-            onSnapshot(q, (snapshot) => {
-                expensesData = [];
-                snapshot.forEach((doc) => {
-                    expensesData.push({ id: doc.id, ...doc.data() });
-                });
+        function listenToData() {
+            // Listen Projects
+            const qProj = query(collection(db, "projects"), where("userId", "==", currentUser.uid));
+            onSnapshot(qProj, (snapshot) => {
+                projectsData = [];
+                snapshot.forEach(doc => projectsData.push({ id: doc.id, ...doc.data() }));
+                renderProjectList();
                 renderDashboard();
-                renderHistory();
+            });
+
+            // Listen Transaction Items
+            const qItems = query(collection(db, "expenses"), where("userId", "==", currentUser.uid));
+            onSnapshot(qItems, (snapshot) => {
+                itemsData = [];
+                snapshot.forEach(doc => itemsData.push({ id: doc.id, ...doc.data() }));
+                renderProjectList();
+                renderDashboard();
+                const curProjId = document.getElementById('currentProjectId').value;
+                if (curProjId) renderProjectItems(curProjId);
             });
         }
 
-        // Image Handling
-        window.previewImage = (e) => {
+        // Project Modal & Operations
+        window.openProjectModal = (id = null) => {
+            document.getElementById('projectModal').classList.remove('hidden');
+            if (id) {
+                const proj = projectsData.find(p => p.id === id);
+                document.getElementById('projectModalTitle').innerText = "Edit Expense (Project)";
+                document.getElementById('editProjectId').value = id;
+                document.getElementById('projectName').value = proj.name;
+                document.getElementById('projectNote').value = proj.note || "";
+            } else {
+                document.getElementById('projectModalTitle').innerText = "Add New Expense (Project)";
+                document.getElementById('editProjectId').value = "";
+                document.getElementById('projectForm').reset();
+            }
+        };
+
+        window.closeProjectModal = () => {
+            document.getElementById('projectModal').classList.add('hidden');
+        };
+
+        window.saveProject = async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editProjectId').value;
+            const name = document.getElementById('projectName').value;
+            const note = document.getElementById('projectNote').value;
+
+            if (editId) {
+                await updateDoc(doc(db, "projects", editId), { name, note });
+            } else {
+                await addDoc(collection(db, "projects"), {
+                    userId: currentUser.uid,
+                    name,
+                    note,
+                    createdAt: new Date().toISOString()
+                });
+            }
+            closeProjectModal();
+        };
+
+        window.deleteProject = async (id) => {
+            if (confirm("Hapus Expense/Project ini beserta seluruh rincian identifikasinya?")) {
+                await deleteDoc(doc(db, "projects", id));
+                // Delete related items
+                const related = itemsData.filter(i => i.projectId === id);
+                for (let item of related) {
+                    await deleteDoc(doc(db, "expenses", item.id));
+                }
+            }
+        };
+
+        // Render List Expenses / Projects
+        window.renderProjectList = () => {
+            const search = document.getElementById('searchExpenseInput').value.toLowerCase();
+            const container = document.getElementById('projectListContainer');
+            container.innerHTML = '';
+
+            const filtered = projectsData.filter(p => p.name.toLowerCase().includes(search));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="bg-white p-6 text-center text-gray-400 rounded-xl shadow">Belum ada Expense/Project. Klik tombol di atas untuk membuat.</div>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const pItems = itemsData.filter(i => i.projectId === p.id);
+                const totalAmount = pItems.reduce((acc, curr) => acc + curr.amount, 0);
+
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-xl shadow space-y-3 border-l-4 border-blue-500";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-base">${p.name}</h4>
+                            <p class="text-xs text-gray-500">${p.note || 'Tidak ada catatan'}</p>
+                            <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded mt-1 inline-block font-semibold">${pItems.length} Transaksi</span>
+                        </div>
+                        <span class="font-bold text-blue-600 text-base">Rp ${totalAmount.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t text-xs gap-2">
+                        <button onclick="openProjectDetail('${p.id}')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1 hover:bg-blue-700">
+                            <i class="fa-solid fa-folder-open"></i> Isi / Detail
+                        </button>
+                        <div class="flex gap-1">
+                            <button onclick="openProjectModal('${p.id}')" class="p-1.5 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button onclick="exportSingleProject('${p.id}')" class="p-1.5 bg-green-100 text-green-700 rounded hover:bg-green-200"><i class="fa-solid fa-file-excel"></i> Export</button>
+                            <button onclick="deleteProject('${p.id}')" class="p-1.5 bg-red-100 text-red-600 rounded hover:bg-red-200"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        // Project Detail & Item Operations
+        window.openProjectDetail = (projectId) => {
+            const proj = projectsData.find(p => p.id === projectId);
+            if (!proj) return;
+
+            document.getElementById('currentProjectId').value = projectId;
+            document.getElementById('detailProjectTitle').innerText = proj.name;
+            document.getElementById('detailProjectNote').innerText = proj.note || "";
+            
+            renderProjectItems(projectId);
+            switchTab('project-detail');
+        };
+
+        window.previewItemImage = (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -341,185 +437,89 @@
                     canvas.height = img.height * scaleSize;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    currentBase64Image = canvas.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('imgPreview').src = currentBase64Image;
-                    document.getElementById('imgPreview').classList.remove('hidden');
+                    currentItemImage = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('itemImgPreview').src = currentItemImage;
+                    document.getElementById('itemImgPreview').classList.remove('hidden');
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         };
 
-        // Save New Expense
-        window.saveExpense = async (e) => {
+        window.saveTransactionItem = async (e) => {
             e.preventDefault();
-            const newExp = {
+            const projectId = document.getElementById('currentProjectId').value;
+            const proj = projectsData.find(p => p.id === projectId);
+
+            const newItem = {
                 userId: currentUser.uid,
-                project: document.getElementById('project').value,
-                date: document.getElementById('date').value,
-                category: document.getElementById('category').value,
-                amount: Number(document.getElementById('amount').value),
-                note: document.getElementById('note').value,
-                receipt: currentBase64Image,
+                projectId: projectId,
+                project: proj ? proj.name : "",
+                date: document.getElementById('itemDate').value,
+                category: document.getElementById('itemCategory').value,
+                amount: Number(document.getElementById('itemAmount').value),
+                note: document.getElementById('itemNote').value,
+                receipt: currentItemImage,
                 createdAt: new Date().toISOString()
             };
-            await addDoc(collection(db, "expenses"), newExp);
-            document.getElementById('expenseForm').reset();
-            document.getElementById('imgPreview').classList.add('hidden');
-            currentBase64Image = "";
-            document.getElementById('date').valueAsDate = new Date();
-            alert('Expense berhasil disimpan!');
-            switchSubTab('list');
+
+            await addDoc(collection(db, "expenses"), newItem);
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemImgPreview').classList.add('hidden');
+            currentItemImage = "";
+            document.getElementById('itemDate').valueAsDate = new Date();
+            renderProjectItems(projectId);
         };
 
-        // Delete Expense
-        window.deleteExpense = async (id) => {
-            if (confirm("Hapus catatan expense ini?")) {
+        function renderProjectItems(projectId) {
+            const pItems = itemsData.filter(i => i.projectId === projectId);
+            const total = pItems.reduce((acc, curr) => acc + curr.amount, 0);
+            document.getElementById('detailProjectTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+
+            const container = document.getElementById('itemListContainer');
+            container.innerHTML = '';
+
+            if (pItems.length === 0) {
+                container.innerHTML = `<div class="bg-white p-4 text-center text-xs text-gray-400 rounded-xl">Belum ada rincian transaksi untuk proyek ini.</div>`;
+                return;
+            }
+
+            pItems.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            pItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-xl shadow flex justify-between items-center text-xs";
+                card.innerHTML = `
+                    <div>
+                        <span class="font-bold text-gray-800">${item.category} - Rp ${item.amount.toLocaleString('id-ID')}</span>
+                        <p class="text-gray-500">${item.date} ${item.note ? '| ' + item.note : ''}</p>
+                        ${item.receipt ? `<a href="${item.receipt}" target="_blank" class="text-blue-600 underline font-semibold"><i class="fa-solid fa-paperclip"></i> Lihat Struk</a>` : ''}
+                    </div>
+                    <button onclick="deleteItem('${item.id}')" class="text-red-500 p-2 hover:bg-red-50 rounded"><i class="fa-solid fa-trash"></i></button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.deleteItem = async (id) => {
+            if (confirm("Hapus rincian transaksi ini?")) {
                 await deleteDoc(doc(db, "expenses", id));
             }
         };
 
-        // Render Dashboard Analytics
-        function renderDashboard() {
-            const total = expensesData.reduce((acc, curr) => acc + curr.amount, 0);
-            const count = expensesData.length;
-            const avg = count > 0 ? total / count : 0;
+        // Export Single Project to Excel
+        window.exportSingleProject = (projectId) => {
+            const proj = projectsData.find(p => p.id === projectId);
+            const pItems = itemsData.filter(i => i.projectId === projectId);
 
-            // Current Month Total
-            const now = new Date();
-            const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            const thisMonthTotal = expensesData
-                .filter(item => item.date && item.date.startsWith(currentMonthStr))
-                .reduce((acc, curr) => acc + curr.amount, 0);
-
-            document.getElementById('dashTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
-            document.getElementById('dashThisMonth').innerText = `Rp ${thisMonthTotal.toLocaleString('id-ID')}`;
-            document.getElementById('dashCount').innerText = `${count} Transaksi`;
-            document.getElementById('dashAvg').innerText = `Rp ${Math.round(avg).toLocaleString('id-ID')}`;
-
-            // Category Breakdown
-            const catMap = {};
-            expensesData.forEach(item => {
-                catMap[item.category] = (catMap[item.category] || 0) + item.amount;
-            });
-
-            const catContainer = document.getElementById('categoryBreakdown');
-            catContainer.innerHTML = '';
-            if (Object.keys(catMap).length === 0) {
-                catContainer.innerHTML = `<p class="text-xs text-gray-400 italic">Belum ada data expense.</p>`;
-            } else {
-                Object.keys(catMap).forEach(cat => {
-                    const catAmount = catMap[cat];
-                    const percent = total > 0 ? Math.round((catAmount / total) * 100) : 0;
-                    catContainer.innerHTML += `
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold mb-1">
-                                <span>${cat}</span>
-                                <span>Rp ${catAmount.toLocaleString('id-ID')} (${percent}%)</span>
-                            </div>
-                            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${percent}%"></div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            // Project Breakdown
-            const projMap = {};
-            expensesData.forEach(item => {
-                projMap[item.project] = (projMap[item.project] || 0) + item.amount;
-            });
-
-            const projContainer = document.getElementById('projectBreakdown');
-            projContainer.innerHTML = '';
-            if (Object.keys(projMap).length === 0) {
-                projContainer.innerHTML = `<p class="text-xs text-gray-400 italic">Belum ada data proyek.</p>`;
-            } else {
-                Object.keys(projMap).forEach(proj => {
-                    projContainer.innerHTML += `
-                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded border">
-                            <span class="font-medium text-xs text-gray-700">${proj}</span>
-                            <span class="font-bold text-xs text-gray-900">Rp ${projMap[proj].toLocaleString('id-ID')}</span>
-                        </div>
-                    `;
-                });
-            }
-
-            // Recent 5 Expenses Widget
-            const recentContainer = document.getElementById('recentExpensesList');
-            recentContainer.innerHTML = '';
-            const sortedRecent = [...expensesData].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-            
-            if (sortedRecent.length === 0) {
-                recentContainer.innerHTML = `<p class="text-xs text-gray-400 italic">Belum ada transaksi.</p>`;
-            } else {
-                sortedRecent.forEach(item => {
-                    recentContainer.innerHTML += `
-                        <div class="flex justify-between items-center text-xs p-2 hover:bg-gray-50 rounded border-b">
-                            <div>
-                                <span class="font-bold text-gray-800">${item.category}</span>
-                                <span class="text-gray-400 ml-1">(${item.project})</span>
-                                <p class="text-[10px] text-gray-400">${item.date}</p>
-                            </div>
-                            <span class="font-bold text-blue-600">Rp ${item.amount.toLocaleString('id-ID')}</span>
-                        </div>
-                    `;
-                });
-            }
-        }
-
-        // Render List Expenses
-        window.renderHistory = () => {
-            const filterProj = document.getElementById('filterProject').value.toLowerCase();
-            const filterCat = document.getElementById('filterCategory').value;
-            const list = document.getElementById('historyList');
-            list.innerHTML = '';
-
-            const filtered = expensesData.filter(item => {
-                return item.project.toLowerCase().includes(filterProj) && (filterCat === "" || item.category === filterCat);
-            });
-
-            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-            if (filtered.length === 0) {
-                list.innerHTML = `<div class="bg-white p-6 text-center text-gray-400 rounded-xl shadow">Tidak ada data expense yang cocok.</div>`;
+            if (pItems.length === 0) {
+                alert("Belum ada rincian transaksi pada proyek ini untuk diekspor!");
                 return;
             }
 
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-xl shadow flex justify-between items-center border-l-4 border-blue-500";
-                card.innerHTML = `
-                    <div class="space-y-1">
-                        <span class="text-xs bg-blue-100 text-blue-800 font-semibold px-2 py-0.5 rounded">${item.project}</span>
-                        <h4 class="font-bold text-gray-800">${item.category} - Rp ${item.amount.toLocaleString('id-ID')}</h4>
-                        <p class="text-xs text-gray-500">${item.date} ${item.note ? '| ' + item.note : ''}</p>
-                        ${item.receipt ? `<a href="${item.receipt}" target="_blank" class="text-xs text-blue-600 underline font-medium"><i class="fa-solid fa-paperclip"></i> Lihat Struk Bon</a>` : ''}
-                    </div>
-                    <button onclick="deleteExpense('${item.id}')" class="text-red-500 p-2 hover:bg-red-50 rounded no-print"><i class="fa-solid fa-trash"></i></button>
-                `;
-                list.appendChild(card);
-            });
-        };
-
-        // Export Excel
-        window.exportToExcel = () => {
-            const filterProj = document.getElementById('filterProject').value.toLowerCase();
-            const filterCat = document.getElementById('filterCategory').value;
-
-            const filtered = expensesData.filter(item => {
-                return item.project.toLowerCase().includes(filterProj) && (filterCat === "" || item.category === filterCat);
-            });
-
-            if (filtered.length === 0) {
-                alert("Tidak ada data untuk diekspor!");
-                return;
-            }
-
-            const exportData = filtered.map((item, index) => ({
+            const exportData = pItems.map((item, index) => ({
                 "No": index + 1,
-                "Proyek": item.project,
+                "Proyek": proj ? proj.name : "",
                 "Tanggal": item.date,
                 "Kategori": item.category,
                 "Nominal (Rp)": item.amount,
@@ -528,9 +528,55 @@
 
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Expenses");
-            XLSX.writeFile(wb, `Expense_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Reimburse");
+            XLSX.writeFile(wb, `Reimburse_${proj.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
+
+        // Dashboard Analytics
+        function renderDashboard() {
+            const total = itemsData.reduce((acc, curr) => acc + curr.amount, 0);
+            const now = new Date();
+            const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const thisMonthTotal = itemsData.filter(i => i.date && i.date.startsWith(currentMonthStr)).reduce((acc, curr) => acc + curr.amount, 0);
+
+            document.getElementById('dashTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('dashThisMonth').innerText = `Rp ${thisMonthTotal.toLocaleString('id-ID')}`;
+            document.getElementById('dashCount').innerText = `${itemsData.length} Transaksi`;
+            document.getElementById('dashProjects').innerText = `${projectsData.length} Project`;
+
+            // Breakdown Category
+            const catMap = {};
+            itemsData.forEach(item => { catMap[item.category] = (catMap[item.category] || 0) + item.amount; });
+            const catContainer = document.getElementById('categoryBreakdown');
+            catContainer.innerHTML = '';
+            Object.keys(catMap).forEach(cat => {
+                const percent = total > 0 ? Math.round((catMap[cat] / total) * 100) : 0;
+                catContainer.innerHTML += `
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span>${cat}</span>
+                            <span>Rp ${catMap[cat].toLocaleString('id-ID')} (${percent}%)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Breakdown Project
+            const projContainer = document.getElementById('projectBreakdown');
+            projContainer.innerHTML = '';
+            projectsData.forEach(p => {
+                const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
+                projContainer.innerHTML += `
+                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded border">
+                        <span class="font-medium text-xs text-gray-700">${p.name}</span>
+                        <span class="font-bold text-xs text-gray-900">Rp ${pTotal.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            });
+        }
     </script>
 </body>
 </html>
