@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Expense Tracker KMNG</title>
-    <!-- Script Pre-render Theme & Avatar untuk Mencegah Flashing & Huruf U -->
+    <!-- Script Pre-render Theme & Avatar untuk Mencegah Flashing -->
     <script>
-        // Auto-apply Dark Mode
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
@@ -80,7 +79,7 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.8.3</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.9.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -102,24 +101,19 @@
         </div>
     </div>
 
-    <!-- Modal My Profile & Settings -->
-    <div id="profileSettingsModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
+    <!-- Modal My Profile Only -->
+    <div id="profileModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
             
             <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <div class="flex gap-4">
-                    <button onclick="switchProfileTab('profile')" id="btnTabProfile" class="text-base font-bold text-teal-600 dark:text-teal-400 border-b-2 border-teal-600 pb-1 flex items-center gap-2">
-                        <i class="fa-solid fa-user"></i> <span data-i18n="tabProfile">My Profile</span>
-                    </button>
-                    <button onclick="switchProfileTab('settings')" id="btnTabSettings" class="text-base font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pb-1 flex items-center gap-2">
-                        <i class="fa-solid fa-gear"></i> <span data-i18n="tabSettings">Settings</span>
-                    </button>
-                </div>
-                <button onclick="closeProfileSettingsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="text-base font-bold text-teal-600 dark:text-teal-400 flex items-center gap-2">
+                    <i class="fa-solid fa-user"></i> <span data-i18n="tabProfile">My Profile</span>
+                </h3>
+                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <!-- SECTION TAB 1: MY PROFILE -->
-            <div id="profileTabContent" class="space-y-4">
+            <!-- MY PROFILE CONTENT -->
+            <div class="space-y-4">
                 <div class="flex flex-col items-center justify-center space-y-2 py-2">
                     <div class="relative">
                         <img id="userAvatarImg" src="" class="w-20 h-20 rounded-full object-cover border-4 border-teal-500 shadow-md hidden">
@@ -170,60 +164,6 @@
                         </div>
                         <button type="submit" id="changePassBtn" class="w-full py-2 bg-indigo-900 hover:bg-indigo-950 text-white rounded-xl text-xs font-semibold transition" data-i18n="saveNewPassBtn">Save New Password</button>
                     </form>
-                </div>
-            </div>
-
-            <!-- SECTION TAB 2: SETTINGS -->
-            <div id="settingsTabContent" class="space-y-4 hidden">
-                <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
-                    <div>
-                        <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="languageLabel">Language</h4>
-                        <p class="text-[10px] text-slate-400" data-i18n="languageDesc">Choose interface language</p>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800 p-1 rounded-lg text-xs font-bold flex gap-1 border border-slate-200 dark:border-slate-600">
-                        <button onclick="setLanguage('en')" id="modal-lang-en" class="px-2.5 py-1 rounded-md bg-teal-600 text-white shadow-sm transition">EN</button>
-                        <button onclick="setLanguage('id')" id="modal-lang-id" class="px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition">ID</button>
-                    </div>
-                </div>
-
-                <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
-                    <div>
-                        <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="currencyLabel">Default Currency Format</h4>
-                        <p class="text-[10px] text-slate-400" data-i18n="currencyDesc">Select default currency symbol</p>
-                    </div>
-                    <select id="currencySettingSelect" onchange="changeCurrencySetting(this.value)" class="w-full p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-xs outline-none">
-                        <option value="Rp">IDR - Rupiah (Rp)</option>
-                        <option value="$">USD - Dollar ($)</option>
-                        <option value="€">EUR - Euro (€)</option>
-                        <option value="S$">SGD - Singapore Dollar (S$)</option>
-                    </select>
-                </div>
-
-                <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
-                    <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="customCategoryLabel">Custom Categories</h4>
-                    <div class="flex gap-2">
-                        <input type="text" id="newCategoryInput" placeholder="Add custom category..." class="w-full p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-xs outline-none">
-                        <button onclick="addCustomCategory()" class="px-3 py-2 bg-teal-600 text-white rounded-xl text-xs font-bold hover:bg-teal-700 transition shrink-0"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                    <div id="customCategoryList" class="flex flex-wrap gap-1.5 pt-1"></div>
-                </div>
-
-                <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
-                    <div>
-                        <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="themeLabel">App Appearance</h4>
-                        <p class="text-[10px] text-slate-400" data-i18n="themeDesc">Switch Light / Dark theme</p>
-                    </div>
-                    <button onclick="toggleDarkMode()" id="themeToggleBtn" class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-700 dark:text-teal-300 flex items-center gap-1.5 shadow-sm">
-                        <i class="fa-solid fa-moon"></i> <span id="themeToggleText">Dark</span>
-                    </button>
-                </div>
-
-                <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
-                    <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="exportBackupLabel">Export & Backup Data</h4>
-                    <p class="text-[10px] text-slate-400" data-i18n="exportBackupDesc">Download all recorded transactions as Excel spreadsheet</p>
-                    <button onclick="exportAllUserData()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-sm">
-                        <i class="fa-solid fa-file-excel"></i> <span data-i18n="exportAllBtn">Export All Data (Excel)</span>
-                    </button>
                 </div>
             </div>
 
@@ -331,25 +271,25 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER DENGAN LEBAR VERTIKAL KECIL / RAMPING -->
-        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-2.5 sm:py-3 shadow-md sticky top-0 z-10 no-print">
+        <!-- HEADER DENGAN UKURAN DIBESARKAN SEDIKIT & KMNG TAMPILAN PUTIH -->
+        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3 sm:py-3.5 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
-                <!-- LOGO DAN JUDUL RAMPING -->
+                <!-- LOGO DAN JUDUL RAMPING PROPORSIONAL -->
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <i class="fa-solid fa-receipt text-teal-300 text-xl sm:text-2xl shrink-0"></i>
+                    <i class="fa-solid fa-receipt text-teal-300 text-2xl sm:text-3xl shrink-0"></i>
                     <div class="flex flex-col leading-tight">
                         <div class="flex items-center gap-1.5">
-                            <h1 class="text-sm sm:text-lg font-bold tracking-tight">Expense Tracker</h1>
-                            <span class="text-sm sm:text-lg font-bold tracking-tight text-teal-200">KMNG</span>
+                            <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">Expense Tracker</h1>
+                            <span class="text-base sm:text-xl font-bold tracking-tight text-white">KMNG</span>
                         </div>
-                        <span class="text-[8px] sm:text-[9px] text-teal-200/80 font-medium tracking-wider">v1.8.3</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v1.9.0</span>
                     </div>
                 </div>
 
                 <!-- AVATAR PROFILE BUTTON -->
                 <div class="flex items-center shrink-0">
-                    <button onclick="openProfileSettingsModal()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-teal-500/30 hover:bg-teal-500/50 border-2 border-teal-300/80 flex items-center justify-center font-bold text-xs sm:text-sm text-white shadow-sm transition overflow-hidden" id="headerAvatarBtn">
+                    <button onclick="openProfileModal()" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-teal-500/30 hover:bg-teal-500/50 border-2 border-teal-300/80 flex items-center justify-center font-bold text-xs sm:text-sm text-white shadow-sm transition overflow-hidden" id="headerAvatarBtn">
                         <img id="headerAvatarImg" src="" class="w-full h-full object-cover hidden">
                         <span id="headerAvatarText">U</span>
                     </button>
@@ -359,10 +299,11 @@
 
         <!-- Main Body -->
         <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
-            <!-- Navigation Tabs -->
+            <!-- Navigation Tabs (Home | Expenses | Settings) -->
             <div class="no-print bg-white dark:bg-slate-800 p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 dark:border-slate-700 md:relative fixed bottom-0 left-0 right-0 z-30">
                 <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
                 <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> <span data-i18n="expensesTab">Expenses</span></button>
+                <button onclick="switchTab('settings')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition" id="tab-settings"><i class="fa-solid fa-gear block text-lg"></i> <span data-i18n="tabSettings">Settings</span></button>
             </div>
 
             <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
@@ -422,7 +363,72 @@
                 </div>
             </section>
 
-            <!-- VIEW 3: PROJECT DETAIL & RINCIAN TRANSAKSI -->
+            <!-- VIEW 3: SETTINGS PAGE (MENU UTAMA TIGA) -->
+            <section id="view-settings" class="hidden space-y-4">
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4">
+                    <h2 class="text-lg font-bold text-indigo-950 dark:text-teal-400 border-b dark:border-slate-700 pb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-gear text-teal-600"></i> <span data-i18n="tabSettings">Settings</span>
+                    </h2>
+
+                    <!-- Language Setting -->
+                    <div class="flex justify-between items-center p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <div>
+                            <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="languageLabel">Language</h4>
+                            <p class="text-[10px] text-slate-400" data-i18n="languageDesc">Choose interface language</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-1 rounded-lg text-xs font-bold flex gap-1 border border-slate-200 dark:border-slate-600">
+                            <button onclick="setLanguage('en')" id="modal-lang-en" class="px-3 py-1 rounded-md bg-teal-600 text-white shadow-sm transition">EN</button>
+                            <button onclick="setLanguage('id')" id="modal-lang-id" class="px-3 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition">ID</button>
+                        </div>
+                    </div>
+
+                    <!-- Currency Setting -->
+                    <div class="p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
+                        <div>
+                            <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="currencyLabel">Default Currency Format</h4>
+                            <p class="text-[10px] text-slate-400" data-i18n="currencyDesc">Select default currency symbol</p>
+                        </div>
+                        <select id="currencySettingSelect" onchange="changeCurrencySetting(this.value)" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-xs outline-none">
+                            <option value="Rp">IDR - Rupiah (Rp)</option>
+                            <option value="$">USD - Dollar ($)</option>
+                            <option value="€">EUR - Euro (€)</option>
+                            <option value="S$">SGD - Singapore Dollar (S$)</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Categories Setting -->
+                    <div class="p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
+                        <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="customCategoryLabel">Custom Categories</h4>
+                        <div class="flex gap-2">
+                            <input type="text" id="newCategoryInput" placeholder="Add custom category..." class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-xl text-xs outline-none">
+                            <button onclick="addCustomCategory()" class="px-3.5 py-2.5 bg-teal-600 text-white rounded-xl text-xs font-bold hover:bg-teal-700 transition shrink-0"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div id="customCategoryList" class="flex flex-wrap gap-1.5 pt-1"></div>
+                    </div>
+
+                    <!-- Theme Light / Dark Mode -->
+                    <div class="flex justify-between items-center p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <div>
+                            <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="themeLabel">App Appearance</h4>
+                            <p class="text-[10px] text-slate-400" data-i18n="themeDesc">Switch Light / Dark theme</p>
+                        </div>
+                        <button onclick="toggleDarkMode()" id="themeToggleBtn" class="px-3.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-bold text-slate-700 dark:text-teal-300 flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-moon"></i> <span id="themeToggleText">Dark</span>
+                        </button>
+                    </div>
+
+                    <!-- Backup / Export All Data -->
+                    <div class="p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
+                        <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="exportBackupLabel">Export & Backup Data</h4>
+                        <p class="text-[10px] text-slate-400" data-i18n="exportBackupDesc">Download all recorded transactions as Excel spreadsheet</p>
+                        <button onclick="exportAllUserData()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-sm">
+                            <i class="fa-solid fa-file-excel"></i> <span data-i18n="exportAllBtn">Export All Data (Excel)</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 4: PROJECT DETAIL & RINCIAN TRANSAKSI -->
             <section id="view-project-detail" class="hidden space-y-4">
                 <button onclick="switchTab('expenses')" class="text-sm text-teal-600 dark:text-teal-400 font-semibold flex items-center gap-1 hover:underline">
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
@@ -455,7 +461,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.8.3
+            Expense Tracker KMNG &bull; Version 1.9.0
         </footer>
     </div>
 
@@ -636,8 +642,8 @@
 
         window.setLanguage = (lang) => {
             currentLang = lang;
-            document.getElementById('modal-lang-en').className = lang === 'en' ? 'px-2.5 py-1 rounded-md bg-teal-600 text-white shadow-sm transition' : 'px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition';
-            document.getElementById('modal-lang-id').className = lang === 'id' ? 'px-2.5 py-1 rounded-md bg-teal-600 text-white shadow-sm transition' : 'px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition';
+            document.getElementById('modal-lang-en').className = lang === 'en' ? 'px-3 py-1 rounded-md bg-teal-600 text-white shadow-sm transition' : 'px-3 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition';
+            document.getElementById('modal-lang-id').className = lang === 'id' ? 'px-3 py-1 rounded-md bg-teal-600 text-white shadow-sm transition' : 'px-3 py-1 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition';
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -781,7 +787,6 @@
             renderCategoryOptions();
         }
 
-        /* PERBAIKAN AVATAR & MENCEGAH HURUF U ATAU FLASHING SAAT REFRESH */
         function updateAvatarDisplay(photoUrl) {
             const storedName = currentUser ? (currentUser.displayName || currentUser.email) : localStorage.getItem('user_initial_name');
             let initial = "U";
@@ -812,23 +817,8 @@
             }
         }
 
-        window.switchProfileTab = (tab) => {
-            if (tab === 'profile') {
-                document.getElementById('profileTabContent').classList.remove('hidden');
-                document.getElementById('settingsTabContent').classList.add('hidden');
-                document.getElementById('btnTabProfile').className = "text-base font-bold text-teal-600 dark:text-teal-400 border-b-2 border-teal-600 pb-1 flex items-center gap-2";
-                document.getElementById('btnTabSettings').className = "text-base font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pb-1 flex items-center gap-2";
-            } else {
-                document.getElementById('profileTabContent').classList.add('hidden');
-                document.getElementById('settingsTabContent').classList.remove('hidden');
-                document.getElementById('btnTabSettings').className = "text-base font-bold text-teal-600 dark:text-teal-400 border-b-2 border-teal-600 pb-1 flex items-center gap-2";
-                document.getElementById('btnTabProfile').className = "text-base font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pb-1 flex items-center gap-2";
-            }
-        };
-
-        window.openProfileSettingsModal = () => {
-            document.getElementById('profileSettingsModal').classList.remove('hidden');
-            switchProfileTab('profile');
+        window.openProfileModal = () => {
+            document.getElementById('profileModal').classList.remove('hidden');
             if (currentUser) {
                 document.getElementById('profileEmailDisplay').value = currentUser.email || "";
                 document.getElementById('profileFullName').value = currentUser.displayName || "";
@@ -841,8 +831,8 @@
             }
         };
 
-        window.closeProfileSettingsModal = () => {
-            document.getElementById('profileSettingsModal').classList.add('hidden');
+        window.closeProfileModal = () => {
+            document.getElementById('profileModal').classList.add('hidden');
         };
 
         window.uploadUserAvatar = (e) => {
@@ -886,7 +876,7 @@
                 localStorage.setItem('user_initial_name', newName);
                 updateAvatarDisplay(userProfileDoc.photoURL || currentUser.photoURL);
                 alert(currentLang === 'id' ? "Nama profil berhasil diperbarui!" : "Profile name updated successfully!");
-                openProfileSettingsModal();
+                closeProfileModal();
             } catch (err) {
                 alert("Error: " + err.message);
             } finally {
@@ -1025,7 +1015,7 @@
         window.logout = () => {
             localStorage.removeItem('user_photo_url');
             localStorage.removeItem('user_initial_name');
-            closeProfileSettingsModal();
+            closeProfileModal();
             signOut(auth);
         };
 
@@ -1049,13 +1039,14 @@
         });
 
         window.switchTab = (tabName) => {
-            ['dashboard', 'expenses', 'project-detail'].forEach(t => {
+            ['dashboard', 'expenses', 'settings', 'project-detail'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
             });
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
             if (tabName !== 'project-detail') {
                 document.getElementById('tab-dashboard').className = tabName === 'dashboard' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
                 document.getElementById('tab-expenses').className = tabName === 'expenses' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
+                document.getElementById('tab-settings').className = tabName === 'settings' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
             }
         };
 
