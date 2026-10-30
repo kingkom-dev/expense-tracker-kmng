@@ -20,11 +20,32 @@
         }
         .print-only { display: none; }
         
-        /* Fix Styling Input Date Native di iOS / Mobile */
-        input[type="date"] {
-            min-height: 42px;
-            -webkit-appearance: none;
-            appearance: none;
+        /* FIX TOTAL UNTUK NATIVE INPUT PADA MOBILE (iOS Safari / Android) */
+        input[type="date"], select {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            height: 42px !important;
+            line-height: 42px !important;
+            border-radius: 0.75rem !important; /* rounded-xl */
+            background-color: #ffffff !important;
+        }
+
+        /* Custom Arrow Icon untuk Select Kategori agar rapi di Mobile */
+        .custom-select-wrapper {
+            position: relative;
+        }
+        .custom-select-wrapper::after {
+            content: "\f0dc";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+            font-size: 11px;
         }
     </style>
 </head>
@@ -41,7 +62,7 @@
         <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.6.1</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200">v1.6.2</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -89,17 +110,19 @@
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
                 
-                <!-- GRID INPUT TANGGAL & KATEGORI LEBIH RAPI & KONSISTEN -->
+                <!-- FIX KOTAK TANGGAL DAN KATEGORI DI MOBILE (SEJAJAR & SERASI) -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="dateLabel">Date</label>
-                        <input type="date" id="itemDate" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none text-slate-700">
+                        <input type="date" id="itemDate" required class="w-full px-3 border border-slate-200 rounded-xl text-xs sm:text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none text-slate-700 shadow-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-medium mb-1 text-slate-700" data-i18n="categoryLabel">Category</label>
-                        <select id="itemCategory" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none text-slate-700 h-[42px]">
-                            <!-- Dynamic Options Based on Language -->
-                        </select>
+                        <div class="custom-select-wrapper">
+                            <select id="itemCategory" class="w-full px-3 border border-slate-200 rounded-xl text-xs sm:text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none text-slate-700 shadow-sm pr-7">
+                                <!-- Dynamic Options Based on Language -->
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -157,24 +180,24 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER PROPORSI KONSISTEN & RAPI DI MOBILE -->
-        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3.5 shadow-sm sticky top-0 z-10 no-print">
-            <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
+        <!-- HEADER PROPORSI DAN PROPORSI ELEMEN RAPI DI MOBILE -->
+        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-3 sm:px-4 py-3 shadow-sm sticky top-0 z-10 no-print">
+            <div class="max-w-6xl mx-auto flex justify-between items-center gap-1.5">
                 
-                <!-- LOGO, JUDUL, DAN BADGE VERSI SEJAJAR LURUS -->
-                <div class="flex items-center gap-2 min-w-0">
-                    <i class="fa-solid fa-receipt text-teal-300 text-lg sm:text-xl shrink-0"></i>
-                    <h1 class="text-base sm:text-lg font-bold truncate whitespace-nowrap">Expense Tracker KMNG</h1>
-                    <span class="text-[9px] sm:text-[10px] bg-white/20 text-teal-100 px-1.5 py-0.5 rounded-full font-medium shrink-0">v1.6.1</span>
+                <!-- LOGO + JUDUL + VERSI PADA SATU BARIS SECARA PROPORSI -->
+                <div class="flex items-center gap-1.5 min-w-0">
+                    <i class="fa-solid fa-receipt text-teal-300 text-base sm:text-xl shrink-0"></i>
+                    <h1 class="text-xs sm:text-base font-bold truncate">Expense Tracker KMNG</h1>
+                    <span class="text-[8px] sm:text-[10px] bg-white/20 text-teal-100 px-1.5 py-0.5 rounded-full font-medium shrink-0">v1.6.2</span>
                 </div>
 
-                <div class="flex items-center gap-2 shrink-0">
+                <div class="flex items-center gap-1.5 shrink-0">
                     <!-- Language Switcher -->
-                    <div class="bg-white/10 p-1 rounded-xl text-xs font-bold flex gap-0.5 border border-white/20">
+                    <div class="bg-white/10 p-0.5 sm:p-1 rounded-xl text-[11px] sm:text-xs font-bold flex gap-0.5 border border-white/20">
                         <button onclick="setLanguage('en')" id="lang-en" class="px-1.5 sm:px-2 py-0.5 rounded-lg bg-white text-indigo-950 shadow-sm transition">EN</button>
                         <button onclick="setLanguage('id')" id="lang-id" class="px-1.5 sm:px-2 py-0.5 rounded-lg text-teal-100 hover:bg-white/10 transition">ID</button>
                     </div>
-                    <button onclick="logout()" class="text-xs sm:text-sm bg-white/15 hover:bg-white/25 px-2.5 sm:px-3 py-1.5 rounded-xl transition border border-white/20 flex items-center gap-1">
+                    <button onclick="logout()" class="text-xs sm:text-sm bg-white/15 hover:bg-white/25 px-2 sm:px-3 py-1 rounded-xl transition border border-white/20 flex items-center gap-1">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         <span class="hidden sm:inline" data-i18n="logoutBtn">Logout</span>
                     </button>
@@ -282,7 +305,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.6.1
+            Expense Tracker KMNG &bull; Version 1.6.2
         </footer>
     </div>
 
