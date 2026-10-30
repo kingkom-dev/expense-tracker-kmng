@@ -26,7 +26,7 @@
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-blue-600">Masuk Aplikasi</h2>
-                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.3.2</span></p>
+                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.3.4</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -56,8 +56,8 @@
                     <input type="text" id="projectName" placeholder="Contoh: Project Wifi Jakarta, Dinas Bandung, dll." required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Keterangan / Catatan (Opsional)</label>
-                    <input type="text" id="projectNote" placeholder="Catatan singkat..." class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-medium mb-1">Catatan (Opsional)</label>
+                    <input type="text" id="projectNote" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-100">Batal</button>
@@ -85,17 +85,21 @@
                             <option value="Makan">Makan</option>
                             <option value="Tol">Tol</option>
                             <option value="Parkir">Parkir</option>
+                            <option value="Akomodasi / Hotel">Akomodasi / Hotel</option>
+                            <option value="Transportasi / Tiket">Transportasi / Tiket</option>
+                            <option value="ATK & Operasional">ATK & Operasional</option>
                             <option value="Lainnya">Lainnya</option>
                         </select>
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-medium mb-1">Jumlah (Rp)</label>
-                    <input type="number" id="itemAmount" placeholder="0" required class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="itemAmountFormatted" placeholder="0" oninput="formatCurrencyInput(this)" required class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                    <input type="hidden" id="itemAmount">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium mb-1">Keterangan / Catatan</label>
-                    <input type="text" id="itemNote" placeholder="Misal: Pertamax, Parkir" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-medium mb-1">Keterangan</label>
+                    <input type="text" id="itemNote" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-medium mb-1">Foto Struk / Bon</label>
@@ -110,6 +114,22 @@
         </div>
     </div>
 
+    <!-- Modal Popup Viewing Struk Bon Gambar -->
+    <div id="receiptModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-blue-600"></i> Struk / Bon Pembayaran</h3>
+                <button onclick="closeReceiptModal()" class="text-gray-500 hover:text-red-500 p-1 text-lg font-bold"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="max-h-[75vh] overflow-y-auto flex justify-center bg-gray-50 p-2 rounded-lg border">
+                <img id="modalReceiptImg" src="" alt="Struk Bon" class="max-w-full h-auto rounded shadow">
+            </div>
+            <div class="text-right">
+                <button onclick="closeReceiptModal()" class="px-4 py-1.5 bg-gray-600 text-white rounded-lg text-xs font-semibold hover:bg-gray-700">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div id="appContent" class="hidden">
         <!-- Header -->
@@ -117,7 +137,7 @@
             <div class="max-w-4xl mx-auto flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-receipt"></i> Expense Tracker KMNG</h1>
-                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.3.2</span>
+                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.3.4</span>
                 </div>
                 <button onclick="logout()" class="text-sm bg-blue-700 px-3 py-1.5 rounded hover:bg-blue-800 transition"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
             </div>
@@ -171,20 +191,17 @@
 
             <!-- VIEW 2: EXPENSES PAGE -->
             <section id="view-expenses" class="hidden space-y-4">
-                <!-- 1. ATAS: TOMBOL ADD NEW EXPENSE -->
                 <div>
                     <button onclick="openProjectModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-plus-circle text-lg"></i> + Add New Expense (Project)
                     </button>
                 </div>
 
-                <!-- 2. TENGAH: FITUR SEARCH EXPENSES -->
                 <div class="bg-white p-3 rounded-xl shadow flex items-center gap-2 border">
                     <i class="fa-solid fa-magnifying-glass text-gray-400 pl-2"></i>
                     <input type="text" id="searchExpenseInput" oninput="renderProjectList()" placeholder="Cari nama expense / project..." class="w-full p-2 text-sm outline-none">
                 </div>
 
-                <!-- 3. BAWAH: LIST EXPENSES -->
                 <div class="space-y-3">
                     <h3 class="font-bold text-gray-700 text-sm border-b pb-1">Daftar Expenses</h3>
                     <div id="projectListContainer" class="space-y-3"></div>
@@ -197,7 +214,6 @@
                     <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Expenses
                 </button>
 
-                <!-- Info Banner Proyek -->
                 <div class="bg-white p-4 rounded-xl shadow border-l-4 border-blue-600 flex justify-between items-start">
                     <div>
                         <h2 id="detailProjectTitle" class="text-xl font-bold text-gray-800">Project Name</h2>
@@ -206,14 +222,16 @@
                     <span id="detailProjectTotal" class="text-lg font-bold text-blue-600">Rp 0</span>
                 </div>
 
-                <!-- PALING ATAS: TOMBOL ADD TRANSAKSI -->
-                <div>
-                    <button onclick="openTransactionModal()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow hover:bg-green-700 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-circle-plus text-lg"></i> + Add Transaction
+                <!-- DUA TOMBOL SEJAJAR: ADD TRANSACTION & EXPORT -->
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openTransactionModal()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-circle-plus text-base"></i> + Add Transaction
+                    </button>
+                    <button onclick="exportCurrentDetailProject()" class="w-full bg-emerald-700 text-white py-3 rounded-xl font-bold shadow hover:bg-emerald-800 transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-file-excel text-base"></i> Export Excel
                     </button>
                 </div>
 
-                <!-- DIBAWAHNYA: LIST RINCIAN TRANSAKSI -->
                 <div class="space-y-2">
                     <h3 class="font-bold text-gray-700 text-sm border-b pb-1">List Rincian Transaksi</h3>
                     <div id="itemListContainer" class="space-y-2"></div>
@@ -222,7 +240,7 @@
         </main>
 
         <footer class="text-center text-xs text-gray-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.3.2
+            Expense Tracker KMNG &bull; Version 1.3.4
         </footer>
     </div>
 
@@ -253,7 +271,27 @@
 
         document.getElementById('itemDate').valueAsDate = new Date();
 
-        // Bind Global Functions to Window
+        window.formatCurrencyInput = (input) => {
+            let value = input.value.replace(/\D/g, "");
+            if (value === "") {
+                input.value = "";
+                document.getElementById('itemAmount').value = "0";
+                return;
+            }
+            document.getElementById('itemAmount').value = value;
+            input.value = Number(value).toLocaleString('id-ID');
+        };
+
+        window.openReceiptModal = (imgSrc) => {
+            document.getElementById('modalReceiptImg').src = imgSrc;
+            document.getElementById('receiptModal').classList.remove('hidden');
+        };
+
+        window.closeReceiptModal = () => {
+            document.getElementById('receiptModal').classList.add('hidden');
+            document.getElementById('modalReceiptImg').src = "";
+        };
+
         window.toggleAuthMode = () => {
             isLoginMode = !isLoginMode;
             document.getElementById('authTitle').innerText = isLoginMode ? 'Masuk Aplikasi' : 'Daftar Akun';
@@ -319,7 +357,6 @@
             });
         }
 
-        // Project Modal
         window.openProjectModal = (id = null) => {
             document.getElementById('projectModal').classList.remove('hidden');
             if (id) {
@@ -379,7 +416,6 @@
             }
         };
 
-        // Render List Expenses (Kotak List bisa diklik langsung)
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -399,7 +435,6 @@
                 const card = document.createElement('div');
                 card.className = "bg-white p-4 rounded-xl shadow space-y-3 border-l-4 border-blue-500 cursor-pointer hover:shadow-md transition";
                 
-                // Klik area kotak untuk membuka detail
                 card.onclick = () => openProjectDetail(p.id);
 
                 card.innerHTML = `
@@ -421,7 +456,6 @@
             });
         };
 
-        // Transaction Modal & Operations
         window.openProjectDetail = (projectId) => {
             const proj = projectsData.find(p => p.id === projectId);
             if (!proj) return;
@@ -437,6 +471,8 @@
         window.openTransactionModal = () => {
             document.getElementById('transactionModal').classList.remove('hidden');
             document.getElementById('itemForm').reset();
+            document.getElementById('itemAmount').value = "0";
+            document.getElementById('itemAmountFormatted').value = "";
             document.getElementById('itemImgPreview').classList.add('hidden');
             currentItemImage = "";
             document.getElementById('itemDate').valueAsDate = new Date();
@@ -524,7 +560,7 @@
                     <div class="space-y-0.5">
                         <span class="font-bold text-gray-800 text-sm">${item.category} - Rp ${item.amount.toLocaleString('id-ID')}</span>
                         <p class="text-gray-500">${item.date} ${item.note ? '| ' + item.note : ''}</p>
-                        ${item.receipt ? `<a href="${item.receipt}" target="_blank" class="text-blue-600 underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> Lihat Struk Bon</a>` : ''}
+                        ${item.receipt ? `<button onclick="openReceiptModal('${item.receipt}')" class="text-blue-600 underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> Lihat Struk Bon</button>` : ''}
                     </div>
                     <button onclick="deleteItem('${item.id}')" class="text-red-500 p-2 hover:bg-red-50 rounded"><i class="fa-solid fa-trash text-sm"></i></button>
                 `;
@@ -535,6 +571,13 @@
         window.deleteItem = async (id) => {
             if (confirm("Hapus rincian transaksi ini?")) {
                 await deleteDoc(doc(db, "expenses", id));
+            }
+        };
+
+        window.exportCurrentDetailProject = () => {
+            const projectId = document.getElementById('currentProjectId').value;
+            if (projectId) {
+                exportSingleProject(projectId);
             }
         };
 
@@ -553,13 +596,13 @@
                 "Tanggal": item.date,
                 "Kategori": item.category,
                 "Nominal (Rp)": item.amount,
-                "Catatan": item.note
+                "Keterangan": item.note
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Reimburse");
-            XLSX.writeFile(wb, `Reimburse_${proj.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.writeFile(wb, `Reimburse_${proj ? proj.name : 'Project'}_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
         function renderDashboard() {
