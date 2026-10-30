@@ -25,22 +25,22 @@
     <div id="authContainer" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
             <div class="text-center mb-6">
-                <h2 id="authTitle" class="text-2xl font-bold text-blue-600">Masuk Aplikasi</h2>
-                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.3.4</span></p>
+                <h2 id="authTitle" class="text-2xl font-bold text-blue-600" data-i18n="loginTitle">Masuk Aplikasi</h2>
+                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.4.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Email</label>
+                    <label class="block text-sm font-medium mb-1" data-i18n="emailLabel">Email</label>
                     <input type="email" id="authEmail" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-sm font-medium mb-1">Password</label>
+                    <label class="block text-sm font-medium mb-1" data-i18n="passLabel">Password</label>
                     <input type="password" id="authPassword" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
-                <button type="submit" id="authBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Masuk</button>
+                <button type="submit" id="authBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition" data-i18n="loginBtn">Masuk</button>
             </form>
             <div class="mt-4 text-center text-sm">
-                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-blue-600 underline">Belum punya akun? Daftar</button>
+                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-blue-600 underline" data-i18n="toggleRegister">Belum punya akun? Daftar</button>
             </div>
         </div>
     </div>
@@ -48,20 +48,20 @@
     <!-- Modal Create / Edit Expense Project -->
     <div id="projectModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-xl shadow-xl p-5 w-full max-w-md space-y-4">
-            <h3 id="projectModalTitle" class="text-lg font-bold text-gray-800">Add New Expense (Project)</h3>
+            <h3 id="projectModalTitle" class="text-lg font-bold text-gray-800" data-i18n="addExpenseTitle">Add New Expense (Project)</h3>
             <form id="projectForm" onsubmit="saveProject(event)" class="space-y-3">
                 <input type="hidden" id="editProjectId">
                 <div>
-                    <label class="block text-sm font-medium mb-1">Nama Expense / Project</label>
+                    <label class="block text-sm font-medium mb-1" data-i18n="projectNameLabel">Nama Expense / Project</label>
                     <input type="text" id="projectName" placeholder="Contoh: Project Wifi Jakarta, Dinas Bandung, dll." required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Catatan (Opsional)</label>
+                    <label class="block text-sm font-medium mb-1" data-i18n="noteLabel">Catatan (Opsional)</label>
                     <input type="text" id="projectNote" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-100">Batal</button>
-                    <button type="submit" id="saveProjectBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition">Save</button>
+                    <button type="button" onclick="closeProjectModal()" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-100" data-i18n="cancelBtn">Batal</button>
+                    <button type="submit" id="saveProjectBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition" data-i18n="saveBtn">Save</button>
                 </div>
             </form>
         </div>
@@ -70,45 +70,45 @@
     <!-- Modal Add Transaction Item -->
     <div id="transactionModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-xl shadow-xl p-5 w-full max-w-md space-y-4">
-            <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-receipt text-blue-600"></i> Tambah Rincian Transaksi</h3>
+            <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-receipt text-blue-600"></i> <span data-i18n="addTxTitle">Tambah Rincian Transaksi</span></h3>
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-medium mb-1">Tanggal</label>
+                        <label class="block text-xs font-medium mb-1" data-i18n="dateLabel">Tanggal</label>
                         <input type="date" id="itemDate" required class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium mb-1">Kategori</label>
+                        <label class="block text-xs font-medium mb-1" data-i18n="categoryLabel">Kategori</label>
                         <select id="itemCategory" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
-                            <option value="Bensin">Bensin</option>
-                            <option value="Makan">Makan</option>
-                            <option value="Tol">Tol</option>
-                            <option value="Parkir">Parkir</option>
+                            <option value="Bensin">Bensin / Fuel</option>
+                            <option value="Makan">Makan / Meal</option>
+                            <option value="Tol">Tol / Toll</option>
+                            <option value="Parkir">Parkir / Parking</option>
                             <option value="Akomodasi / Hotel">Akomodasi / Hotel</option>
-                            <option value="Transportasi / Tiket">Transportasi / Tiket</option>
+                            <option value="Transportasi / Tiket">Transportasi / Ticket</option>
                             <option value="ATK & Operasional">ATK & Operasional</option>
-                            <option value="Lainnya">Lainnya</option>
+                            <option value="Lainnya">Lainnya / Others</option>
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium mb-1">Jumlah (Rp)</label>
+                    <label class="block text-xs font-medium mb-1" data-i18n="amountLabel">Jumlah (Rp)</label>
                     <input type="text" id="itemAmountFormatted" placeholder="0" oninput="formatCurrencyInput(this)" required class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                     <input type="hidden" id="itemAmount">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium mb-1">Keterangan</label>
+                    <label class="block text-xs font-medium mb-1" data-i18n="descriptionLabel">Keterangan</label>
                     <input type="text" id="itemNote" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium mb-1">Foto Struk / Bon</label>
+                    <label class="block text-xs font-medium mb-1" data-i18n="receiptImgLabel">Foto Struk / Bon</label>
                     <input type="file" id="itemReceiptImg" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="w-full text-xs">
                     <img id="itemImgPreview" class="mt-2 h-24 object-cover rounded hidden border">
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-100">Batal</button>
-                    <button type="submit" id="saveItemBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition">Save</button>
+                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-100" data-i18n="cancelBtn">Batal</button>
+                    <button type="submit" id="saveItemBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition" data-i18n="saveBtn">Save</button>
                 </div>
             </form>
         </div>
@@ -118,14 +118,14 @@
     <div id="receiptModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-blue-600"></i> Struk / Bon Pembayaran</h3>
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-blue-600"></i> <span data-i18n="receiptTitle">Struk / Bon Pembayaran</span></h3>
                 <button onclick="closeReceiptModal()" class="text-gray-500 hover:text-red-500 p-1 text-lg font-bold"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="max-h-[75vh] overflow-y-auto flex justify-center bg-gray-50 p-2 rounded-lg border">
                 <img id="modalReceiptImg" src="" alt="Struk Bon" class="max-w-full h-auto rounded shadow">
             </div>
             <div class="text-right">
-                <button onclick="closeReceiptModal()" class="px-4 py-1.5 bg-gray-600 text-white rounded-lg text-xs font-semibold hover:bg-gray-700">Tutup</button>
+                <button onclick="closeReceiptModal()" class="px-4 py-1.5 bg-gray-600 text-white rounded-lg text-xs font-semibold hover:bg-gray-700" data-i18n="closeBtn">Tutup</button>
             </div>
         </div>
     </div>
@@ -137,9 +137,16 @@
             <div class="max-w-4xl mx-auto flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-receipt"></i> Expense Tracker KMNG</h1>
-                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.3.4</span>
+                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.4.0</span>
                 </div>
-                <button onclick="logout()" class="text-sm bg-blue-700 px-3 py-1.5 rounded hover:bg-blue-800 transition"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+                <div class="flex items-center gap-3">
+                    <!-- Language Switcher -->
+                    <div class="bg-blue-700 p-1 rounded-lg text-xs font-bold flex gap-1 border border-blue-500">
+                        <button onclick="setLanguage('id')" id="lang-id" class="px-2 py-0.5 rounded bg-white text-blue-700 shadow">ID</button>
+                        <button onclick="setLanguage('en')" id="lang-en" class="px-2 py-0.5 rounded text-white hover:bg-blue-600">EN</button>
+                    </div>
+                    <button onclick="logout()" class="text-sm bg-blue-700 px-3 py-1.5 rounded hover:bg-blue-800 transition"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logoutBtn">Keluar</span></button>
+                </div>
             </div>
         </header>
 
@@ -147,27 +154,27 @@
         <main class="max-w-4xl mx-auto p-4 space-y-6">
             <!-- Navigation Tabs -->
             <div class="no-print bg-white p-2 rounded-xl shadow flex justify-around border md:relative fixed bottom-0 left-0 right-0 z-40">
-                <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-blue-600 font-semibold" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> Home</button>
-                <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-gray-500 font-semibold" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> Expenses</button>
+                <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-blue-600 font-semibold" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
+                <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-gray-500 font-semibold" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> <span data-i18n="expensesTab">Expenses</span></button>
             </div>
 
             <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
             <section id="view-dashboard" class="space-y-4">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div class="bg-white p-3.5 rounded-xl shadow border-l-4 border-blue-500">
-                        <p class="text-xs text-gray-500 font-medium">Total Pengeluaran</p>
+                        <p class="text-xs text-gray-500 font-medium" data-i18n="dashTotalLabel">Total Pengeluaran</p>
                         <h3 id="dashTotal" class="text-lg font-bold text-gray-800 mt-1">Rp 0</h3>
                     </div>
                     <div class="bg-white p-3.5 rounded-xl shadow border-l-4 border-green-500">
-                        <p class="text-xs text-gray-500 font-medium">Bulan Ini</p>
+                        <p class="text-xs text-gray-500 font-medium" data-i18n="dashMonthLabel">Bulan Ini</p>
                         <h3 id="dashThisMonth" class="text-lg font-bold text-gray-800 mt-1">Rp 0</h3>
                     </div>
                     <div class="bg-white p-3.5 rounded-xl shadow border-l-4 border-amber-500">
-                        <p class="text-xs text-gray-500 font-medium">Total Bon</p>
+                        <p class="text-xs text-gray-500 font-medium" data-i18n="dashReceiptCount">Total Bon</p>
                         <h3 id="dashCount" class="text-lg font-bold text-gray-800 mt-1">0 Transaksi</h3>
                     </div>
                     <div class="bg-white p-3.5 rounded-xl shadow border-l-4 border-purple-500">
-                        <p class="text-xs text-gray-500 font-medium">Total Project</p>
+                        <p class="text-xs text-gray-500 font-medium" data-i18n="dashProjCount">Total Project</p>
                         <h3 id="dashProjects" class="text-lg font-bold text-gray-800 mt-1">0 Project</h3>
                     </div>
                 </div>
@@ -175,14 +182,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-white p-4 rounded-xl shadow space-y-3">
                         <h3 class="font-bold text-gray-700 text-sm border-b pb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-tags text-blue-500"></i> Pengeluaran per Kategori
+                            <i class="fa-solid fa-tags text-blue-500"></i> <span data-i18n="catBreakdownTitle">Pengeluaran per Kategori</span>
                         </h3>
                         <div id="categoryBreakdown" class="space-y-2.5 text-sm"></div>
                     </div>
 
                     <div class="bg-white p-4 rounded-xl shadow space-y-3">
                         <h3 class="font-bold text-gray-700 text-sm border-b pb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-folder-tree text-green-500"></i> Ringkasan per Project
+                            <i class="fa-solid fa-folder-tree text-green-500"></i> <span data-i18n="projBreakdownTitle">Ringkasan per Project</span>
                         </h3>
                         <div id="projectBreakdown" class="space-y-2 text-sm max-h-56 overflow-y-auto"></div>
                     </div>
@@ -193,7 +200,7 @@
             <section id="view-expenses" class="hidden space-y-4">
                 <div>
                     <button onclick="openProjectModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus-circle text-lg"></i> + Add New Expense (Project)
+                        <i class="fa-solid fa-plus-circle text-lg"></i> + <span data-i18n="addExpenseBtn">+ Add New Expense (Project)</span>
                     </button>
                 </div>
 
@@ -203,7 +210,7 @@
                 </div>
 
                 <div class="space-y-3">
-                    <h3 class="font-bold text-gray-700 text-sm border-b pb-1">Daftar Expenses</h3>
+                    <h3 class="font-bold text-gray-700 text-sm border-b pb-1" data-i18n="expenseListHeader">Daftar Expenses</h3>
                     <div id="projectListContainer" class="space-y-3"></div>
                 </div>
             </section>
@@ -211,36 +218,40 @@
             <!-- VIEW 3: PROJECT DETAIL & RINCIAN TRANSAKSI -->
             <section id="view-project-detail" class="hidden space-y-4">
                 <button onclick="switchTab('expenses')" class="text-sm text-blue-600 font-semibold flex items-center gap-1 hover:underline">
-                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Expenses
+                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Kembali ke Daftar Expenses</span>
                 </button>
 
+                <!-- Info Banner Proyek (Tombol Export Kecil di Sebelah Judul) -->
                 <div class="bg-white p-4 rounded-xl shadow border-l-4 border-blue-600 flex justify-between items-start">
                     <div>
-                        <h2 id="detailProjectTitle" class="text-xl font-bold text-gray-800">Project Name</h2>
-                        <p id="detailProjectNote" class="text-xs text-gray-500 mt-0.5">Catatan...</p>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 id="detailProjectTitle" class="text-xl font-bold text-gray-800">Project Name</h2>
+                            <!-- TOMBOL EXPORT KECIL DI SEBELAH JUDUL -->
+                            <button onclick="exportCurrentDetailProject()" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1 hover:bg-emerald-700 transition">
+                                <i class="fa-solid fa-file-excel text-xs"></i> Export
+                            </button>
+                        </div>
+                        <p id="detailProjectNote" class="text-xs text-gray-500 mt-1">Catatan...</p>
                     </div>
                     <span id="detailProjectTotal" class="text-lg font-bold text-blue-600">Rp 0</span>
                 </div>
 
-                <!-- DUA TOMBOL SEJAJAR: ADD TRANSACTION & EXPORT -->
-                <div class="grid grid-cols-2 gap-2">
+                <!-- TOMBOL ADD TRANSACTION FULL WIDTH -->
+                <div>
                     <button onclick="openTransactionModal()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm">
-                        <i class="fa-solid fa-circle-plus text-base"></i> + Add Transaction
-                    </button>
-                    <button onclick="exportCurrentDetailProject()" class="w-full bg-emerald-700 text-white py-3 rounded-xl font-bold shadow hover:bg-emerald-800 transition flex items-center justify-center gap-2 text-sm">
-                        <i class="fa-solid fa-file-excel text-base"></i> Export Excel
+                        <i class="fa-solid fa-circle-plus text-base"></i> + <span data-i18n="addTxBtn">Add Transaction</span>
                     </button>
                 </div>
 
                 <div class="space-y-2">
-                    <h3 class="font-bold text-gray-700 text-sm border-b pb-1">List Rincian Transaksi</h3>
+                    <h3 class="font-bold text-gray-700 text-sm border-b pb-1" data-i18n="txListHeader">List Rincian Transaksi</h3>
                     <div id="itemListContainer" class="space-y-2"></div>
                 </div>
             </section>
         </main>
 
         <footer class="text-center text-xs text-gray-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.3.4
+            Expense Tracker KMNG &bull; Version 1.4.0
         </footer>
     </div>
 
@@ -268,6 +279,112 @@
         let itemsData = [];
         let isLoginMode = true;
         let currentItemImage = "";
+        let currentLang = "id";
+
+        // Dictionary I18N Bahasa ID / EN
+        const i18n = {
+            id: {
+                loginTitle: "Masuk Aplikasi",
+                emailLabel: "Email",
+                passLabel: "Password",
+                loginBtn: "Masuk",
+                toggleRegister: "Belum punya akun? Daftar",
+                addExpenseTitle: "Add New Expense (Project)",
+                projectNameLabel: "Nama Expense / Project",
+                noteLabel: "Catatan (Opsional)",
+                cancelBtn: "Batal",
+                saveBtn: "Save",
+                addTxTitle: "Tambah Rincian Transaksi",
+                dateLabel: "Tanggal",
+                categoryLabel: "Kategori",
+                amountLabel: "Jumlah (Rp)",
+                descriptionLabel: "Keterangan",
+                receiptImgLabel: "Foto Struk / Bon",
+                receiptTitle: "Struk / Bon Pembayaran",
+                closeBtn: "Tutup",
+                logoutBtn: "Keluar",
+                homeTab: "Home",
+                expensesTab: "Expenses",
+                dashTotalLabel: "Total Pengeluaran",
+                dashMonthLabel: "Bulan Ini",
+                dashReceiptCount: "Total Bon",
+                dashProjCount: "Total Project",
+                catBreakdownTitle: "Pengeluaran per Kategori",
+                projBreakdownTitle: "Ringkasan per Project",
+                addExpenseBtn: "Add New Expense (Project)",
+                searchPlaceholder: "Cari nama expense / project...",
+                expenseListHeader: "Daftar Expenses",
+                backToExpenses: "Kembali ke Daftar Expenses",
+                addTxBtn: "Add Transaction",
+                txListHeader: "List Rincian Transaksi",
+                noNotes: "Tidak ada catatan",
+                txCount: "Transaksi",
+                viewReceipt: "Lihat Struk Bon",
+                noProjMsg: "Belum ada Expense/Project. Klik tombol di atas untuk membuat.",
+                noTxMsg: "Belum ada rincian transaksi untuk proyek ini. Klik + Add Transaction untuk menambahkan."
+            },
+            en: {
+                loginTitle: "App Login",
+                emailLabel: "Email Address",
+                passLabel: "Password",
+                loginBtn: "Login",
+                toggleRegister: "Don't have an account? Register",
+                addExpenseTitle: "Add New Expense (Project)",
+                projectNameLabel: "Expense / Project Name",
+                noteLabel: "Notes (Optional)",
+                cancelBtn: "Cancel",
+                saveBtn: "Save",
+                addTxTitle: "Add Transaction Detail",
+                dateLabel: "Date",
+                categoryLabel: "Category",
+                amountLabel: "Amount (Rp)",
+                descriptionLabel: "Description",
+                receiptImgLabel: "Receipt Photo",
+                receiptTitle: "Receipt Attachment",
+                closeBtn: "Close",
+                logoutBtn: "Logout",
+                homeTab: "Home",
+                expensesTab: "Expenses",
+                dashTotalLabel: "Total Expenses",
+                dashMonthLabel: "This Month",
+                dashReceiptCount: "Total Receipts",
+                dashProjCount: "Total Projects",
+                catBreakdownTitle: "Expenses by Category",
+                projBreakdownTitle: "Summary by Project",
+                addExpenseBtn: "Add New Expense (Project)",
+                searchPlaceholder: "Search expense / project name...",
+                expenseListHeader: "Expenses List",
+                backToExpenses: "Back to Expenses List",
+                addTxBtn: "Add Transaction",
+                txListHeader: "Transaction Details List",
+                noNotes: "No notes",
+                txCount: "Transactions",
+                viewReceipt: "View Receipt",
+                noProjMsg: "No Expenses/Projects found. Click the button above to create one.",
+                noTxMsg: "No transaction details for this project yet. Click + Add Transaction to add."
+            }
+        };
+
+        window.setLanguage = (lang) => {
+            currentLang = lang;
+            document.getElementById('lang-id').className = lang === 'id' ? 'px-2 py-0.5 rounded bg-white text-blue-700 shadow' : 'px-2 py-0.5 rounded text-white hover:bg-blue-600';
+            document.getElementById('lang-en').className = lang === 'en' ? 'px-2 py-0.5 rounded bg-white text-blue-700 shadow' : 'px-2 py-0.5 rounded text-white hover:bg-blue-600';
+
+            // Update UI static text
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) {
+                    el.innerText = i18n[lang][key];
+                }
+            });
+
+            document.getElementById('searchExpenseInput').placeholder = i18n[lang].searchPlaceholder;
+
+            // Re-render Dynamic Content
+            renderProjectList();
+            const curProjId = document.getElementById('currentProjectId').value;
+            if (curProjId) renderProjectItems(curProjId);
+        };
 
         document.getElementById('itemDate').valueAsDate = new Date();
 
@@ -294,9 +411,9 @@
 
         window.toggleAuthMode = () => {
             isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').innerText = isLoginMode ? 'Masuk Aplikasi' : 'Daftar Akun';
-            document.getElementById('authBtn').innerText = isLoginMode ? 'Masuk' : 'Daftar';
-            document.getElementById('toggleAuthBtn').innerText = isLoginMode ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk';
+            document.getElementById('authTitle').innerText = isLoginMode ? i18n[currentLang].loginTitle : (currentLang === 'id' ? 'Daftar Akun' : 'Register Account');
+            document.getElementById('authBtn').innerText = isLoginMode ? i18n[currentLang].loginBtn : (currentLang === 'id' ? 'Daftar' : 'Register');
+            document.getElementById('toggleAuthBtn').innerText = isLoginMode ? i18n[currentLang].toggleRegister : (currentLang === 'id' ? 'Sudah punya akun? Masuk' : 'Already have an account? Login');
         };
 
         window.handleAuth = async (e) => {
@@ -361,12 +478,12 @@
             document.getElementById('projectModal').classList.remove('hidden');
             if (id) {
                 const proj = projectsData.find(p => p.id === id);
-                document.getElementById('projectModalTitle').innerText = "Edit Expense (Project)";
+                document.getElementById('projectModalTitle').innerText = currentLang === 'id' ? "Edit Expense (Project)" : "Edit Expense (Project)";
                 document.getElementById('editProjectId').value = id;
                 document.getElementById('projectName').value = proj.name;
                 document.getElementById('projectNote').value = proj.note || "";
             } else {
-                document.getElementById('projectModalTitle').innerText = "Add New Expense (Project)";
+                document.getElementById('projectModalTitle').innerText = i18n[currentLang].addExpenseTitle;
                 document.getElementById('editProjectId').value = "";
                 document.getElementById('projectForm').reset();
             }
@@ -399,7 +516,7 @@
                 }
                 closeProjectModal();
             } catch (err) {
-                alert("Gagal menyimpan: " + err.message);
+                alert("Error: " + err.message);
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerText = "Save";
@@ -407,7 +524,7 @@
         };
 
         window.deleteProject = async (id) => {
-            if (confirm("Hapus Expense/Project ini beserta seluruh rincian identifikasinya?")) {
+            if (confirm(currentLang === 'id' ? "Hapus Expense/Project ini beserta seluruh rincian identifikasinya?" : "Delete this Expense/Project along with all its transactions?")) {
                 await deleteDoc(doc(db, "projects", id));
                 const related = itemsData.filter(i => i.projectId === id);
                 for (let item of related) {
@@ -416,6 +533,7 @@
             }
         };
 
+        // Render List Expenses (Tombol Edit Dipindahkan ke Sebelah Nama Project)
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -424,7 +542,7 @@
             const filtered = projectsData.filter(p => p.name.toLowerCase().includes(search));
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 text-center text-gray-400 rounded-xl shadow">Belum ada Expense/Project. Klik tombol di atas untuk membuat.</div>`;
+                container.innerHTML = `<div class="bg-white p-6 text-center text-gray-400 rounded-xl shadow">${i18n[currentLang].noProjMsg}</div>`;
                 return;
             }
 
@@ -440,16 +558,19 @@
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
-                            <h4 class="font-bold text-gray-800 text-base">${p.name}</h4>
-                            <p class="text-xs text-gray-500">${p.note || 'Tidak ada catatan'}</p>
-                            <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded mt-1 inline-block font-semibold">${pItems.length} Transaksi</span>
+                            <!-- NAMA PROJECT + TOMBOL EDIT DI SEBELAHNYA -->
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-bold text-gray-800 text-base">${p.name}</h4>
+                                <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="p-1 text-gray-400 hover:text-blue-600 rounded text-xs" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                            </div>
+                            <p class="text-xs text-gray-500">${p.note || i18n[currentLang].noNotes}</p>
+                            <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded mt-1 inline-block font-semibold">${pItems.length} ${i18n[currentLang].txCount}</span>
                         </div>
                         <span class="font-bold text-blue-600 text-base">Rp ${totalAmount.toLocaleString('id-ID')}</span>
                     </div>
                     <div class="flex justify-end items-center pt-2 border-t text-xs gap-1">
-                        <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="px-2.5 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"><i class="fa-solid fa-pen"></i> Edit</button>
-                        <button onclick="event.stopPropagation(); exportSingleProject('${p.id}')" class="px-2.5 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"><i class="fa-solid fa-file-excel"></i> Export</button>
-                        <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="px-2.5 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200"><i class="fa-solid fa-trash"></i> Delete</button>
+                        <button onclick="event.stopPropagation(); exportSingleProject('${p.id}')" class="px-2.5 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium flex items-center gap-1"><i class="fa-solid fa-file-excel"></i> Export</button>
+                        <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="px-2.5 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 font-medium flex items-center gap-1"><i class="fa-solid fa-trash"></i> Delete</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -462,7 +583,7 @@
 
             document.getElementById('currentProjectId').value = projectId;
             document.getElementById('detailProjectTitle').innerText = proj.name;
-            document.getElementById('detailProjectNote').innerText = proj.note || "";
+            document.getElementById('detailProjectNote').innerText = proj.note || i18n[currentLang].noNotes;
             
             renderProjectItems(projectId);
             switchTab('project-detail');
@@ -531,7 +652,7 @@
                 closeTransactionModal();
                 renderProjectItems(projectId);
             } catch (err) {
-                alert("Gagal menyimpan rincian: " + err.message);
+                alert("Error: " + err.message);
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerText = "Save";
@@ -547,7 +668,7 @@
             container.innerHTML = '';
 
             if (pItems.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 text-center text-xs text-gray-400 rounded-xl shadow">Belum ada rincian transaksi untuk proyek ini. Klik <b>+ Add Transaction</b> untuk menambahkan.</div>`;
+                container.innerHTML = `<div class="bg-white p-6 text-center text-xs text-gray-400 rounded-xl shadow">${i18n[currentLang].noTxMsg}</div>`;
                 return;
             }
 
@@ -560,7 +681,7 @@
                     <div class="space-y-0.5">
                         <span class="font-bold text-gray-800 text-sm">${item.category} - Rp ${item.amount.toLocaleString('id-ID')}</span>
                         <p class="text-gray-500">${item.date} ${item.note ? '| ' + item.note : ''}</p>
-                        ${item.receipt ? `<button onclick="openReceiptModal('${item.receipt}')" class="text-blue-600 underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> Lihat Struk Bon</button>` : ''}
+                        ${item.receipt ? `<button onclick="openReceiptModal('${item.receipt}')" class="text-blue-600 underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> ${i18n[currentLang].viewReceipt}</button>` : ''}
                     </div>
                     <button onclick="deleteItem('${item.id}')" class="text-red-500 p-2 hover:bg-red-50 rounded"><i class="fa-solid fa-trash text-sm"></i></button>
                 `;
@@ -569,7 +690,7 @@
         }
 
         window.deleteItem = async (id) => {
-            if (confirm("Hapus rincian transaksi ini?")) {
+            if (confirm(currentLang === 'id' ? "Hapus rincian transaksi ini?" : "Delete this transaction item?")) {
                 await deleteDoc(doc(db, "expenses", id));
             }
         };
@@ -586,17 +707,17 @@
             const pItems = itemsData.filter(i => i.projectId === projectId);
 
             if (pItems.length === 0) {
-                alert("Belum ada rincian transaksi pada proyek ini untuk diekspor!");
+                alert(currentLang === 'id' ? "Belum ada rincian transaksi pada proyek ini untuk diekspor!" : "No transactions in this project to export!");
                 return;
             }
 
             const exportData = pItems.map((item, index) => ({
                 "No": index + 1,
-                "Proyek": proj ? proj.name : "",
-                "Tanggal": item.date,
-                "Kategori": item.category,
-                "Nominal (Rp)": item.amount,
-                "Keterangan": item.note
+                "Proyek / Project": proj ? proj.name : "",
+                "Tanggal / Date": item.date,
+                "Kategori / Category": item.category,
+                "Nominal / Amount (Rp)": item.amount,
+                "Keterangan / Description": item.note
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
@@ -613,7 +734,7 @@
 
             document.getElementById('dashTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
             document.getElementById('dashThisMonth').innerText = `Rp ${thisMonthTotal.toLocaleString('id-ID')}`;
-            document.getElementById('dashCount').innerText = `${itemsData.length} Transaksi`;
+            document.getElementById('dashCount').innerText = `${itemsData.length} ${i18n[currentLang].txCount}`;
             document.getElementById('dashProjects').innerText = `${projectsData.length} Project`;
 
             const catMap = {};
