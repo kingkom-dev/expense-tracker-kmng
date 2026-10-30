@@ -26,7 +26,7 @@
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-blue-600">Masuk Aplikasi</h2>
-                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.3.1</span></p>
+                <p class="text-xs text-gray-400 font-semibold mt-1">Expense Tracker KMNG <span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">v1.3.2</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -67,6 +67,49 @@
         </div>
     </div>
 
+    <!-- Modal Add Transaction Item -->
+    <div id="transactionModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-5 w-full max-w-md space-y-4">
+            <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-receipt text-blue-600"></i> Tambah Rincian Transaksi</h3>
+            <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
+                <input type="hidden" id="currentProjectId">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Tanggal</label>
+                        <input type="date" id="itemDate" required class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Kategori</label>
+                        <select id="itemCategory" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="Bensin">Bensin</option>
+                            <option value="Makan">Makan</option>
+                            <option value="Tol">Tol</option>
+                            <option value="Parkir">Parkir</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1">Jumlah (Rp)</label>
+                    <input type="number" id="itemAmount" placeholder="0" required class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1">Keterangan / Catatan</label>
+                    <input type="text" id="itemNote" placeholder="Misal: Pertamax, Parkir" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1">Foto Struk / Bon</label>
+                    <input type="file" id="itemReceiptImg" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="w-full text-xs">
+                    <img id="itemImgPreview" class="mt-2 h-24 object-cover rounded hidden border">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-100">Batal</button>
+                    <button type="submit" id="saveItemBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div id="appContent" class="hidden">
         <!-- Header -->
@@ -74,7 +117,7 @@
             <div class="max-w-4xl mx-auto flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-receipt"></i> Expense Tracker KMNG</h1>
-                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.3.1</span>
+                    <span class="text-[10px] bg-blue-800 text-blue-200 px-2 py-0.5 rounded-full font-medium">v1.3.2</span>
                 </div>
                 <button onclick="logout()" class="text-sm bg-blue-700 px-3 py-1.5 rounded hover:bg-blue-800 transition"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
             </div>
@@ -148,72 +191,38 @@
                 </div>
             </section>
 
-            <!-- VIEW 3: PROJECT DETAIL & INPUT TRANSAKSI -->
+            <!-- VIEW 3: PROJECT DETAIL & RINCIAN TRANSAKSI -->
             <section id="view-project-detail" class="hidden space-y-4">
                 <button onclick="switchTab('expenses')" class="text-sm text-blue-600 font-semibold flex items-center gap-1 hover:underline">
                     <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Expenses
                 </button>
 
-                <div class="bg-white p-4 rounded-xl shadow space-y-3 border-l-4 border-blue-600">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h2 id="detailProjectTitle" class="text-xl font-bold text-gray-800">Project Name</h2>
-                            <p id="detailProjectNote" class="text-xs text-gray-500 mt-0.5">Catatan...</p>
-                        </div>
-                        <span id="detailProjectTotal" class="text-lg font-bold text-blue-600">Rp 0</span>
+                <!-- Info Banner Proyek -->
+                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-blue-600 flex justify-between items-start">
+                    <div>
+                        <h2 id="detailProjectTitle" class="text-xl font-bold text-gray-800">Project Name</h2>
+                        <p id="detailProjectNote" class="text-xs text-gray-500 mt-0.5">Catatan...</p>
                     </div>
+                    <span id="detailProjectTotal" class="text-lg font-bold text-blue-600">Rp 0</span>
                 </div>
 
-                <!-- Form Add Item/Receipt Transaksi -->
-                <div class="bg-white p-4 rounded-xl shadow space-y-3">
-                    <h3 class="font-bold text-gray-700 text-sm border-b pb-2">+ Tambah Rincian Bon / Transaksi</h3>
-                    <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
-                        <input type="hidden" id="currentProjectId">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs font-medium mb-1">Tanggal</label>
-                                <input type="date" id="itemDate" required class="w-full p-2 border rounded-lg text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium mb-1">Kategori</label>
-                                <select id="itemCategory" class="w-full p-2 border rounded-lg text-sm">
-                                    <option value="Bensin">Bensin</option>
-                                    <option value="Makan">Makan</option>
-                                    <option value="Tol">Tol</option>
-                                    <option value="Parkir">Parkir</option>
-                                    <option value="Lainnya">Lainnya</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs font-medium mb-1">Jumlah (Rp)</label>
-                                <input type="number" id="itemAmount" placeholder="0" required class="w-full p-2 border rounded-lg text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium mb-1">Keterangan / Catatan</label>
-                                <input type="text" id="itemNote" placeholder="Misal: Pertamax, Parkir" class="w-full p-2 border rounded-lg text-sm">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium mb-1">Foto Struk / Bon</label>
-                            <input type="file" id="itemReceiptImg" accept="image/*" capture="environment" onchange="previewItemImage(event)" class="w-full text-xs">
-                            <img id="itemImgPreview" class="mt-2 h-24 object-cover rounded hidden border">
-                        </div>
-                        <button type="submit" class="w-full bg-green-600 text-white py-2.5 rounded-lg font-bold text-sm hover:bg-green-700"><i class="fa-solid fa-floppy-disk"></i> Simpan Transaksi</button>
-                    </form>
+                <!-- PALING ATAS: TOMBOL ADD TRANSAKSI -->
+                <div>
+                    <button onclick="openTransactionModal()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow hover:bg-green-700 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-plus text-lg"></i> + Add Transaction
+                    </button>
                 </div>
 
-                <!-- Transaction Items List -->
+                <!-- DIBAWAHNYA: LIST RINCIAN TRANSAKSI -->
                 <div class="space-y-2">
-                    <h3 class="font-bold text-gray-700 text-sm">Rincian Transaksi Proyek Ini</h3>
+                    <h3 class="font-bold text-gray-700 text-sm border-b pb-1">List Rincian Transaksi</h3>
                     <div id="itemListContainer" class="space-y-2"></div>
                 </div>
             </section>
         </main>
 
         <footer class="text-center text-xs text-gray-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.3.1
+            Expense Tracker KMNG &bull; Version 1.3.2
         </footer>
     </div>
 
@@ -223,14 +232,14 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-      const firebaseConfig = {
-		apiKey: "AIzaSyCl1prA-wQZQzSkMNU9_JsSUKmf_CuXp5c",
-		authDomain: "expense-tracker-komang.firebaseapp.com",
-		projectId: "expense-tracker-komang",
-		storageBucket: "expense-tracker-komang.firebasestorage.app",
-		messagingSenderId: "452671118843",
-		appId: "1:452671118843:web:9499f180e0b94899883f5e"
-	};
+		const firebaseConfig = {
+			apiKey: "AIzaSyCl1prA-wQZQzSkMNU9_JsSUKmf_CuXp5c",
+			authDomain: "expense-tracker-komang.firebaseapp.com",
+			projectId: "expense-tracker-komang",
+			storageBucket: "expense-tracker-komang.firebasestorage.app",
+			messagingSenderId: "452671118843",
+			appId: "1:452671118843:web:9499f180e0b94899883f5e"
+		};
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -297,7 +306,7 @@
                 snapshot.forEach(doc => projectsData.push({ id: doc.id, ...doc.data() }));
                 renderProjectList();
                 renderDashboard();
-            }, (err) => console.error("Project Listen Error:", err));
+            });
 
             const qItems = query(collection(db, "expenses"), where("userId", "==", currentUser.uid));
             onSnapshot(qItems, (snapshot) => {
@@ -307,9 +316,10 @@
                 renderDashboard();
                 const curProjId = document.getElementById('currentProjectId').value;
                 if (curProjId) renderProjectItems(curProjId);
-            }, (err) => console.error("Expense Listen Error:", err));
+            });
         }
 
+        // Project Modal
         window.openProjectModal = (id = null) => {
             document.getElementById('projectModal').classList.remove('hidden');
             if (id) {
@@ -352,7 +362,7 @@
                 }
                 closeProjectModal();
             } catch (err) {
-                alert("Gagal menyimpan project: " + err.message);
+                alert("Gagal menyimpan: " + err.message);
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerText = "Save";
@@ -369,6 +379,7 @@
             }
         };
 
+        // Render List Expenses (Kotak List bisa diklik langsung)
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -386,7 +397,11 @@
                 const totalAmount = pItems.reduce((acc, curr) => acc + curr.amount, 0);
 
                 const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-xl shadow space-y-3 border-l-4 border-blue-500";
+                card.className = "bg-white p-4 rounded-xl shadow space-y-3 border-l-4 border-blue-500 cursor-pointer hover:shadow-md transition";
+                
+                // Klik area kotak untuk membuka detail
+                card.onclick = () => openProjectDetail(p.id);
+
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
@@ -396,21 +411,17 @@
                         </div>
                         <span class="font-bold text-blue-600 text-base">Rp ${totalAmount.toLocaleString('id-ID')}</span>
                     </div>
-                    <div class="flex justify-between items-center pt-2 border-t text-xs gap-2">
-                        <button onclick="openProjectDetail('${p.id}')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1 hover:bg-blue-700">
-                            <i class="fa-solid fa-folder-open"></i> Isi / Detail
-                        </button>
-                        <div class="flex gap-1">
-                            <button onclick="openProjectModal('${p.id}')" class="p-1.5 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"><i class="fa-solid fa-pen"></i> Edit</button>
-                            <button onclick="exportSingleProject('${p.id}')" class="p-1.5 bg-green-100 text-green-700 rounded hover:bg-green-200"><i class="fa-solid fa-file-excel"></i> Export</button>
-                            <button onclick="deleteProject('${p.id}')" class="p-1.5 bg-red-100 text-red-600 rounded hover:bg-red-200"><i class="fa-solid fa-trash"></i> Delete</button>
-                        </div>
+                    <div class="flex justify-end items-center pt-2 border-t text-xs gap-1">
+                        <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="px-2.5 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"><i class="fa-solid fa-pen"></i> Edit</button>
+                        <button onclick="event.stopPropagation(); exportSingleProject('${p.id}')" class="px-2.5 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"><i class="fa-solid fa-file-excel"></i> Export</button>
+                        <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="px-2.5 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200"><i class="fa-solid fa-trash"></i> Delete</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         };
 
+        // Transaction Modal & Operations
         window.openProjectDetail = (projectId) => {
             const proj = projectsData.find(p => p.id === projectId);
             if (!proj) return;
@@ -421,6 +432,18 @@
             
             renderProjectItems(projectId);
             switchTab('project-detail');
+        };
+
+        window.openTransactionModal = () => {
+            document.getElementById('transactionModal').classList.remove('hidden');
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemImgPreview').classList.add('hidden');
+            currentItemImage = "";
+            document.getElementById('itemDate').valueAsDate = new Date();
+        };
+
+        window.closeTransactionModal = () => {
+            document.getElementById('transactionModal').classList.add('hidden');
         };
 
         window.previewItemImage = (e) => {
@@ -448,27 +471,35 @@
 
         window.saveTransactionItem = async (e) => {
             e.preventDefault();
-            const projectId = document.getElementById('currentProjectId').value;
-            const proj = projectsData.find(p => p.id === projectId);
+            const saveBtn = document.getElementById('saveItemBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerText = "Saving...";
 
-            const newItem = {
-                userId: currentUser.uid,
-                projectId: projectId,
-                project: proj ? proj.name : "",
-                date: document.getElementById('itemDate').value,
-                category: document.getElementById('itemCategory').value,
-                amount: Number(document.getElementById('itemAmount').value),
-                note: document.getElementById('itemNote').value,
-                receipt: currentItemImage,
-                createdAt: new Date().toISOString()
-            };
+            try {
+                const projectId = document.getElementById('currentProjectId').value;
+                const proj = projectsData.find(p => p.id === projectId);
 
-            await addDoc(collection(db, "expenses"), newItem);
-            document.getElementById('itemForm').reset();
-            document.getElementById('itemImgPreview').classList.add('hidden');
-            currentItemImage = "";
-            document.getElementById('itemDate').valueAsDate = new Date();
-            renderProjectItems(projectId);
+                const newItem = {
+                    userId: currentUser.uid,
+                    projectId: projectId,
+                    project: proj ? proj.name : "",
+                    date: document.getElementById('itemDate').value,
+                    category: document.getElementById('itemCategory').value,
+                    amount: Number(document.getElementById('itemAmount').value),
+                    note: document.getElementById('itemNote').value,
+                    receipt: currentItemImage,
+                    createdAt: new Date().toISOString()
+                };
+
+                await addDoc(collection(db, "expenses"), newItem);
+                closeTransactionModal();
+                renderProjectItems(projectId);
+            } catch (err) {
+                alert("Gagal menyimpan rincian: " + err.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = "Save";
+            }
         };
 
         function renderProjectItems(projectId) {
@@ -480,7 +511,7 @@
             container.innerHTML = '';
 
             if (pItems.length === 0) {
-                container.innerHTML = `<div class="bg-white p-4 text-center text-xs text-gray-400 rounded-xl">Belum ada rincian transaksi untuk proyek ini.</div>`;
+                container.innerHTML = `<div class="bg-white p-6 text-center text-xs text-gray-400 rounded-xl shadow">Belum ada rincian transaksi untuk proyek ini. Klik <b>+ Add Transaction</b> untuk menambahkan.</div>`;
                 return;
             }
 
@@ -488,14 +519,14 @@
 
             pItems.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-3 rounded-xl shadow flex justify-between items-center text-xs";
+                card.className = "bg-white p-3.5 rounded-xl shadow flex justify-between items-center text-xs border";
                 card.innerHTML = `
-                    <div>
-                        <span class="font-bold text-gray-800">${item.category} - Rp ${item.amount.toLocaleString('id-ID')}</span>
+                    <div class="space-y-0.5">
+                        <span class="font-bold text-gray-800 text-sm">${item.category} - Rp ${item.amount.toLocaleString('id-ID')}</span>
                         <p class="text-gray-500">${item.date} ${item.note ? '| ' + item.note : ''}</p>
-                        ${item.receipt ? `<a href="${item.receipt}" target="_blank" class="text-blue-600 underline font-semibold"><i class="fa-solid fa-paperclip"></i> Lihat Struk</a>` : ''}
+                        ${item.receipt ? `<a href="${item.receipt}" target="_blank" class="text-blue-600 underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> Lihat Struk Bon</a>` : ''}
                     </div>
-                    <button onclick="deleteItem('${item.id}')" class="text-red-500 p-2 hover:bg-red-50 rounded"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="deleteItem('${item.id}')" class="text-red-500 p-2 hover:bg-red-50 rounded"><i class="fa-solid fa-trash text-sm"></i></button>
                 `;
                 container.appendChild(card);
             });
