@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Expense Tracker KMNG</title>
+    <title>KomExpense Tracker</title>
     <!-- Script Pre-render Theme & Avatar untuk Mencegah Flashing -->
     <script>
         if (localStorage.getItem('theme') === 'dark') {
@@ -80,7 +80,7 @@
     <!-- Loading Screen -->
     <div id="loadingApp" class="fixed inset-0 bg-indigo-950 flex flex-col items-center justify-center p-4 z-50 text-white space-y-3">
         <i class="fa-solid fa-circle-notch fa-spin text-4xl text-teal-400"></i>
-        <p class="text-sm font-medium text-slate-200">Loading Expense Tracker KMNG...</p>
+        <p class="text-sm font-medium text-slate-200">Loading KomExpense Tracker...</p>
     </div>
 
     <!-- Auth Section (Login/Register Modal) -->
@@ -88,7 +88,7 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.9.1</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.0.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -184,7 +184,7 @@
         </div>
     </div>
 
-    <!-- Modal Create / Edit Expense Project -->
+    <!-- Modal Create / Edit Expense Project (With Status Selection) -->
     <div id="projectModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 border border-slate-100 dark:border-slate-700">
             <h3 id="projectModalTitle" class="text-lg font-bold text-indigo-950 dark:text-teal-400" data-i18n="addExpenseTitle">Add New Expense (Project)</h3>
@@ -193,6 +193,16 @@
                 <div>
                     <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="projectNameLabel">Expense / Project Name</label>
                     <input type="text" id="projectName" required class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-teal-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="statusLabel">Status</label>
+                    <div class="select-custom-wrapper">
+                        <select id="projectStatus" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
+                            <option value="draft">Draft</option>
+                            <option value="submitted">Submitted</option>
+                            <option value="close">Close</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="noteLabel">Notes (Optional)</label>
@@ -280,7 +290,7 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER DENGAN UKURAN PAS & TEXT PUTIH -->
+        <!-- HEADER DENGAN NAMA BARU "KomExpense Tracker" -->
         <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3 sm:py-3.5 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
@@ -288,11 +298,8 @@
                 <div class="flex items-center gap-2.5 min-w-0">
                     <i class="fa-solid fa-receipt text-teal-300 text-2xl sm:text-3xl shrink-0"></i>
                     <div class="flex flex-col leading-tight">
-                        <div class="flex items-center gap-1.5">
-                            <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">Expense Tracker</h1>
-                            <span class="text-base sm:text-xl font-bold tracking-tight text-white">KMNG</span>
-                        </div>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v1.9.1</span>
+                        <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.0.0</span>
                     </div>
                 </div>
 
@@ -443,12 +450,13 @@
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <!-- HEADER DETAIL DENGAN LAYOUT RAPI MENCEGAH JUDUL PANJANG BERANTAKAN -->
+                <!-- HEADER DETAIL DENGAN STATUS BADGE -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 space-y-2">
                     <div class="flex justify-between items-start gap-3">
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h2 id="detailProjectTitle" class="text-lg sm:text-xl font-bold text-indigo-950 dark:text-slate-100 break-words leading-snug">Project Name</h2>
+                                <span id="detailProjectStatusBadge"></span>
                                 <button onclick="exportCurrentDetailProject()" class="text-slate-500 dark:text-slate-300 hover:text-emerald-700 bg-slate-100 dark:bg-slate-700 hover:bg-emerald-50 px-2 py-0.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition border border-slate-200/80 dark:border-slate-600 shrink-0" title="Export Excel">
                                     <i class="fa-solid fa-file-excel text-emerald-600"></i> Export
                                 </button>
@@ -475,7 +483,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.9.1
+            KomExpense Tracker &bull; Version 2.0.0
         </footer>
     </div>
 
@@ -513,7 +521,7 @@
             id: ["Bensin", "Makan", "Tol", "Parkir", "Akomodasi / Hotel", "Transportasi / Tiket", "ATK & Operasional", "Lainnya"]
         };
 
-        // Peta normalisasi kategori gabungan ID <-> EN agar grafik di Home tidak dobel
+        // Normalisasi Kategori Gabungan
         const categoryMapNormalization = {
             "Bensin": { en: "Fuel", id: "Bensin" },
             "Fuel": { en: "Fuel", id: "Bensin" },
@@ -565,6 +573,7 @@
                 exportAllBtn: "Export All Data (Excel)",
                 addExpenseTitle: "Add New Expense (Project)",
                 projectNameLabel: "Expense / Project Name",
+                statusLabel: "Status",
                 projectNamePlaceholder: "e.g. Wifi Deployment, Out of Town Trip, etc.",
                 noteLabel: "Notes (Optional)",
                 notePlaceholder: "Short project note...",
@@ -634,6 +643,7 @@
                 exportAllBtn: "Ekspor Seluruh Data (Excel)",
                 addExpenseTitle: "Add New Expense (Project)",
                 projectNameLabel: "Nama Expense / Project",
+                statusLabel: "Status Proyek",
                 projectNamePlaceholder: "Contoh: Project Wifi Jakarta, Dinas Bandung, dll.",
                 noteLabel: "Catatan (Opsional)",
                 notePlaceholder: "Catatan singkat proyek...",
@@ -673,6 +683,18 @@
                 noTxMsg: "Belum ada rincian transaksi untuk proyek ini. Klik + Add Transaction untuk menambahkan."
             }
         };
+
+        // Fungsi Helper Badge Status
+        function getStatusBadgeHTML(status = 'draft') {
+            const st = status.toLowerCase();
+            if (st === 'submitted') {
+                return `<span class="text-[10px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 font-bold px-2 py-0.5 rounded-full border border-sky-200 dark:border-sky-700 shrink-0"><i class="fa-solid fa-paper-plane text-[9px] mr-1"></i>Submitted</span>`;
+            } else if (st === 'close') {
+                return `<span class="text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"><i class="fa-solid fa-lock text-[9px] mr-1"></i>Closed</span>`;
+            } else {
+                return `<span class="text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-700 shrink-0"><i class="fa-solid fa-pen-ruler text-[9px] mr-1"></i>Draft</span>`;
+            }
+        }
 
         window.setLanguage = (lang) => {
             currentLang = lang;
@@ -968,8 +990,8 @@
             const worksheet = workbook.addWorksheet('All_Expenses');
 
             const headers = currentLang === 'id' 
-                ? ["No", "Proyek", "Tanggal", "Kategori", `Nominal (${currentCurrency})`, "Keterangan"]
-                : ["No", "Project", "Date", "Category", `Amount (${currentCurrency})`, "Description"];
+                ? ["No", "Proyek", "Status", "Tanggal", "Kategori", `Nominal (${currentCurrency})`, "Keterangan"]
+                : ["No", "Project", "Status", "Date", "Category", `Amount (${currentCurrency})`, "Description"];
 
             worksheet.addRow(headers);
             const headerRow = worksheet.getRow(1);
@@ -979,6 +1001,7 @@
             worksheet.columns = [
                 { width: 6 },
                 { width: 22 },
+                { width: 12 },
                 { width: 14 },
                 { width: 20 },
                 { width: 18 },
@@ -992,6 +1015,7 @@
                 worksheet.addRow([
                     index + 1,
                     proj ? proj.name : item.project || "",
+                    proj ? (proj.status || "draft").toUpperCase() : "DRAFT",
                     item.date,
                     item.category,
                     item.amount,
@@ -1001,7 +1025,7 @@
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            saveAs(blob, `Expense_Tracker_All_Backup_${new Date().toISOString().slice(0,10)}.xlsx`);
+            saveAs(blob, `KomExpense_Tracker_All_Backup_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
         document.getElementById('itemDate').valueAsDate = new Date();
@@ -1114,11 +1138,13 @@
                 document.getElementById('projectModalTitle').innerText = "Edit Expense (Project)";
                 document.getElementById('editProjectId').value = id;
                 document.getElementById('projectName').value = proj.name;
+                document.getElementById('projectStatus').value = proj.status || "draft";
                 document.getElementById('projectNote').value = proj.note || "";
             } else {
                 document.getElementById('projectModalTitle').innerText = i18n[currentLang].addExpenseTitle;
                 document.getElementById('editProjectId').value = "";
                 document.getElementById('projectForm').reset();
+                document.getElementById('projectStatus').value = "draft";
             }
         };
 
@@ -1135,14 +1161,16 @@
             try {
                 const editId = document.getElementById('editProjectId').value;
                 const name = document.getElementById('projectName').value;
+                const status = document.getElementById('projectStatus').value;
                 const note = document.getElementById('projectNote').value;
 
                 if (editId) {
-                    await updateDoc(doc(db, "projects", editId), { name, note });
+                    await updateDoc(doc(db, "projects", editId), { name, status, note });
                 } else {
                     await addDoc(collection(db, "projects"), {
                         userId: currentUser.uid,
                         name: name,
+                        status: status,
                         note: note,
                         createdAt: new Date().toISOString()
                     });
@@ -1198,6 +1226,7 @@
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <h4 class="font-bold text-indigo-950 dark:text-slate-100 text-base break-words">${p.name}</h4>
+                                ${getStatusBadgeHTML(p.status)}
                                 <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="p-1 text-slate-300 hover:text-teal-600 rounded text-[10px] transition shrink-0" title="Edit"><i class="fa-solid fa-pen"></i></button>
                             </div>
                             <p class="text-xs text-slate-400 mt-0.5 break-words">${p.note || i18n[currentLang].noNotes}</p>
@@ -1224,6 +1253,7 @@
             document.getElementById('currentProjectId').value = projectId;
             document.getElementById('detailProjectTitle').innerText = proj.name;
             document.getElementById('detailProjectNote').innerText = proj.note || i18n[currentLang].noNotes;
+            document.getElementById('detailProjectStatusBadge').innerHTML = getStatusBadgeHTML(proj.status);
             
             renderProjectItems(projectId);
             switchTab('project-detail');
@@ -1374,8 +1404,8 @@
             const worksheet = workbook.addWorksheet('Expenses');
 
             const headers = currentLang === 'id' 
-                ? ["No", "Proyek", "Tanggal", "Kategori", `Nominal (${currentCurrency})`, "Keterangan", "Foto Struk / Bon"]
-                : ["No", "Project", "Date", "Category", `Amount (${currentCurrency})`, "Description", "Receipt Image"];
+                ? ["No", "Proyek", "Status", "Tanggal", "Kategori", `Nominal (${currentCurrency})`, "Keterangan", "Foto Struk / Bon"]
+                : ["No", "Project", "Status", "Date", "Category", `Amount (${currentCurrency})`, "Description", "Receipt Image"];
 
             worksheet.addRow(headers);
             const headerRow = worksheet.getRow(1);
@@ -1385,6 +1415,7 @@
             worksheet.columns = [
                 { width: 6 },
                 { width: 22 },
+                { width: 12 },
                 { width: 14 },
                 { width: 20 },
                 { width: 18 },
@@ -1401,6 +1432,7 @@
                 const row = worksheet.addRow([
                     index + 1,
                     proj ? proj.name : "",
+                    proj ? (proj.status || "draft").toUpperCase() : "DRAFT",
                     item.date,
                     item.category,
                     item.amount,
@@ -1426,7 +1458,7 @@
                         });
 
                         worksheet.addImage(imageId, {
-                            tl: { col: 6, row: rowIndex - 1 },
+                            tl: { col: 7, row: rowIndex - 1 },
                             ext: { width: imgWidth, height: imgHeight }
                         });
                     } catch (e) {
@@ -1439,7 +1471,7 @@
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            saveAs(blob, `Expense_Report_${proj ? proj.name : 'Project'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            saveAs(blob, `KomExpense_Report_${proj ? proj.name : 'Project'}_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
         function renderDashboard() {
@@ -1453,7 +1485,6 @@
             document.getElementById('dashCount').innerText = `${itemsData.length} ${i18n[currentLang].txCount}`;
             document.getElementById('dashProjects').innerText = `${projectsData.length} Projects`;
 
-            // Normalisasi kategori gabungan ID <-> EN agar tidak terjadi persentase terpisah/dobel
             const catMap = {};
             itemsData.forEach(item => {
                 let normalizedCat = item.category;
@@ -1480,7 +1511,6 @@
                 `;
             });
 
-            // Summary per Project diurutkan sesuai yang terakhir dibuat paling atas
             const sortedProjects = [...projectsData].sort((a, b) => {
                 const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                 const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -1493,12 +1523,43 @@
                 const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
                 projContainer.innerHTML += `
                     <div class="flex justify-between items-center p-2.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 gap-2">
-                        <span class="font-medium text-xs text-slate-700 dark:text-slate-300 break-words min-w-0 flex-1">${p.name}</span>
+                        <div class="min-w-0 flex-1 flex items-center gap-1.5">
+                            <span class="font-medium text-xs text-slate-700 dark:text-slate-300 break-words">${p.name}</span>
+                            ${getStatusBadgeHTML(p.status)}
+                        </div>
                         <span class="font-bold text-xs text-indigo-950 dark:text-teal-300 shrink-0">${currentCurrency} ${pTotal.toLocaleString('id-ID')}</span>
                     </div>
                 `;
             });
         }
+
+        // ==========================================================
+        // GESTURE SWIPE BACK MENCEGAH TERLEPAS DARI DETAIL KEMBALI KE LIST
+        // ==========================================================
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+            
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+
+            // Memastikan swipe horisontal dari kiri ke kanan (Swipe Right) dengan ambang batas min 80px & kemiringan < 50px
+            if (diffX > 80 && Math.abs(diffY) < 50) {
+                const detailSection = document.getElementById('view-project-detail');
+                // Hanya aktifkan perintah back jika pengguna sedang berada di halaman detail proyek
+                if (!detailSection.classList.contains('hidden')) {
+                    switchTab('expenses');
+                }
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>
