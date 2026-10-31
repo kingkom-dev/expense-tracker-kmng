@@ -1429,7 +1429,6 @@
             document.getElementById('transactionModal').classList.add('hidden');
         };
 
-        // PREVIEW FOTO STRUK & INTEGRASI LOGIKA REVISI OCR AUTO-FILL FORM
         window.previewItemImage = (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1457,7 +1456,6 @@
             reader.readAsDataURL(file);
         };
 
-        // INTEGRASI ENGINE OCR TERPERBAIKI DENGAN AUTO-FILL INPUT FORM
         async function runOCRAnalysis(imageData) {
             const loadingBox = document.getElementById('ocrLoading');
             const progressText = document.getElementById('ocrProgressText');
@@ -1475,7 +1473,6 @@
                 const lines = text.split('\n');
                 let detectedAmount = 0;
 
-                // Cari berdasarkan baris keyword transaksi
                 lines.forEach(line => {
                     const cleanLine = line.toUpperCase();
                     if (cleanLine.includes('TOTAL') || cleanLine.includes('RP') || cleanLine.includes('BAYAR') || cleanLine.includes('CASH') || cleanLine.includes('TUNAI') || cleanLine.includes('AMOUNT')) {
@@ -1491,7 +1488,6 @@
                     }
                 });
 
-                // Fallback: jika keyword tidak spesifik, ambil angka terbanyak/terbesar yang masuk akal
                 if (detectedAmount === 0) {
                     const allNumbers = text.match(/\b\d{1,3}(?:[.,]\d{3})*\b|\b\d{4,8}\b/g);
                     if (allNumbers) {
@@ -1504,13 +1500,11 @@
                     }
                 }
 
-                // LANGSUNG MASUKKAN NOMINAL KE INPUT FORM SECARA OTOMATIS
                 if (detectedAmount > 0) {
                     document.getElementById('itemAmount').value = detectedAmount;
                     document.getElementById('itemAmountFormatted').value = Number(detectedAmount).toLocaleString('id-ID');
                 }
 
-                // EKSTRAKSI & AUTO FILL TANGGAL (YYYY-MM-DD / DD-MM-YYYY)
                 const dateMatch = text.match(/(\d{2})[\/\.-](\d{2})[\/\.-](\d{4})/) || text.match(/(\d{4})[\/\.-](\d{2})[\/\.-](\d{2})/);
                 if (dateMatch) {
                     try {
