@@ -98,7 +98,7 @@
                     <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.0</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.1</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -230,13 +230,13 @@
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
 
-                <!-- Fitur Smart OCR Upload Banner -->
+                <!-- Smart OCR Banner -->
                 <div class="p-3 bg-gradient-to-r from-teal-500/10 to-indigo-500/10 border border-teal-500/30 rounded-2xl flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-wand-magic-sparkles text-teal-500 text-lg animate-pulse"></i>
                         <div>
                             <p class="text-xs font-bold text-slate-800 dark:text-teal-300">Smart OCR Auto-Scan</p>
-                            <p class="text-[10px] text-slate-400">Ambil foto struk, tanggal & nominal terisi otomatis!</p>
+                            <p class="text-[10px] text-slate-400">Upload foto struk, tanggal & nominal terisi otomatis!</p>
                         </div>
                     </div>
                 </div>
@@ -279,10 +279,10 @@
                         </button>
                     </div>
 
-                    <!-- OCR Scanning Status Loading -->
-                    <div id="ocrLoading" class="hidden mt-2 p-2 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-xl text-xs flex items-center justify-center gap-2">
+                    <!-- OCR Scanning Status Indicator -->
+                    <div id="ocrLoading" class="hidden mt-2 p-2.5 bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 rounded-xl text-xs flex items-center justify-center gap-2 border border-teal-200 dark:border-teal-700">
                         <i class="fa-solid fa-spinner fa-spin"></i>
-                        <span id="ocrProgressText">Scanning receipt data...</span>
+                        <span id="ocrProgressText" class="font-medium">Menganalisis teks struk...</span>
                     </div>
 
                     <img id="itemImgPreview" class="mt-2.5 h-28 object-cover rounded-xl hidden border border-slate-200 dark:border-slate-600 w-full">
@@ -322,7 +322,7 @@
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.0</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.1</span>
                     </div>
                 </div>
 
@@ -346,33 +346,8 @@
             </div>
 
             <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
-            <section id="view-dashboard" class="space-y-6">
+            <section id="view-dashboard" class="space-y-4">
                 
-                <!-- DATE RANGE FILTER BAR -->
-                <div class="bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div class="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200">
-                        <i class="fa-solid fa-filter text-teal-500"></i>
-                        <span>Filter Period:</span>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                        <div class="select-custom-wrapper">
-                            <select id="dashDateFilter" onchange="handleDateFilterChange(this.value)" class="p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-xs outline-none pr-6 font-medium">
-                                <option value="all">All Time</option>
-                                <option value="today">Today</option>
-                                <option value="this_week">This Week</option>
-                                <option value="this_month" selected>This Month</option>
-                                <option value="last_month">Last Month</option>
-                                <option value="custom">Custom Range...</option>
-                            </select>
-                        </div>
-                        <div id="customDateInputs" class="hidden flex items-center gap-1.5">
-                            <input type="date" id="dashCustomStart" onchange="renderDashboard()" class="p-1.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-xs outline-none">
-                            <span class="text-slate-400">-</span>
-                            <input type="date" id="dashCustomEnd" onchange="renderDashboard()" class="p-1.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-xs outline-none">
-                        </div>
-                    </div>
-                </div>
-
                 <!-- HERO CARD SUMMARY -->
                 <div class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-950 to-teal-900 text-white p-6 rounded-3xl shadow-xl border border-indigo-800/50 z-0">
                     <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-teal-500/20 rounded-full blur-2xl pointer-events-none"></div>
@@ -382,7 +357,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <span id="dashGreeting" class="text-xs font-semibold uppercase tracking-wider text-teal-300/90">Good Day!</span>
-                                <h2 class="text-xs sm:text-sm text-slate-300 font-medium mt-0.5" data-i18n="dashTotalLabel">Total Expenses (Selected Filter)</h2>
+                                <h2 class="text-xs sm:text-sm text-slate-300 font-medium mt-0.5" data-i18n="dashTotalLabel">Total Expenses (Filtered)</h2>
                             </div>
                             <span class="bg-teal-500/20 border border-teal-400/30 text-teal-300 text-[11px] px-3 py-1 rounded-full font-semibold flex items-center gap-1.5">
                                 <i class="fa-solid fa-shield-halved text-xs"></i> Verified Data
@@ -413,6 +388,31 @@
                                     <p id="dashCount" class="text-xs font-bold text-white truncate">0 Transactions</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMPACT FILTER PERIOD BAR (DIBAWAH HERO CARD) -->
+                <div class="bg-white dark:bg-slate-800 px-3.5 py-2.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-1.5 font-semibold text-slate-600 dark:text-slate-300">
+                        <i class="fa-solid fa-calendar-days text-teal-500 text-sm"></i>
+                        <span>Period:</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 min-w-0">
+                        <div class="select-custom-wrapper min-w-[130px]">
+                            <select id="dashDateFilter" onchange="handleDateFilterChange(this.value)" class="p-1.5 text-xs border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl outline-none font-medium pr-6 w-full">
+                                <option value="all">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="this_week">This Week</option>
+                                <option value="this_month" selected>This Month</option>
+                                <option value="last_month">Last Month</option>
+                                <option value="custom">Custom Range...</option>
+                            </select>
+                        </div>
+                        <div id="customDateInputs" class="hidden flex items-center gap-1">
+                            <input type="date" id="dashCustomStart" onchange="renderDashboard()" class="p-1 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-[11px] outline-none">
+                            <span class="text-slate-400 text-[10px]">-</span>
+                            <input type="date" id="dashCustomEnd" onchange="renderDashboard()" class="p-1 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-[11px] outline-none">
                         </div>
                     </div>
                 </div>
@@ -463,9 +463,8 @@
                     </div>
                 </div>
 
-                <!-- CHART GRAPH SECTION (CHART.JS ANALYTICS) -->
+                <!-- CHART GRAPH SECTION -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Doughnut Chart: Category Allocation -->
                     <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-3">
                         <div class="border-b dark:border-slate-700/80 pb-2">
                             <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2">
@@ -477,7 +476,6 @@
                         </div>
                     </div>
 
-                    <!-- Bar Chart: Spending Trend -->
                     <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-3">
                         <div class="border-b dark:border-slate-700/80 pb-2">
                             <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2">
@@ -630,7 +628,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.6.0
+            KomExpense Tracker &bull; Version 2.6.1
         </footer>
     </div>
 
@@ -669,7 +667,6 @@
         let currentCurrency = localStorage.getItem('currency') || "Rp";
         let customCategories = [];
 
-        // Global Chart instances
         let categoryChartInstance = null;
         let trendChartInstance = null;
 
@@ -938,7 +935,7 @@
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeButtonUI(isDark);
             await saveUserSettings();
-            renderDashboard(); // Re-render chart colors
+            renderDashboard();
         };
 
         function updateThemeButtonUI(isDark) {
@@ -1432,7 +1429,7 @@
             document.getElementById('transactionModal').classList.add('hidden');
         };
 
-        // INTEGRASI FITUR OCR (TESSERACT.JS AUTO SCAN STRUK)
+        // PREVIEW FOTO STRUK & INTEGRASI LOGIKA REVISI OCR AUTO-FILL FORM
         window.previewItemImage = (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1453,7 +1450,6 @@
                     document.getElementById('itemImgPreview').src = currentItemImage;
                     document.getElementById('itemImgPreview').classList.remove('hidden');
 
-                    // Jalankan OCR Engine
                     runOCRAnalysis(currentItemImage);
                 };
                 img.src = event.target.result;
@@ -1461,11 +1457,12 @@
             reader.readAsDataURL(file);
         };
 
+        // INTEGRASI ENGINE OCR TERPERBAIKI DENGAN AUTO-FILL INPUT FORM
         async function runOCRAnalysis(imageData) {
             const loadingBox = document.getElementById('ocrLoading');
             const progressText = document.getElementById('ocrProgressText');
             loadingBox.classList.remove('hidden');
-            progressText.innerText = "Analyzing receipt text with OCR...";
+            progressText.innerText = "Menganalisis teks struk dengan OCR...";
 
             try {
                 const worker = await Tesseract.createWorker('ind');
@@ -1473,27 +1470,47 @@
                 await worker.terminate();
 
                 const text = ret.data.text;
-                console.log("OCR Extracted Text:", text);
+                console.log("Extracted OCR Text:\n", text);
 
-                // Ekstraksi Nominal (Mencari angka dengan format total/nominal terbesar)
-                const numbersFound = text.match(/(?:TOTAL|Rp|RP|AMOUNT)?\s*:?\s*([0-9]{1,3}(?:[.,][0-9]{3})+|[0-9]{4,8})/gi);
-                let highestAmount = 0;
+                const lines = text.split('\n');
+                let detectedAmount = 0;
 
-                if (numbersFound) {
-                    numbersFound.forEach(numStr => {
-                        const cleanNum = parseInt(numStr.replace(/\D/g, ''), 10);
-                        if (!isNaN(cleanNum) && cleanNum > highestAmount && cleanNum < 100000000) {
-                            highestAmount = cleanNum;
+                // Cari berdasarkan baris keyword transaksi
+                lines.forEach(line => {
+                    const cleanLine = line.toUpperCase();
+                    if (cleanLine.includes('TOTAL') || cleanLine.includes('RP') || cleanLine.includes('BAYAR') || cleanLine.includes('CASH') || cleanLine.includes('TUNAI') || cleanLine.includes('AMOUNT')) {
+                        const numbers = line.match(/\d[\d.,]*/g);
+                        if (numbers) {
+                            numbers.forEach(numStr => {
+                                const val = parseInt(numStr.replace(/\D/g, ''), 10);
+                                if (!isNaN(val) && val > detectedAmount && val < 50000000) {
+                                    detectedAmount = val;
+                                }
+                            });
                         }
-                    });
+                    }
+                });
+
+                // Fallback: jika keyword tidak spesifik, ambil angka terbanyak/terbesar yang masuk akal
+                if (detectedAmount === 0) {
+                    const allNumbers = text.match(/\b\d{1,3}(?:[.,]\d{3})*\b|\b\d{4,8}\b/g);
+                    if (allNumbers) {
+                        allNumbers.forEach(n => {
+                            const val = parseInt(n.replace(/\D/g, ''), 10);
+                            if (!isNaN(val) && val > detectedAmount && val < 50000000) {
+                                detectedAmount = val;
+                            }
+                        });
+                    }
                 }
 
-                if (highestAmount > 0) {
-                    document.getElementById('itemAmount').value = highestAmount;
-                    document.getElementById('itemAmountFormatted').value = Number(highestAmount).toLocaleString('id-ID');
+                // LANGSUNG MASUKKAN NOMINAL KE INPUT FORM SECARA OTOMATIS
+                if (detectedAmount > 0) {
+                    document.getElementById('itemAmount').value = detectedAmount;
+                    document.getElementById('itemAmountFormatted').value = Number(detectedAmount).toLocaleString('id-ID');
                 }
 
-                // Ekstraksi Tanggal (YYYY-MM-DD / DD-MM-YYYY)
+                // EKSTRAKSI & AUTO FILL TANGGAL (YYYY-MM-DD / DD-MM-YYYY)
                 const dateMatch = text.match(/(\d{2})[\/\.-](\d{2})[\/\.-](\d{4})/) || text.match(/(\d{4})[\/\.-](\d{2})[\/\.-](\d{2})/);
                 if (dateMatch) {
                     try {
@@ -1507,12 +1524,14 @@
                     } catch (e) {}
                 }
 
-                progressText.innerText = highestAmount > 0 ? `Auto-filled Amount: ${currentCurrency} ${highestAmount.toLocaleString('id-ID')}` : "OCR Scan complete.";
+                progressText.innerText = detectedAmount > 0 
+                    ? `Auto-Fill Berhasil: ${currentCurrency} ${detectedAmount.toLocaleString('id-ID')}` 
+                    : "OCR selesai. Silakan periksa kembali nominal.";
             } catch (err) {
                 console.error("OCR Error:", err);
-                progressText.innerText = "Scan complete. Please verify amount manually.";
+                progressText.innerText = "Selesai membaca. Silakan periksa atau isi nominal manual.";
             } finally {
-                setTimeout(() => loadingBox.classList.add('hidden'), 2500);
+                setTimeout(() => loadingBox.classList.add('hidden'), 3000);
             }
         }
 
@@ -1689,7 +1708,6 @@
             saveAs(blob, `KomExpense_Report_${proj ? proj.name : 'Expense'}_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
-        // HANDLER FILTER DATE RANGE
         window.handleDateFilterChange = (val) => {
             const customBox = document.getElementById('customDateInputs');
             if (val === 'custom') {
@@ -1727,7 +1745,7 @@
                     if (endVal && item.date > endVal) return false;
                     return true;
                 }
-                return true; // 'all'
+                return true;
             });
         }
 
@@ -1775,11 +1793,9 @@
             });
             document.getElementById('dashTopCategory').innerText = topCatName;
 
-            // RENDER CHARTS
             renderCategoryDoughnutChart(catMap);
             renderExpenseTrendBarChart(filteredItems);
 
-            // Render Category List Breakdown
             const catContainer = document.getElementById('categoryBreakdown');
             catContainer.innerHTML = '';
             
@@ -1810,7 +1826,6 @@
                 });
             }
 
-            // Render Expense Group Breakdown
             const sortedProjects = [...projectsData].sort((a, b) => {
                 const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                 const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -1846,7 +1861,6 @@
             }
         }
 
-        // FUNSI CHART.JS (DOUGHNUT)
         function renderCategoryDoughnutChart(catMap) {
             const ctx = document.getElementById('categoryChartCanvas').getContext('2d');
             const labels = Object.keys(catMap);
@@ -1883,11 +1897,8 @@
             });
         }
 
-        // FUNGSI CHART.JS (BAR TREND)
         function renderExpenseTrendBarChart(filteredItems) {
             const ctx = document.getElementById('trendChartCanvas').getContext('2d');
-            
-            // Map berdasarkan Tanggal (sorted)
             const dateMap = {};
             filteredItems.forEach(item => {
                 if (item.date) {
@@ -1933,7 +1944,6 @@
             });
         }
 
-        // GESTURE SWIPE BACK
         let touchStartX = 0;
         let touchStartY = 0;
 
