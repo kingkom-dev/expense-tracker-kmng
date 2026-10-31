@@ -43,9 +43,18 @@
             max-height: 40px !important;
             border-radius: 0.75rem !important;
             font-size: 13px !important;
-            display: block !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
             width: 100% !important;
             box-sizing: border-box !important;
+        }
+
+        /* Khusus input date agar teksnya benar-benar presisi di tengah */
+        input[type="date"].mobile-input-fix {
+            text-align: center !important;
+            text-align-last: center !important;
         }
 
         .select-custom-wrapper {
@@ -79,7 +88,7 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.9.0</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">Expense Tracker KMNG <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v1.9.1</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -207,7 +216,7 @@
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
                         <label class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="dateLabel">Date</label>
-                        <input type="date" id="itemDate" required class="mobile-input-fix px-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none shadow-sm">
+                        <input type="date" id="itemDate" required class="mobile-input-fix px-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none shadow-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="categoryLabel">Category</label>
@@ -271,11 +280,11 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER DENGAN UKURAN DIBESARKAN SEDIKIT & KMNG TAMPILAN PUTIH -->
+        <!-- HEADER DENGAN UKURAN PAS & TEXT PUTIH -->
         <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3 sm:py-3.5 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
-                <!-- LOGO DAN JUDUL RAMPING PROPORSIONAL -->
+                <!-- LOGO DAN JUDUL -->
                 <div class="flex items-center gap-2.5 min-w-0">
                     <i class="fa-solid fa-receipt text-teal-300 text-2xl sm:text-3xl shrink-0"></i>
                     <div class="flex flex-col leading-tight">
@@ -283,7 +292,7 @@
                             <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">Expense Tracker</h1>
                             <span class="text-base sm:text-xl font-bold tracking-tight text-white">KMNG</span>
                         </div>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v1.9.0</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v1.9.1</span>
                     </div>
                 </div>
 
@@ -363,7 +372,7 @@
                 </div>
             </section>
 
-            <!-- VIEW 3: SETTINGS PAGE (MENU UTAMA TIGA) -->
+            <!-- VIEW 3: SETTINGS PAGE -->
             <section id="view-settings" class="hidden space-y-4">
                 <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4">
                     <h2 class="text-lg font-bold text-indigo-950 dark:text-teal-400 border-b dark:border-slate-700 pb-2 flex items-center gap-2">
@@ -434,17 +443,22 @@
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 flex justify-between items-start">
-                    <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h2 id="detailProjectTitle" class="text-xl font-bold text-indigo-950 dark:text-slate-100">Project Name</h2>
-                            <button onclick="exportCurrentDetailProject()" class="text-slate-500 dark:text-slate-300 hover:text-emerald-700 bg-slate-100 dark:bg-slate-700 hover:bg-emerald-50 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition border border-slate-200/80 dark:border-slate-600" title="Export Excel">
-                                <i class="fa-solid fa-file-excel text-emerald-600"></i> Export
-                            </button>
+                <!-- HEADER DETAIL DENGAN LAYOUT RAPI MENCEGAH JUDUL PANJANG BERANTAKAN -->
+                <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 space-y-2">
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h2 id="detailProjectTitle" class="text-lg sm:text-xl font-bold text-indigo-950 dark:text-slate-100 break-words leading-snug">Project Name</h2>
+                                <button onclick="exportCurrentDetailProject()" class="text-slate-500 dark:text-slate-300 hover:text-emerald-700 bg-slate-100 dark:bg-slate-700 hover:bg-emerald-50 px-2 py-0.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition border border-slate-200/80 dark:border-slate-600 shrink-0" title="Export Excel">
+                                    <i class="fa-solid fa-file-excel text-emerald-600"></i> Export
+                                </button>
+                            </div>
+                            <p id="detailProjectNote" class="text-xs text-slate-400 mt-1 break-words">Notes...</p>
                         </div>
-                        <p id="detailProjectNote" class="text-xs text-slate-400 mt-1">Notes...</p>
+                        <div class="text-right shrink-0">
+                            <span id="detailProjectTotal" class="text-lg sm:text-xl font-bold text-teal-600 dark:text-teal-400 block">Rp 0</span>
+                        </div>
                     </div>
-                    <span id="detailProjectTotal" class="text-xl font-bold text-teal-600 dark:text-teal-400">Rp 0</span>
                 </div>
 
                 <div>
@@ -461,7 +475,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            Expense Tracker KMNG &bull; Version 1.9.0
+            Expense Tracker KMNG &bull; Version 1.9.1
         </footer>
     </div>
 
@@ -497,6 +511,26 @@
         const defaultCategories = {
             en: ["Fuel", "Meal", "Toll", "Parking", "Hotel / Lodging", "Transport / Ticket", "Office Supplies", "Others"],
             id: ["Bensin", "Makan", "Tol", "Parkir", "Akomodasi / Hotel", "Transportasi / Tiket", "ATK & Operasional", "Lainnya"]
+        };
+
+        // Peta normalisasi kategori gabungan ID <-> EN agar grafik di Home tidak dobel
+        const categoryMapNormalization = {
+            "Bensin": { en: "Fuel", id: "Bensin" },
+            "Fuel": { en: "Fuel", id: "Bensin" },
+            "Makan": { en: "Meal", id: "Makan" },
+            "Meal": { en: "Meal", id: "Makan" },
+            "Tol": { en: "Toll", id: "Tol" },
+            "Toll": { en: "Toll", id: "Tol" },
+            "Parkir": { en: "Parking", id: "Parkir" },
+            "Parking": { en: "Parking", id: "Parkir" },
+            "Akomodasi / Hotel": { en: "Hotel / Lodging", id: "Akomodasi / Hotel" },
+            "Hotel / Lodging": { en: "Hotel / Lodging", id: "Akomodasi / Hotel" },
+            "Transportasi / Tiket": { en: "Transport / Ticket", id: "Transportasi / Tiket" },
+            "Transport / Ticket": { en: "Transport / Ticket", id: "Transportasi / Tiket" },
+            "ATK & Operasional": { en: "Office Supplies", id: "ATK & Operasional" },
+            "Office Supplies": { en: "Office Supplies", id: "ATK & Operasional" },
+            "Lainnya": { en: "Others", id: "Lainnya" },
+            "Others": { en: "Others", id: "Lainnya" }
         };
 
         const i18n = {
@@ -653,6 +687,7 @@
             });
 
             renderCategoryOptions();
+            renderDashboard();
 
             document.getElementById('authEmail').placeholder = i18n[lang].emailPlaceholder;
             document.getElementById('authPassword').placeholder = i18n[lang].passPlaceholder;
@@ -1159,15 +1194,15 @@
                 card.onclick = () => openProjectDetail(p.id);
 
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="flex items-center gap-1.5">
-                                <h4 class="font-bold text-indigo-950 dark:text-slate-100 text-base">${p.name}</h4>
-                                <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="p-1 text-slate-300 hover:text-teal-600 rounded text-[10px] transition" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <h4 class="font-bold text-indigo-950 dark:text-slate-100 text-base break-words">${p.name}</h4>
+                                <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="p-1 text-slate-300 hover:text-teal-600 rounded text-[10px] transition shrink-0" title="Edit"><i class="fa-solid fa-pen"></i></button>
                             </div>
-                            <p class="text-xs text-slate-400 mt-0.5">${p.note || i18n[currentLang].noNotes}</p>
+                            <p class="text-xs text-slate-400 mt-0.5 break-words">${p.note || i18n[currentLang].noNotes}</p>
                         </div>
-                        <span class="font-bold text-teal-600 dark:text-teal-400 text-base">${currentCurrency} ${totalAmount.toLocaleString('id-ID')}</span>
+                        <span class="font-bold text-teal-600 dark:text-teal-400 text-base shrink-0">${currentCurrency} ${totalAmount.toLocaleString('id-ID')}</span>
                     </div>
 
                     <div class="flex justify-between items-center pt-1">
@@ -1418,8 +1453,16 @@
             document.getElementById('dashCount').innerText = `${itemsData.length} ${i18n[currentLang].txCount}`;
             document.getElementById('dashProjects').innerText = `${projectsData.length} Projects`;
 
+            // Normalisasi kategori gabungan ID <-> EN agar tidak terjadi persentase terpisah/dobel
             const catMap = {};
-            itemsData.forEach(item => { catMap[item.category] = (catMap[item.category] || 0) + item.amount; });
+            itemsData.forEach(item => {
+                let normalizedCat = item.category;
+                if (categoryMapNormalization[item.category]) {
+                    normalizedCat = categoryMapNormalization[item.category][currentLang];
+                }
+                catMap[normalizedCat] = (catMap[normalizedCat] || 0) + item.amount;
+            });
+
             const catContainer = document.getElementById('categoryBreakdown');
             catContainer.innerHTML = '';
             Object.keys(catMap).forEach(cat => {
@@ -1437,14 +1480,21 @@
                 `;
             });
 
+            // Summary per Project diurutkan sesuai yang terakhir dibuat paling atas
+            const sortedProjects = [...projectsData].sort((a, b) => {
+                const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return timeB - timeA;
+            });
+
             const projContainer = document.getElementById('projectBreakdown');
             projContainer.innerHTML = '';
-            projectsData.forEach(p => {
+            sortedProjects.forEach(p => {
                 const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
                 projContainer.innerHTML += `
-                    <div class="flex justify-between items-center p-2.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
-                        <span class="font-medium text-xs text-slate-700 dark:text-slate-300">${p.name}</span>
-                        <span class="font-bold text-xs text-indigo-950 dark:text-teal-300">${currentCurrency} ${pTotal.toLocaleString('id-ID')}</span>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 gap-2">
+                        <span class="font-medium text-xs text-slate-700 dark:text-slate-300 break-words min-w-0 flex-1">${p.name}</span>
+                        <span class="font-bold text-xs text-indigo-950 dark:text-teal-300 shrink-0">${currentCurrency} ${pTotal.toLocaleString('id-ID')}</span>
                     </div>
                 `;
             });
