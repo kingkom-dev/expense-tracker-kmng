@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KomExpense Tracker</title>
     
-    <!-- Favicon Tab Browser (Mengambil dari logo.png) -->
+    <!-- Favicon Tab Browser (Mengambil dari ./logo.png) -->
     <link rel="icon" type="image/png" id="appFavicon">
     <link rel="apple-touch-icon" id="appAppleIcon">
 
@@ -93,10 +93,10 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <div class="flex justify-center mb-2">
-                    <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="App Logo">
+                    <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.4.0</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.4.1</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -307,7 +307,7 @@
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.4.0</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.4.1</span>
                     </div>
                 </div>
 
@@ -491,7 +491,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.4.0
+            KomExpense Tracker &bull; Version 2.4.1
         </footer>
     </div>
 
@@ -514,8 +514,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // MEMANGGIL LOGO.PNG ASLI SECARA LANGSUNG
-        const exactAppLogoUrl = "logo.png";
+        // MEMANGGIL LOGO.PNG MENGGUNAKAN JALUR RELATIF LOKAL PRESISI
+        const exactAppLogoUrl = "./logo.png";
 
         document.getElementById('appFavicon').href = exactAppLogoUrl;
         document.getElementById('appAppleIcon').href = exactAppLogoUrl;
