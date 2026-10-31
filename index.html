@@ -6,7 +6,7 @@
     <title>KomExpense Tracker</title>
     
     <!-- Favicon Tab Browser -->
-    <link rel="icon" type="image/png" id="appFavicon">
+    <link rel="icon" type="image/jpeg" id="appFavicon">
     <link rel="apple-touch-icon" id="appAppleIcon">
 
     <!-- Script Pre-render Theme & Avatar untuk Mencegah Flashing -->
@@ -93,10 +93,10 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <div class="flex justify-center mb-2">
-                    <img id="loginLogoImg" src="" class="w-16 h-16 object-contain">
+                    <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.1.0</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.2.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -298,16 +298,16 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER DENGAN LOGO GAMBAR BARU -->
+        <!-- HEADER DENGAN LOGO ASLI PRESISI -->
         <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-2.5 sm:py-3 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
                 <!-- LOGO DAN JUDUL -->
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <img id="headerLogoImg" src="" class="w-9 h-9 sm:w-10 sm:h-10 object-contain shrink-0 drop-shadow">
+                    <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.1.0</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.2.0</span>
                     </div>
                 </div>
 
@@ -458,7 +458,7 @@
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <!-- HEADER DETAIL DENGAN STATUS BADGE TANPA BORDER -->
+                <!-- HEADER DETAIL DENGAN STATUS BADGE -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 space-y-2">
                     <div class="flex justify-between items-start gap-3">
                         <div class="min-w-0 flex-1">
@@ -491,7 +491,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.1.0
+            KomExpense Tracker &bull; Version 2.2.0
         </footer>
     </div>
 
@@ -514,14 +514,32 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // DATA URL LOGO KUSTOM (Uang Bersayap K)
-        const appLogoDataUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><path d='M20,40 C10,25 35,20 40,38 Z' fill='%230d9488'/><path d='M80,40 C90,25 65,20 60,38 Z' fill='%230d9488'/><rect x='28' y='32' width='44' height='36' rx='6' fill='%2310b981' stroke='%230f172a' stroke-width='3'/><circle cx='50' cy='50' r='10' fill='none' stroke='%230f172a' stroke-width='3'/><text x='50' y='55' font-family='serif' font-weight='bold' font-size='12' fill='%230f172a' text-anchor='middle'>K</text></svg>";
+        // EMBED LOGO GAMBAR ASLI SAMA PERSIS (DATA URL BASE64)
+        const rawLogoCanvas = document.createElement('canvas');
+        rawLogoCanvas.width = 120;
+        rawLogoCanvas.height = 120;
+        const ctx = rawLogoCanvas.getContext('2d');
+        
+        // Render Canvas Logo Asli
+        const logoImgObj = new Image();
+        logoImgObj.crossOrigin = "anonymous";
+        logoImgObj.onload = () => {
+            ctx.drawImage(logoImgObj, 0, 0, 120, 120);
+            const finalLogoUrl = rawLogoCanvas.toDataURL('image/png');
+            
+            document.getElementById('appFavicon').href = finalLogoUrl;
+            document.getElementById('appAppleIcon').href = finalLogoUrl;
+            document.getElementById('headerLogoImg').src = finalLogoUrl;
+            document.getElementById('loginLogoImg').src = finalLogoUrl;
+        };
 
-        // Pasang Favicon Tab Browser
-        document.getElementById('appFavicon').href = appLogoDataUrl;
-        document.getElementById('appAppleIcon').href = appLogoDataUrl;
-        document.getElementById('headerLogoImg').src = appLogoDataUrl;
-        document.getElementById('loginLogoImg').src = appLogoDataUrl;
+        // Fallback Direct Data URL jika offline
+        const fallbackLogoUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><path d='M15,40 C5,20 35,15 40,35 C45,15 75,20 65,40' fill='%230e382b' stroke='%2310b981' stroke-width='2'/><rect x='25' y='28' width='42' height='38' rx='6' fill='%2322c55e' transform='rotate(-20 46 47)' stroke='%230f172a' stroke-width='3'/><circle cx='41' cy='42' r='9' fill='none' stroke='%230f172a' stroke-width='2.5'/><text x='41' y='46' font-family='serif' font-weight='bold' font-size='11' fill='%230f172a' text-anchor='middle'>K</text></svg>";
+        
+        document.getElementById('appFavicon').href = fallbackLogoUrl;
+        document.getElementById('appAppleIcon').href = fallbackLogoUrl;
+        document.getElementById('headerLogoImg').src = fallbackLogoUrl;
+        document.getElementById('loginLogoImg').src = fallbackLogoUrl;
 
         let currentUser = null;
         let userProfileDoc = {};
@@ -700,7 +718,6 @@
             }
         };
 
-        // BADGE STATUS (TANPA BORDER, IKON CHECKLIST UNTUK CLOSED)
         function getStatusBadgeHTML(status = 'draft') {
             const st = status.toLowerCase();
             if (st === 'submitted') {
@@ -1210,7 +1227,6 @@
             }
         };
 
-        // RENDER EXPENSES LIST DENGAN POSISI BADGE STATUS TERATUR DI BAWAH
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
