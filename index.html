@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KomExpense Tracker</title>
+    
+    <!-- Favicon Tab Browser -->
+    <link rel="icon" type="image/png" id="appFavicon">
+    <link rel="apple-touch-icon" id="appAppleIcon">
+
     <!-- Script Pre-render Theme & Avatar untuk Mencegah Flashing -->
     <script>
         if (localStorage.getItem('theme') === 'dark') {
@@ -87,8 +92,11 @@
     <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-40 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
+                <div class="flex justify-center mb-2">
+                    <img id="loginLogoImg" src="" class="w-16 h-16 object-contain">
+                </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.0.0</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.1.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -184,7 +192,7 @@
         </div>
     </div>
 
-    <!-- Modal Create / Edit Expense Project (With Status Selection) -->
+    <!-- Modal Create / Edit Expense Project -->
     <div id="projectModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 border border-slate-100 dark:border-slate-700">
             <h3 id="projectModalTitle" class="text-lg font-bold text-indigo-950 dark:text-teal-400" data-i18n="addExpenseTitle">Add New Expense (Project)</h3>
@@ -290,16 +298,16 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER DENGAN NAMA BARU "KomExpense Tracker" -->
-        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3 sm:py-3.5 shadow-md sticky top-0 z-10 no-print">
+        <!-- HEADER DENGAN LOGO GAMBAR BARU -->
+        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-2.5 sm:py-3 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
                 <!-- LOGO DAN JUDUL -->
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <i class="fa-solid fa-receipt text-teal-300 text-2xl sm:text-3xl shrink-0"></i>
+                    <img id="headerLogoImg" src="" class="w-9 h-9 sm:w-10 sm:h-10 object-contain shrink-0 drop-shadow">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.0.0</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.1.0</span>
                     </div>
                 </div>
 
@@ -450,7 +458,7 @@
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <!-- HEADER DETAIL DENGAN STATUS BADGE -->
+                <!-- HEADER DETAIL DENGAN STATUS BADGE TANPA BORDER -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 space-y-2">
                     <div class="flex justify-between items-start gap-3">
                         <div class="min-w-0 flex-1">
@@ -483,7 +491,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.0.0
+            KomExpense Tracker &bull; Version 2.1.0
         </footer>
     </div>
 
@@ -506,6 +514,15 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // DATA URL LOGO KUSTOM (Uang Bersayap K)
+        const appLogoDataUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><path d='M20,40 C10,25 35,20 40,38 Z' fill='%230d9488'/><path d='M80,40 C90,25 65,20 60,38 Z' fill='%230d9488'/><rect x='28' y='32' width='44' height='36' rx='6' fill='%2310b981' stroke='%230f172a' stroke-width='3'/><circle cx='50' cy='50' r='10' fill='none' stroke='%230f172a' stroke-width='3'/><text x='50' y='55' font-family='serif' font-weight='bold' font-size='12' fill='%230f172a' text-anchor='middle'>K</text></svg>";
+
+        // Pasang Favicon Tab Browser
+        document.getElementById('appFavicon').href = appLogoDataUrl;
+        document.getElementById('appAppleIcon').href = appLogoDataUrl;
+        document.getElementById('headerLogoImg').src = appLogoDataUrl;
+        document.getElementById('loginLogoImg').src = appLogoDataUrl;
+
         let currentUser = null;
         let userProfileDoc = {};
         let projectsData = [];
@@ -521,7 +538,6 @@
             id: ["Bensin", "Makan", "Tol", "Parkir", "Akomodasi / Hotel", "Transportasi / Tiket", "ATK & Operasional", "Lainnya"]
         };
 
-        // Normalisasi Kategori Gabungan
         const categoryMapNormalization = {
             "Bensin": { en: "Fuel", id: "Bensin" },
             "Fuel": { en: "Fuel", id: "Bensin" },
@@ -684,15 +700,15 @@
             }
         };
 
-        // Fungsi Helper Badge Status
+        // BADGE STATUS (TANPA BORDER, IKON CHECKLIST UNTUK CLOSED)
         function getStatusBadgeHTML(status = 'draft') {
             const st = status.toLowerCase();
             if (st === 'submitted') {
-                return `<span class="text-[10px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 font-bold px-2 py-0.5 rounded-full border border-sky-200 dark:border-sky-700 shrink-0"><i class="fa-solid fa-paper-plane text-[9px] mr-1"></i>Submitted</span>`;
+                return `<span class="text-[10px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 font-bold px-2 py-0.5 rounded-md shrink-0 flex items-center gap-1"><i class="fa-solid fa-paper-plane text-[9px]"></i>Submitted</span>`;
             } else if (st === 'close') {
-                return `<span class="text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"><i class="fa-solid fa-lock text-[9px] mr-1"></i>Closed</span>`;
+                return `<span class="text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-md shrink-0 flex items-center gap-1"><i class="fa-solid fa-check-double text-teal-600 dark:text-teal-400 text-[10px]"></i>Closed</span>`;
             } else {
-                return `<span class="text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-700 shrink-0"><i class="fa-solid fa-pen-ruler text-[9px] mr-1"></i>Draft</span>`;
+                return `<span class="text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold px-2 py-0.5 rounded-md shrink-0 flex items-center gap-1"><i class="fa-solid fa-pen-ruler text-[9px]"></i>Draft</span>`;
             }
         }
 
@@ -1194,6 +1210,7 @@
             }
         };
 
+        // RENDER EXPENSES LIST DENGAN POSISI BADGE STATUS TERATUR DI BAWAH
         window.renderProjectList = () => {
             const search = document.getElementById('searchExpenseInput').value.toLowerCase();
             const container = document.getElementById('projectListContainer');
@@ -1226,7 +1243,6 @@
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <h4 class="font-bold text-indigo-950 dark:text-slate-100 text-base break-words">${p.name}</h4>
-                                ${getStatusBadgeHTML(p.status)}
                                 <button onclick="event.stopPropagation(); openProjectModal('${p.id}')" class="p-1 text-slate-300 hover:text-teal-600 rounded text-[10px] transition shrink-0" title="Edit"><i class="fa-solid fa-pen"></i></button>
                             </div>
                             <p class="text-xs text-slate-400 mt-0.5 break-words">${p.note || i18n[currentLang].noNotes}</p>
@@ -1234,8 +1250,11 @@
                         <span class="font-bold text-teal-600 dark:text-teal-400 text-base shrink-0">${currentCurrency} ${totalAmount.toLocaleString('id-ID')}</span>
                     </div>
 
-                    <div class="flex justify-between items-center pt-1">
-                        <span class="text-[11px] bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-md font-semibold border border-teal-100 dark:border-teal-700">${pItems.length} ${i18n[currentLang].txCount}</span>
+                    <div class="flex justify-between items-center pt-1 border-t border-slate-50 dark:border-slate-700/50">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-md font-semibold border border-teal-100 dark:border-teal-700">${pItems.length} ${i18n[currentLang].txCount}</span>
+                            ${getStatusBadgeHTML(p.status)}
+                        </div>
                         <div class="flex items-center gap-1.5">
                             <button onclick="event.stopPropagation(); exportSingleProject('${p.id}')" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 font-medium text-[11px] flex items-center gap-1 transition" title="Export Excel"><i class="fa-solid fa-file-excel text-emerald-600"></i> Export</button>
                             <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-100 font-medium text-[11px] flex items-center gap-1 transition" title="Delete"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -1533,9 +1552,7 @@
             });
         }
 
-        // ==========================================================
-        // GESTURE SWIPE BACK MENCEGAH TERLEPAS DARI DETAIL KEMBALI KE LIST
-        // ==========================================================
+        // GESTURE SWIPE BACK
         let touchStartX = 0;
         let touchStartY = 0;
 
@@ -1551,10 +1568,8 @@
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
 
-            // Memastikan swipe horisontal dari kiri ke kanan (Swipe Right) dengan ambang batas min 80px & kemiringan < 50px
             if (diffX > 80 && Math.abs(diffY) < 50) {
                 const detailSection = document.getElementById('view-project-detail');
-                // Hanya aktifkan perintah back jika pengguna sedang berada di halaman detail proyek
                 if (!detailSection.classList.contains('hidden')) {
                     switchTab('expenses');
                 }
