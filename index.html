@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KomExpense Tracker</title>
     
-    <!-- Favicon Tab Browser (Mengambil dari ./logo.png) -->
+    <!-- Favicon Tab Browser -->
     <link rel="icon" type="image/png" id="appFavicon">
     <link rel="apple-touch-icon" id="appAppleIcon">
 
-    <!-- Script Pre-render Theme & Avatar untuk Mencegah Flashing -->
+    <!-- Script Pre-render Theme -->
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
@@ -26,10 +26,14 @@
     </script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- ExcelJS (Export Excel with Images) -->
+    <!-- ExcelJS & FileSaver -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-    <!-- FileSaver JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Chart.js untuk Analytics Grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tesseract.js untuk OCR Auto Scan Struk -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
     <style>
         @media print {
             .no-print { display: none !important; }
@@ -38,7 +42,6 @@
         }
         .print-only { display: none; }
         
-        /* FIX KHUSUS NATIVE INPUT DI SAFARI / IOS / ANDROID */
         .mobile-input-fix {
             -webkit-appearance: none !important;
             -moz-appearance: none !important;
@@ -56,7 +59,6 @@
             box-sizing: border-box !important;
         }
 
-        /* Khusus input date agar teksnya presisi di tengah */
         input[type="date"].mobile-input-fix {
             text-align: center !important;
             text-align-last: center !important;
@@ -78,16 +80,6 @@
             pointer-events: none;
             font-size: 11px;
         }
-
-        /* Glassmorphism & custom scrollbar */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-        }
-        .dark .glass-card {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
-        }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 pb-20 md:pb-6 font-sans transition-colors duration-200">
@@ -98,7 +90,7 @@
         <p class="text-sm font-medium text-slate-200">Loading KomExpense Tracker...</p>
     </div>
 
-    <!-- Auth Section (Login/Register Modal) -->
+    <!-- Auth Section -->
     <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
@@ -106,7 +98,7 @@
                     <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.5.2</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -128,18 +120,15 @@
         </div>
     </div>
 
-    <!-- Modal My Profile Only -->
+    <!-- Modal Profile -->
     <div id="profileModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
-            
             <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
                 <h3 class="text-base font-bold text-teal-600 dark:text-teal-400 flex items-center gap-2">
                     <i class="fa-solid fa-user"></i> <span data-i18n="tabProfile">My Profile</span>
                 </h3>
                 <button onclick="closeProfileModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
-            <!-- MY PROFILE CONTENT -->
             <div class="space-y-4">
                 <div class="flex flex-col items-center justify-center space-y-2 py-2">
                     <div class="relative">
@@ -234,13 +223,24 @@
         </div>
     </div>
 
-    <!-- Modal Add Transaction Item -->
+    <!-- Modal Add Transaction Item dengan OCR Auto-Scan Struk -->
     <div id="transactionModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
             <h3 class="text-lg font-bold text-indigo-950 dark:text-teal-400 flex items-center gap-2"><i class="fa-solid fa-receipt text-teal-600"></i> <span data-i18n="addTxTitle">Add Transaction Detail</span></h3>
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
-                
+
+                <!-- Fitur Smart OCR Upload Banner -->
+                <div class="p-3 bg-gradient-to-r from-teal-500/10 to-indigo-500/10 border border-teal-500/30 rounded-2xl flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-teal-500 text-lg animate-pulse"></i>
+                        <div>
+                            <p class="text-xs font-bold text-slate-800 dark:text-teal-300">Smart OCR Auto-Scan</p>
+                            <p class="text-[10px] text-slate-400">Ambil foto struk, tanggal & nominal terisi otomatis!</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
                         <label class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="dateLabel">Date</label>
@@ -279,6 +279,12 @@
                         </button>
                     </div>
 
+                    <!-- OCR Scanning Status Loading -->
+                    <div id="ocrLoading" class="hidden mt-2 p-2 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-xl text-xs flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <span id="ocrProgressText">Scanning receipt data...</span>
+                    </div>
+
                     <img id="itemImgPreview" class="mt-2.5 h-28 object-cover rounded-xl hidden border border-slate-200 dark:border-slate-600 w-full">
                 </div>
 
@@ -290,7 +296,7 @@
         </div>
     </div>
 
-    <!-- Modal Popup Viewing Struk Bon Gambar -->
+    <!-- Modal Viewing Struk -->
     <div id="receiptModal" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative border border-slate-100 dark:border-slate-700">
             <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2">
@@ -309,20 +315,17 @@
     <!-- Main Content -->
     <div id="appContent" class="hidden">
         
-        <!-- HEADER UTAMA DENGAN STICKY PERMANEN & OVERFLOW CUT-OFF (FIX Z-INDEX) -->
+        <!-- HEADER UTAMA DENGAN STICKY PERMANEN -->
         <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3 shadow-lg sticky top-0 z-40 overflow-hidden no-print border-b border-white/10">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2 relative z-10">
-                
-                <!-- LOGO DAN JUDUL -->
                 <div class="flex items-center gap-2.5 min-w-0">
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.5.2</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.0</span>
                     </div>
                 </div>
 
-                <!-- AVATAR PROFILE BUTTON -->
                 <div class="flex items-center shrink-0">
                     <button onclick="openProfileModal()" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-teal-500/30 hover:bg-teal-500/50 border-2 border-teal-300/80 flex items-center justify-center font-bold text-xs sm:text-sm text-white shadow-sm transition overflow-hidden" id="headerAvatarBtn">
                         <img id="headerAvatarImg" src="" class="w-full h-full object-cover hidden">
@@ -335,7 +338,7 @@
         <!-- Main Body -->
         <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6 relative z-0">
             
-            <!-- Navigation Tabs (Home | Expenses | Settings) -->
+            <!-- Navigation Tabs -->
             <div class="no-print bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-1.5 rounded-2xl shadow-lg flex justify-around border border-slate-200/80 dark:border-slate-700/80 md:relative fixed bottom-3 left-3 right-3 z-30">
                 <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition rounded-xl" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
                 <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition rounded-xl" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> <span data-i18n="expensesTab">Expenses</span></button>
@@ -345,9 +348,33 @@
             <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
             <section id="view-dashboard" class="space-y-6">
                 
+                <!-- DATE RANGE FILTER BAR -->
+                <div class="bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200">
+                        <i class="fa-solid fa-filter text-teal-500"></i>
+                        <span>Filter Period:</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                        <div class="select-custom-wrapper">
+                            <select id="dashDateFilter" onchange="handleDateFilterChange(this.value)" class="p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-xs outline-none pr-6 font-medium">
+                                <option value="all">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="this_week">This Week</option>
+                                <option value="this_month" selected>This Month</option>
+                                <option value="last_month">Last Month</option>
+                                <option value="custom">Custom Range...</option>
+                            </select>
+                        </div>
+                        <div id="customDateInputs" class="hidden flex items-center gap-1.5">
+                            <input type="date" id="dashCustomStart" onchange="renderDashboard()" class="p-1.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-xs outline-none">
+                            <span class="text-slate-400">-</span>
+                            <input type="date" id="dashCustomEnd" onchange="renderDashboard()" class="p-1.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-xs outline-none">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- HERO CARD SUMMARY -->
                 <div class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-950 to-teal-900 text-white p-6 rounded-3xl shadow-xl border border-indigo-800/50 z-0">
-                    <!-- Background Pattern Elements -->
                     <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-teal-500/20 rounded-full blur-2xl pointer-events-none"></div>
                     <div class="absolute -left-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -355,7 +382,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <span id="dashGreeting" class="text-xs font-semibold uppercase tracking-wider text-teal-300/90">Good Day!</span>
-                                <h2 class="text-xs sm:text-sm text-slate-300 font-medium mt-0.5" data-i18n="dashTotalLabel">Total Expenses Accumulated</h2>
+                                <h2 class="text-xs sm:text-sm text-slate-300 font-medium mt-0.5" data-i18n="dashTotalLabel">Total Expenses (Selected Filter)</h2>
                             </div>
                             <span class="bg-teal-500/20 border border-teal-400/30 text-teal-300 text-[11px] px-3 py-1 rounded-full font-semibold flex items-center gap-1.5">
                                 <i class="fa-solid fa-shield-halved text-xs"></i> Verified Data
@@ -366,7 +393,6 @@
                             <h3 id="dashTotal" class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Rp 0</h3>
                         </div>
 
-                        <!-- Mini Sub-stats Row -->
                         <div class="grid grid-cols-2 gap-3 pt-3 border-t border-white/10">
                             <div class="flex items-center gap-2.5">
                                 <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
@@ -383,7 +409,7 @@
                                     <i class="fa-solid fa-receipt text-xs"></i>
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-[10px] text-slate-300" data-i18n="dashReceiptCount">Total Receipts</p>
+                                    <p class="text-[10px] text-slate-300" data-i18n="dashReceiptCount">Filtered Receipts</p>
                                     <p id="dashCount" class="text-xs font-bold text-white truncate">0 Transactions</p>
                                 </div>
                             </div>
@@ -391,7 +417,7 @@
                     </div>
                 </div>
 
-                <!-- STATS SUMMARY GRID (UPDATED TEXT: ACTIVE EXPENSES) -->
+                <!-- STATS SUMMARY GRID -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 hover:shadow-md transition">
                         <div class="flex items-center justify-between mb-2">
@@ -437,21 +463,44 @@
                     </div>
                 </div>
 
+                <!-- CHART GRAPH SECTION (CHART.JS ANALYTICS) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Doughnut Chart: Category Allocation -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-3">
+                        <div class="border-b dark:border-slate-700/80 pb-2">
+                            <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-teal-500"></i> Category Analytics
+                            </h3>
+                        </div>
+                        <div class="relative h-56 flex items-center justify-center">
+                            <canvas id="categoryChartCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Bar Chart: Spending Trend -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-3">
+                        <div class="border-b dark:border-slate-700/80 pb-2">
+                            <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-chart-column text-purple-600"></i> Expense Trend
+                            </h3>
+                        </div>
+                        <div class="relative h-56 flex items-center justify-center">
+                            <canvas id="trendChartCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- MAIN BREAKDOWN SECTIONS -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    
-                    <!-- CATEGORY BREAKDOWN CARD -->
                     <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4">
                         <div class="flex justify-between items-center border-b dark:border-slate-700/80 pb-3">
                             <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-chart-pie text-teal-500"></i> <span data-i18n="catBreakdownTitle">Expenses by Category</span>
+                                <i class="fa-solid fa-list-check text-teal-500"></i> <span data-i18n="catBreakdownTitle">Expenses by Category</span>
                             </h3>
-                            <span class="text-[10px] text-slate-400 font-medium">Sorted by highest</span>
                         </div>
                         <div id="categoryBreakdown" class="space-y-3 text-sm"></div>
                     </div>
 
-                    <!-- EXPENSE SUMMARY BREAKDOWN CARD (UPDATED TITLE) -->
                     <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4">
                         <div class="flex justify-between items-center border-b dark:border-slate-700/80 pb-3">
                             <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2">
@@ -468,7 +517,7 @@
             <section id="view-expenses" class="hidden space-y-4">
                 <div>
                     <button onclick="openProjectModal()" class="w-full bg-teal-600 text-white py-3.5 rounded-2xl font-bold shadow-md hover:bg-teal-700 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus-circle text-lg"></i> + <span data-i18n="addExpenseBtn">+ Add New Expense</span>
+                        <i class="fa-solid fa-plus-circle text-lg"></i> + <span data-i18n="addExpenseBtn">+ Add New Expense Group</span>
                     </button>
                 </div>
 
@@ -490,7 +539,6 @@
                         <i class="fa-solid fa-gear text-teal-600"></i> <span data-i18n="tabSettings">Settings</span>
                     </h2>
 
-                    <!-- Language Setting -->
                     <div class="flex justify-between items-center p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
                         <div>
                             <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="languageLabel">Language</h4>
@@ -502,7 +550,6 @@
                         </div>
                     </div>
 
-                    <!-- Currency Setting -->
                     <div class="p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
                         <div>
                             <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="currencyLabel">Default Currency Format</h4>
@@ -516,7 +563,6 @@
                         </select>
                     </div>
 
-                    <!-- Custom Categories Setting -->
                     <div class="p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
                         <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="customCategoryLabel">Custom Categories</h4>
                         <div class="flex gap-2">
@@ -526,7 +572,6 @@
                         <div id="customCategoryList" class="flex flex-wrap gap-1.5 pt-1"></div>
                     </div>
 
-                    <!-- Theme Light / Dark Mode -->
                     <div class="flex justify-between items-center p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
                         <div>
                             <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="themeLabel">App Appearance</h4>
@@ -537,7 +582,6 @@
                         </button>
                     </div>
 
-                    <!-- Backup / Export All Data -->
                     <div class="p-3.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-2">
                         <h4 class="text-xs font-bold text-indigo-950 dark:text-slate-200" data-i18n="exportBackupLabel">Export & Backup Data</h4>
                         <p class="text-[10px] text-slate-400" data-i18n="exportBackupDesc">Download all recorded transactions as Excel spreadsheet</p>
@@ -548,13 +592,12 @@
                 </div>
             </section>
 
-            <!-- VIEW 4: PROJECT DETAIL & RINCIAN TRANSAKSI -->
+            <!-- VIEW 4: PROJECT DETAIL -->
             <section id="view-project-detail" class="hidden space-y-4">
                 <button onclick="switchTab('expenses')" class="text-sm text-teal-600 dark:text-teal-400 font-semibold flex items-center gap-1 hover:underline">
                     <i class="fa-solid fa-arrow-left"></i> <span data-i18n="backToExpenses">Back to Expenses List</span>
                 </button>
 
-                <!-- HEADER DETAIL DENGAN STATUS BADGE -->
                 <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 space-y-2">
                     <div class="flex justify-between items-start gap-3">
                         <div class="min-w-0 flex-1">
@@ -587,7 +630,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.5.2
+            KomExpense Tracker &bull; Version 2.6.0
         </footer>
     </div>
 
@@ -610,9 +653,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // MEMANGGIL LOGO.PNG MENGGUNAKAN JALUR RELATIF LOKAL PRESISI
         const exactAppLogoUrl = "./logo.png";
-
         document.getElementById('appFavicon').href = exactAppLogoUrl;
         document.getElementById('appAppleIcon').href = exactAppLogoUrl;
         document.getElementById('headerLogoImg').src = exactAppLogoUrl;
@@ -627,6 +668,10 @@
         let currentLang = "en";
         let currentCurrency = localStorage.getItem('currency') || "Rp";
         let customCategories = [];
+
+        // Global Chart instances
+        let categoryChartInstance = null;
+        let trendChartInstance = null;
 
         const defaultCategories = {
             en: ["Fuel", "Meal", "Toll", "Parking", "Hotel / Lodging", "Transport / Ticket", "Office Supplies", "Others"],
@@ -705,9 +750,9 @@
                 logoutBtn: "Logout Account",
                 homeTab: "Home",
                 expensesTab: "Expenses",
-                dashTotalLabel: "Total Expenses",
+                dashTotalLabel: "Total Expenses (Filtered)",
                 dashMonthLabel: "This Month",
-                dashReceiptCount: "Total Receipts",
+                dashReceiptCount: "Filtered Receipts",
                 dashProjCount: "Active Expenses",
                 catBreakdownTitle: "Expenses by Category",
                 projBreakdownTitle: "Summary by Expense",
@@ -754,7 +799,7 @@
                 exportAllBtn: "Ekspor Seluruh Data (Excel)",
                 addExpenseTitle: "Tambah Pos Pengeluaran Baru",
                 projectNameLabel: "Nama Pos Pengeluaran",
-                statusLabel: "Status Status",
+                statusLabel: "Status",
                 projectNamePlaceholder: "Contoh: Project Wifi, Dinas Bandung, Operasional Rutin",
                 noteLabel: "Catatan (Opsional)",
                 notePlaceholder: "Catatan singkat pengeluaran...",
@@ -775,9 +820,9 @@
                 logoutBtn: "Keluar Akun",
                 homeTab: "Home",
                 expensesTab: "Expenses",
-                dashTotalLabel: "Total Pengeluaran",
+                dashTotalLabel: "Total Pengeluaran (Filtered)",
                 dashMonthLabel: "Bulan Ini",
-                dashReceiptCount: "Total Bon",
+                dashReceiptCount: "Filtered Bon",
                 dashProjCount: "Pos Pengeluaran",
                 catBreakdownTitle: "Pengeluaran per Kategori",
                 projBreakdownTitle: "Ringkasan Pos Pengeluaran",
@@ -893,6 +938,7 @@
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeButtonUI(isDark);
             await saveUserSettings();
+            renderDashboard(); // Re-render chart colors
         };
 
         function updateThemeButtonUI(isDark) {
@@ -1377,6 +1423,7 @@
             document.getElementById('itemAmount').value = "0";
             document.getElementById('itemAmountFormatted').value = "";
             document.getElementById('itemImgPreview').classList.add('hidden');
+            document.getElementById('ocrLoading').classList.add('hidden');
             currentItemImage = "";
             document.getElementById('itemDate').valueAsDate = new Date();
         };
@@ -1385,13 +1432,15 @@
             document.getElementById('transactionModal').classList.add('hidden');
         };
 
+        // INTEGRASI FITUR OCR (TESSERACT.JS AUTO SCAN STRUK)
         window.previewItemImage = (e) => {
             const file = e.target.files[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
-                img.onload = () => {
+                img.onload = async () => {
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 800;
                     const scaleSize = MAX_WIDTH / img.width;
@@ -1399,14 +1448,73 @@
                     canvas.height = img.height * scaleSize;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
                     currentItemImage = canvas.toDataURL('image/jpeg', 0.7);
                     document.getElementById('itemImgPreview').src = currentItemImage;
                     document.getElementById('itemImgPreview').classList.remove('hidden');
+
+                    // Jalankan OCR Engine
+                    runOCRAnalysis(currentItemImage);
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         };
+
+        async function runOCRAnalysis(imageData) {
+            const loadingBox = document.getElementById('ocrLoading');
+            const progressText = document.getElementById('ocrProgressText');
+            loadingBox.classList.remove('hidden');
+            progressText.innerText = "Analyzing receipt text with OCR...";
+
+            try {
+                const worker = await Tesseract.createWorker('ind');
+                const ret = await worker.recognize(imageData);
+                await worker.terminate();
+
+                const text = ret.data.text;
+                console.log("OCR Extracted Text:", text);
+
+                // Ekstraksi Nominal (Mencari angka dengan format total/nominal terbesar)
+                const numbersFound = text.match(/(?:TOTAL|Rp|RP|AMOUNT)?\s*:?\s*([0-9]{1,3}(?:[.,][0-9]{3})+|[0-9]{4,8})/gi);
+                let highestAmount = 0;
+
+                if (numbersFound) {
+                    numbersFound.forEach(numStr => {
+                        const cleanNum = parseInt(numStr.replace(/\D/g, ''), 10);
+                        if (!isNaN(cleanNum) && cleanNum > highestAmount && cleanNum < 100000000) {
+                            highestAmount = cleanNum;
+                        }
+                    });
+                }
+
+                if (highestAmount > 0) {
+                    document.getElementById('itemAmount').value = highestAmount;
+                    document.getElementById('itemAmountFormatted').value = Number(highestAmount).toLocaleString('id-ID');
+                }
+
+                // Ekstraksi Tanggal (YYYY-MM-DD / DD-MM-YYYY)
+                const dateMatch = text.match(/(\d{2})[\/\.-](\d{2})[\/\.-](\d{4})/) || text.match(/(\d{4})[\/\.-](\d{2})[\/\.-](\d{2})/);
+                if (dateMatch) {
+                    try {
+                        let parsedDate;
+                        if (dateMatch[1].length === 4) {
+                            parsedDate = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+                        } else {
+                            parsedDate = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
+                        }
+                        document.getElementById('itemDate').value = parsedDate;
+                    } catch (e) {}
+                }
+
+                progressText.innerText = highestAmount > 0 ? `Auto-filled Amount: ${currentCurrency} ${highestAmount.toLocaleString('id-ID')}` : "OCR Scan complete.";
+            } catch (err) {
+                console.error("OCR Error:", err);
+                progressText.innerText = "Scan complete. Please verify amount manually.";
+            } finally {
+                setTimeout(() => loadingBox.classList.add('hidden'), 2500);
+            }
+        }
 
         window.saveTransactionItem = async (e) => {
             e.preventDefault();
@@ -1493,12 +1601,8 @@
         function getImageDimensions(base64) {
             return new Promise((resolve) => {
                 const img = new Image();
-                img.onload = () => {
-                    resolve({ width: img.width, height: img.height });
-                };
-                img.onerror = () => {
-                    resolve({ width: 200, height: 200 });
-                };
+                img.onload = () => resolve({ width: img.width, height: img.height });
+                img.onerror = () => resolve({ width: 200, height: 200 });
                 img.src = base64;
             });
         }
@@ -1553,7 +1657,6 @@
 
                 if (item.receipt && item.receipt.startsWith("data:image")) {
                     row.height = 145;
-
                     try {
                         const dims = await getImageDimensions(item.receipt);
                         const maxHeight = 180;
@@ -1586,11 +1689,53 @@
             saveAs(blob, `KomExpense_Report_${proj ? proj.name : 'Expense'}_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
-        function renderDashboard() {
-            const total = itemsData.reduce((acc, curr) => acc + curr.amount, 0);
+        // HANDLER FILTER DATE RANGE
+        window.handleDateFilterChange = (val) => {
+            const customBox = document.getElementById('customDateInputs');
+            if (val === 'custom') {
+                customBox.classList.remove('hidden');
+            } else {
+                customBox.classList.add('hidden');
+            }
+            renderDashboard();
+        };
+
+        function filterItemsByDateRange(items) {
+            const filterType = document.getElementById('dashDateFilter').value;
             const now = new Date();
+
+            return items.filter(item => {
+                if (!item.date) return false;
+                const itemDate = new Date(item.date);
+
+                if (filterType === 'today') {
+                    return itemDate.toDateString() === now.toDateString();
+                } else if (filterType === 'this_week') {
+                    const firstDayOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+                    return itemDate >= firstDayOfWeek;
+                } else if (filterType === 'this_month') {
+                    const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                    return item.date.startsWith(monthStr);
+                } else if (filterType === 'last_month') {
+                    const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    const monthStr = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`;
+                    return item.date.startsWith(monthStr);
+                } else if (filterType === 'custom') {
+                    const startVal = document.getElementById('dashCustomStart').value;
+                    const endVal = document.getElementById('dashCustomEnd').value;
+                    if (startVal && item.date < startVal) return false;
+                    if (endVal && item.date > endVal) return false;
+                    return true;
+                }
+                return true; // 'all'
+            });
+        }
+
+        function renderDashboard() {
+            const filteredItems = filterItemsByDateRange(itemsData);
+            const total = filteredItems.reduce((acc, curr) => acc + curr.amount, 0);
             
-            // Dynamic Greeting
+            const now = new Date();
             const hour = now.getHours();
             let greeting = "Good Day!";
             if (hour < 12) greeting = "Good Morning!";
@@ -1605,16 +1750,14 @@
 
             document.getElementById('dashTotal').innerText = `${currentCurrency} ${total.toLocaleString('id-ID')}`;
             document.getElementById('dashThisMonth').innerText = `${currentCurrency} ${thisMonthTotal.toLocaleString('id-ID')}`;
-            document.getElementById('dashCount').innerText = `${itemsData.length} ${i18n[currentLang].txCount}`;
+            document.getElementById('dashCount').innerText = `${filteredItems.length} ${i18n[currentLang].txCount}`;
             document.getElementById('dashProjects').innerText = `${projectsData.length} ${currentLang === 'id' ? 'Pos' : 'Expenses'}`;
 
-            // Calculate Avg & Top Category
-            const avgAmount = itemsData.length > 0 ? Math.round(total / itemsData.length) : 0;
-            const avgEl = document.getElementById('dashAvgTx');
-            if (avgEl) avgEl.innerText = `${currentCurrency} ${avgAmount.toLocaleString('id-ID')}`;
+            const avgAmount = filteredItems.length > 0 ? Math.round(total / filteredItems.length) : 0;
+            document.getElementById('dashAvgTx').innerText = `${currentCurrency} ${avgAmount.toLocaleString('id-ID')}`;
 
             const catMap = {};
-            itemsData.forEach(item => {
+            filteredItems.forEach(item => {
                 let normalizedCat = item.category;
                 if (categoryMapNormalization[item.category]) {
                     normalizedCat = categoryMapNormalization[item.category][currentLang];
@@ -1622,7 +1765,6 @@
                 catMap[normalizedCat] = (catMap[normalizedCat] || 0) + item.amount;
             });
 
-            // Top Category Finding
             let topCatName = "-";
             let maxCatVal = 0;
             Object.keys(catMap).forEach(c => {
@@ -1631,22 +1773,23 @@
                     topCatName = c;
                 }
             });
-            const topCatEl = document.getElementById('dashTopCategory');
-            if (topCatEl) topCatEl.innerText = topCatName;
+            document.getElementById('dashTopCategory').innerText = topCatName;
 
-            // Render Category Breakdown (Sorted)
+            // RENDER CHARTS
+            renderCategoryDoughnutChart(catMap);
+            renderExpenseTrendBarChart(filteredItems);
+
+            // Render Category List Breakdown
             const catContainer = document.getElementById('categoryBreakdown');
             catContainer.innerHTML = '';
             
             const sortedCategories = Object.keys(catMap).sort((a,b) => catMap[b] - catMap[a]);
 
             if (sortedCategories.length === 0) {
-                catContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No transactions recorded yet.</p>`;
+                catContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No transactions for this filter.</p>`;
             } else {
                 sortedCategories.forEach((cat, idx) => {
                     const percent = total > 0 ? Math.round((catMap[cat] / total) * 100) : 0;
-                    
-                    // Dynamic accent bar
                     const colors = ['bg-teal-500', 'bg-purple-500', 'bg-indigo-500', 'bg-sky-500', 'bg-amber-500'];
                     const barColor = colors[idx % colors.length];
 
@@ -1681,7 +1824,7 @@
                 projContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No expenses available.</p>`;
             } else {
                 sortedProjects.forEach(p => {
-                    const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
+                    const pTotal = filteredItems.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
                     const pPercent = total > 0 ? Math.round((pTotal / total) * 100) : 0;
 
                     projContainer.innerHTML += `
@@ -1701,6 +1844,93 @@
                     `;
                 });
             }
+        }
+
+        // FUNSI CHART.JS (DOUGHNUT)
+        function renderCategoryDoughnutChart(catMap) {
+            const ctx = document.getElementById('categoryChartCanvas').getContext('2d');
+            const labels = Object.keys(catMap);
+            const data = Object.values(catMap);
+
+            if (categoryChartInstance) categoryChartInstance.destroy();
+
+            const isDark = document.documentElement.classList.contains('dark');
+
+            categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#0d9488', '#a855f7', '#6366f1', '#0284c7', '#f59e0b', '#ec4899', '#10b981'],
+                        borderWidth: 2,
+                        borderColor: isDark ? '#1e293b' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: isDark ? '#cbd5e1' : '#334155',
+                                font: { size: 10, family: 'sans-serif' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // FUNGSI CHART.JS (BAR TREND)
+        function renderExpenseTrendBarChart(filteredItems) {
+            const ctx = document.getElementById('trendChartCanvas').getContext('2d');
+            
+            // Map berdasarkan Tanggal (sorted)
+            const dateMap = {};
+            filteredItems.forEach(item => {
+                if (item.date) {
+                    dateMap[item.date] = (dateMap[item.date] || 0) + item.amount;
+                }
+            });
+
+            const sortedDates = Object.keys(dateMap).sort();
+            const values = sortedDates.map(d => dateMap[d]);
+
+            if (trendChartInstance) trendChartInstance.destroy();
+
+            const isDark = document.documentElement.classList.contains('dark');
+
+            trendChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedDates,
+                    datasets: [{
+                        label: 'Amount',
+                        data: values,
+                        backgroundColor: '#0d9488',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { size: 9 } },
+                            grid: { display: false }
+                        },
+                        y: {
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { size: 9 } },
+                            grid: { color: isDark ? '#334155' : '#f1f5f9' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
         }
 
         // GESTURE SWIPE BACK
