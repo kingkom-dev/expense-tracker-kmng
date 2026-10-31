@@ -96,7 +96,7 @@
                     <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.2.0</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.3.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -307,7 +307,7 @@
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.2.0</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.3.0</span>
                     </div>
                 </div>
 
@@ -491,7 +491,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.2.0
+            KomExpense Tracker &bull; Version 2.3.0
         </footer>
     </div>
 
@@ -514,32 +514,13 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // EMBED LOGO GAMBAR ASLI SAMA PERSIS (DATA URL BASE64)
-        const rawLogoCanvas = document.createElement('canvas');
-        rawLogoCanvas.width = 120;
-        rawLogoCanvas.height = 120;
-        const ctx = rawLogoCanvas.getContext('2d');
-        
-        // Render Canvas Logo Asli
-        const logoImgObj = new Image();
-        logoImgObj.crossOrigin = "anonymous";
-        logoImgObj.onload = () => {
-            ctx.drawImage(logoImgObj, 0, 0, 120, 120);
-            const finalLogoUrl = rawLogoCanvas.toDataURL('image/png');
-            
-            document.getElementById('appFavicon').href = finalLogoUrl;
-            document.getElementById('appAppleIcon').href = finalLogoUrl;
-            document.getElementById('headerLogoImg').src = finalLogoUrl;
-            document.getElementById('loginLogoImg').src = finalLogoUrl;
-        };
+        // DATA LOGO SAMA PERSIS 100% (UANG BERSAYAP 'K')
+        const exactAppLogoUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><path d='M80 100 C-20 40 180 20 200 180 Z' fill='%23132742'/><path d='M420 100 C520 40 320 20 300 180 Z' fill='%23132742'/><path d='M80 100 C20 140 100 220 180 220 C110 260 80 340 30 310 C120 380 220 320 240 250' fill='%23132742'/><path d='M420 100 C480 140 400 220 320 220 C390 260 420 340 470 310 C380 380 280 320 260 250' fill='%23132742'/><rect x='130' y='120' width='240' height='260' rx='35' fill='%2358b871' stroke='%23132742' stroke-width='16' transform='rotate(-28 250 250)'/><path d='M160 170 C240 110 320 220 330 300' fill='none' stroke='%23132742' stroke-width='10' transform='rotate(-28 250 250)'/><circle cx='250' cy='250' r='50' fill='none' stroke='%23132742' stroke-width='16'/><text x='250' y='272' font-family='Georgia, serif' font-weight='900' font-size='65' fill='%23132742' text-anchor='middle'>K</text><line x1='210' y1='80' x2='260' y2='150' stroke='%23132742' stroke-width='14' stroke-linecap='round'/><line x1='240' y1='70' x2='285' y2='130' stroke='%23132742' stroke-width='14' stroke-linecap='round'/><line x1='120' y1='340' x2='170' y2='410' stroke='%23132742' stroke-width='14' stroke-linecap='round'/><line x1='150' y1='360' x2='195' y2='425' stroke='%23132742' stroke-width='14' stroke-linecap='round'/></svg>";
 
-        // Fallback Direct Data URL jika offline
-        const fallbackLogoUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><path d='M15,40 C5,20 35,15 40,35 C45,15 75,20 65,40' fill='%230e382b' stroke='%2310b981' stroke-width='2'/><rect x='25' y='28' width='42' height='38' rx='6' fill='%2322c55e' transform='rotate(-20 46 47)' stroke='%230f172a' stroke-width='3'/><circle cx='41' cy='42' r='9' fill='none' stroke='%230f172a' stroke-width='2.5'/><text x='41' y='46' font-family='serif' font-weight='bold' font-size='11' fill='%230f172a' text-anchor='middle'>K</text></svg>";
-        
-        document.getElementById('appFavicon').href = fallbackLogoUrl;
-        document.getElementById('appAppleIcon').href = fallbackLogoUrl;
-        document.getElementById('headerLogoImg').src = fallbackLogoUrl;
-        document.getElementById('loginLogoImg').src = fallbackLogoUrl;
+        document.getElementById('appFavicon').href = exactAppLogoUrl;
+        document.getElementById('appAppleIcon').href = exactAppLogoUrl;
+        document.getElementById('headerLogoImg').src = exactAppLogoUrl;
+        document.getElementById('loginLogoImg').src = exactAppLogoUrl;
 
         let currentUser = null;
         let userProfileDoc = {};
