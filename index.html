@@ -99,14 +99,14 @@
     </div>
 
     <!-- Auth Section (Login/Register Modal) -->
-    <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-40 hidden">
+    <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <div class="flex justify-center mb-2">
                     <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.5.0</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.5.1</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -308,16 +308,17 @@
 
     <!-- Main Content -->
     <div id="appContent" class="hidden">
-        <!-- HEADER UTAMA DENGAN LOGO.PNG -->
-        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3 shadow-md sticky top-0 z-10 no-print">
-            <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
+        
+        <!-- HEADER UTAMA DENGAN STICKY PERMANEN & OVERFLOW CUT-OFF (FIX Z-INDEX) -->
+        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3 shadow-lg sticky top-0 z-40 overflow-hidden no-print border-b border-white/10">
+            <div class="max-w-6xl mx-auto flex justify-between items-center gap-2 relative z-10">
                 
                 <!-- LOGO DAN JUDUL -->
                 <div class="flex items-center gap-2.5 min-w-0">
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.5.0</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.5.1</span>
                     </div>
                 </div>
 
@@ -332,7 +333,8 @@
         </header>
 
         <!-- Main Body -->
-        <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+        <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6 relative z-0">
+            
             <!-- Navigation Tabs (Home | Expenses | Settings) -->
             <div class="no-print bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-1.5 rounded-2xl shadow-lg flex justify-around border border-slate-200/80 dark:border-slate-700/80 md:relative fixed bottom-3 left-3 right-3 z-30">
                 <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition rounded-xl" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
@@ -340,11 +342,11 @@
                 <button onclick="switchTab('settings')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition rounded-xl" id="tab-settings"><i class="fa-solid fa-gear block text-lg"></i> <span data-i18n="tabSettings">Settings</span></button>
             </div>
 
-            <!-- VIEW 1: HOME DASHBOARD SUMMARY (MODERNIZED) -->
+            <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
             <section id="view-dashboard" class="space-y-6">
                 
-                <!-- HERO CARD SUMMARY -->
-                <div class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-950 to-teal-900 text-white p-6 rounded-3xl shadow-xl border border-indigo-800/50">
+                <!-- HERO CARD SUMMARY (ISOLATED OVERFLOW & LOWER Z-INDEX) -->
+                <div class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-950 to-teal-900 text-white p-6 rounded-3xl shadow-xl border border-indigo-800/50 z-0">
                     <!-- Background Pattern Elements -->
                     <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-teal-500/20 rounded-full blur-2xl pointer-events-none"></div>
                     <div class="absolute -left-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl pointer-events-none"></div>
@@ -389,7 +391,7 @@
                     </div>
                 </div>
 
-                <!-- STATS SUMMARY GRID (MODERN FLOATING CARDS) -->
+                <!-- STATS SUMMARY GRID -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 hover:shadow-md transition">
                         <div class="flex items-center justify-between mb-2">
@@ -585,7 +587,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.5.0
+            KomExpense Tracker &bull; Version 2.5.1
         </footer>
     </div>
 
