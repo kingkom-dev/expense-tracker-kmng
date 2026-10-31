@@ -78,9 +78,19 @@
             pointer-events: none;
             font-size: 11px;
         }
+
+        /* Glassmorphism & custom scrollbar */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+        }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 pb-20 md:pb-6 font-sans transition-colors duration-200">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 pb-20 md:pb-6 font-sans transition-colors duration-200">
 
     <!-- Loading Screen -->
     <div id="loadingApp" class="fixed inset-0 bg-indigo-950 flex flex-col items-center justify-center p-4 z-50 text-white space-y-3">
@@ -90,13 +100,13 @@
 
     <!-- Auth Section (Login/Register Modal) -->
     <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-40 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
             <div class="text-center mb-6">
                 <div class="flex justify-center mb-2">
                     <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.4.1</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.5.0</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -110,7 +120,7 @@
                 <div class="text-right mb-5">
                     <button type="button" onclick="handleForgotPassword()" class="text-xs text-teal-600 dark:text-teal-400 hover:underline font-medium" data-i18n="forgotPassBtn">Forgot Password?</button>
                 </div>
-                <button type="submit" id="authBtn" class="w-full bg-gradient-to-r from-indigo-900 to-teal-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition shadow-sm" data-i18n="loginBtn">Login</button>
+                <button type="submit" id="authBtn" class="w-full bg-gradient-to-r from-indigo-900 to-teal-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition shadow-md" data-i18n="loginBtn">Login</button>
             </form>
             <div class="mt-4 text-center text-sm">
                 <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-teal-600 dark:text-teal-400 hover:text-teal-700 font-medium underline" data-i18n="toggleRegister">Don't have an account? Register</button>
@@ -120,7 +130,7 @@
 
     <!-- Modal My Profile Only -->
     <div id="profileModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
             
             <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
                 <h3 class="text-base font-bold text-teal-600 dark:text-teal-400 flex items-center gap-2">
@@ -194,7 +204,7 @@
 
     <!-- Modal Create / Edit Expense Project -->
     <div id="projectModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 border border-slate-100 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 w-full max-w-md space-y-4 border border-slate-100 dark:border-slate-700">
             <h3 id="projectModalTitle" class="text-lg font-bold text-indigo-950 dark:text-teal-400" data-i18n="addExpenseTitle">Add New Expense (Project)</h3>
             <form id="projectForm" onsubmit="saveProject(event)" class="space-y-3">
                 <input type="hidden" id="editProjectId">
@@ -226,7 +236,7 @@
 
     <!-- Modal Add Transaction Item -->
     <div id="transactionModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
             <h3 class="text-lg font-bold text-indigo-950 dark:text-teal-400 flex items-center gap-2"><i class="fa-solid fa-receipt text-teal-600"></i> <span data-i18n="addTxTitle">Add Transaction Detail</span></h3>
             <form id="itemForm" onsubmit="saveTransactionItem(event)" class="space-y-3">
                 <input type="hidden" id="currentProjectId">
@@ -282,7 +292,7 @@
 
     <!-- Modal Popup Viewing Struk Bon Gambar -->
     <div id="receiptModal" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative border border-slate-100 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative border border-slate-100 dark:border-slate-700">
             <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2">
                 <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-teal-600"></i> <span data-i18n="receiptTitle">Receipt Attachment</span></h3>
                 <button onclick="closeReceiptModal()" class="text-slate-400 hover:text-red-500 p-1 text-lg font-bold transition"><i class="fa-solid fa-xmark"></i></button>
@@ -299,7 +309,7 @@
     <!-- Main Content -->
     <div id="appContent" class="hidden">
         <!-- HEADER UTAMA DENGAN LOGO.PNG -->
-        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-2.5 sm:py-3 shadow-md sticky top-0 z-10 no-print">
+        <header class="bg-gradient-to-r from-indigo-950 via-purple-900 to-teal-700 text-white px-4 py-3 shadow-md sticky top-0 z-10 no-print">
             <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
                 
                 <!-- LOGO DAN JUDUL -->
@@ -307,7 +317,7 @@
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.4.1</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.5.0</span>
                     </div>
                 </div>
 
@@ -324,46 +334,130 @@
         <!-- Main Body -->
         <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
             <!-- Navigation Tabs (Home | Expenses | Settings) -->
-            <div class="no-print bg-white dark:bg-slate-800 p-1.5 rounded-2xl shadow-sm flex justify-around border border-slate-200/80 dark:border-slate-700 md:relative fixed bottom-0 left-0 right-0 z-30">
-                <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
-                <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> <span data-i18n="expensesTab">Expenses</span></button>
-                <button onclick="switchTab('settings')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition" id="tab-settings"><i class="fa-solid fa-gear block text-lg"></i> <span data-i18n="tabSettings">Settings</span></button>
+            <div class="no-print bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-1.5 rounded-2xl shadow-lg flex justify-around border border-slate-200/80 dark:border-slate-700/80 md:relative fixed bottom-3 left-3 right-3 z-30">
+                <button onclick="switchTab('dashboard')" class="tab-btn flex-1 py-2 text-center text-teal-600 font-semibold transition rounded-xl" id="tab-dashboard"><i class="fa-solid fa-chart-pie block text-lg"></i> <span data-i18n="homeTab">Home</span></button>
+                <button onclick="switchTab('expenses')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition rounded-xl" id="tab-expenses"><i class="fa-solid fa-wallet block text-lg"></i> <span data-i18n="expensesTab">Expenses</span></button>
+                <button onclick="switchTab('settings')" class="tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition rounded-xl" id="tab-settings"><i class="fa-solid fa-gear block text-lg"></i> <span data-i18n="tabSettings">Settings</span></button>
             </div>
 
-            <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
-            <section id="view-dashboard" class="space-y-5">
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-500">
-                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashTotalLabel">Total Expenses</p>
-                        <h3 id="dashTotal" class="text-lg lg:text-xl font-bold text-indigo-950 dark:text-slate-100 mt-1">Rp 0</h3>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-emerald-500">
-                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashMonthLabel">This Month</p>
-                        <h3 id="dashThisMonth" class="text-lg lg:text-xl font-bold text-indigo-950 dark:text-slate-100 mt-1">Rp 0</h3>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-purple-500">
-                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashReceiptCount">Total Receipts</p>
-                        <h3 id="dashCount" class="text-lg lg:text-xl font-bold text-indigo-950 dark:text-slate-100 mt-1">0 Transactions</h3>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800 p-4 lg:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-indigo-600">
-                        <p class="text-xs text-slate-400 font-medium" data-i18n="dashProjCount">Total Projects</p>
-                        <h3 id="dashProjects" class="text-lg lg:text-xl font-bold text-indigo-950 dark:text-slate-100 mt-1">0 Projects</h3>
+            <!-- VIEW 1: HOME DASHBOARD SUMMARY (MODERNIZED) -->
+            <section id="view-dashboard" class="space-y-6">
+                
+                <!-- HERO CARD SUMMARY -->
+                <div class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-950 to-teal-900 text-white p-6 rounded-3xl shadow-xl border border-indigo-800/50">
+                    <!-- Background Pattern Elements -->
+                    <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-teal-500/20 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="absolute -left-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <div class="relative z-10 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span id="dashGreeting" class="text-xs font-semibold uppercase tracking-wider text-teal-300/90">Good Day!</span>
+                                <h2 class="text-xs sm:text-sm text-slate-300 font-medium mt-0.5" data-i18n="dashTotalLabel">Total Expenses Accumulated</h2>
+                            </div>
+                            <span class="bg-teal-500/20 border border-teal-400/30 text-teal-300 text-[11px] px-3 py-1 rounded-full font-semibold flex items-center gap-1.5">
+                                <i class="fa-solid fa-shield-halved text-xs"></i> Verified Data
+                            </span>
+                        </div>
+
+                        <div>
+                            <h3 id="dashTotal" class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Rp 0</h3>
+                        </div>
+
+                        <!-- Mini Sub-stats Row -->
+                        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-white/10">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
+                                    <i class="fa-solid fa-calendar-day text-xs"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] text-slate-300" data-i18n="dashMonthLabel">This Month</p>
+                                    <p id="dashThisMonth" class="text-xs font-bold text-white truncate">Rp 0</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 shrink-0">
+                                    <i class="fa-solid fa-receipt text-xs"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] text-slate-300" data-i18n="dashReceiptCount">Total Receipts</p>
+                                    <p id="dashCount" class="text-xs font-bold text-white truncate">0 Transactions</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                <!-- STATS SUMMARY GRID (MODERN FLOATING CARDS) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 hover:shadow-md transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-medium text-slate-400" data-i18n="dashProjCount">Active Projects</span>
+                            <div class="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-diagram-project"></i>
+                            </div>
+                        </div>
+                        <h4 id="dashProjects" class="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100">0 Projects</h4>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 hover:shadow-md transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-medium text-slate-400">Top Category</span>
+                            <div class="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                        </div>
+                        <h4 id="dashTopCategory" class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 truncate">-</h4>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 hover:shadow-md transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-medium text-slate-400">Avg Transaction</span>
+                            <div class="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-calculator"></i>
+                            </div>
+                        </div>
+                        <h4 id="dashAvgTx" class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 truncate">Rp 0</h4>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 hover:shadow-md transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-medium text-slate-400">System Status</span>
+                            <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h4 class="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400">Sync Active</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN BREAKDOWN SECTIONS -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-3">
-                        <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm border-b dark:border-slate-700 pb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-tags text-teal-500"></i> <span data-i18n="catBreakdownTitle">Expenses by Category</span>
-                        </h3>
+                    
+                    <!-- CATEGORY BREAKDOWN CARD -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4">
+                        <div class="flex justify-between items-center border-b dark:border-slate-700/80 pb-3">
+                            <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-teal-500"></i> <span data-i18n="catBreakdownTitle">Expenses by Category</span>
+                            </h3>
+                            <span class="text-[10px] text-slate-400 font-medium">Sorted by highest</span>
+                        </div>
                         <div id="categoryBreakdown" class="space-y-3 text-sm"></div>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-3">
-                        <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm border-b dark:border-slate-700 pb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-folder-tree text-purple-600"></i> <span data-i18n="projBreakdownTitle">Summary by Project</span>
-                        </h3>
-                        <div id="projectBreakdown" class="space-y-2.5 text-sm max-h-72 overflow-y-auto"></div>
+                    <!-- PROJECT SUMMARY BREAKDOWN CARD -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4">
+                        <div class="flex justify-between items-center border-b dark:border-slate-700/80 pb-3">
+                            <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-folder-tree text-purple-600"></i> <span data-i18n="projBreakdownTitle">Summary by Project</span>
+                            </h3>
+                            <button onclick="switchTab('expenses')" class="text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline">View All</button>
+                        </div>
+                        <div id="projectBreakdown" class="space-y-3 text-sm max-h-80 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
             </section>
@@ -371,7 +465,7 @@
             <!-- VIEW 2: EXPENSES PAGE -->
             <section id="view-expenses" class="hidden space-y-4">
                 <div>
-                    <button onclick="openProjectModal()" class="w-full bg-teal-600 text-white py-3.5 rounded-2xl font-bold shadow-sm hover:bg-teal-700 transition flex items-center justify-center gap-2">
+                    <button onclick="openProjectModal()" class="w-full bg-teal-600 text-white py-3.5 rounded-2xl font-bold shadow-md hover:bg-teal-700 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-plus-circle text-lg"></i> + <span data-i18n="addExpenseBtn">+ Add New Expense (Project)</span>
                     </button>
                 </div>
@@ -389,7 +483,7 @@
 
             <!-- VIEW 3: SETTINGS PAGE -->
             <section id="view-settings" class="hidden space-y-4">
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4">
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 space-y-4">
                     <h2 class="text-lg font-bold text-indigo-950 dark:text-teal-400 border-b dark:border-slate-700 pb-2 flex items-center gap-2">
                         <i class="fa-solid fa-gear text-teal-600"></i> <span data-i18n="tabSettings">Settings</span>
                     </h2>
@@ -459,7 +553,7 @@
                 </button>
 
                 <!-- HEADER DETAIL DENGAN STATUS BADGE -->
-                <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 space-y-2">
+                <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-600 space-y-2">
                     <div class="flex justify-between items-start gap-3">
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2 flex-wrap">
@@ -478,7 +572,7 @@
                 </div>
 
                 <div>
-                    <button onclick="openTransactionModal()" class="w-full bg-teal-600 text-white py-3.5 rounded-2xl font-bold shadow-sm hover:bg-teal-700 transition flex items-center justify-center gap-2 text-sm">
+                    <button onclick="openTransactionModal()" class="w-full bg-teal-600 text-white py-3.5 rounded-2xl font-bold shadow-md hover:bg-teal-700 transition flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-circle-plus text-base"></i> + <span data-i18n="addTxBtn">Add Transaction</span>
                     </button>
                 </div>
@@ -491,7 +585,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.4.1
+            KomExpense Tracker &bull; Version 2.5.0
         </footer>
     </div>
 
@@ -1117,9 +1211,9 @@
             });
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
             if (tabName !== 'project-detail') {
-                document.getElementById('tab-dashboard').className = tabName === 'dashboard' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
-                document.getElementById('tab-expenses').className = tabName === 'expenses' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
-                document.getElementById('tab-settings').className = tabName === 'settings' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition';
+                document.getElementById('tab-dashboard').className = tabName === 'dashboard' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition rounded-xl bg-teal-50 dark:bg-teal-900/30' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition rounded-xl';
+                document.getElementById('tab-expenses').className = tabName === 'expenses' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition rounded-xl bg-teal-50 dark:bg-teal-900/30' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition rounded-xl';
+                document.getElementById('tab-settings').className = tabName === 'settings' ? 'tab-btn flex-1 py-2 text-center text-teal-600 dark:text-teal-400 font-semibold transition rounded-xl bg-teal-50 dark:bg-teal-900/30' : 'tab-btn flex-1 py-2 text-center text-slate-400 font-semibold transition rounded-xl';
             }
         };
 
@@ -1222,7 +1316,7 @@
             const filtered = sortedProjects.filter(p => p.name.toLowerCase().includes(search));
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="bg-white dark:bg-slate-800 p-6 text-center text-slate-400 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">${i18n[currentLang].noProjMsg}</div>`;
+                container.innerHTML = `<div class="bg-white dark:bg-slate-800 p-6 text-center text-slate-400 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">${i18n[currentLang].noProjMsg}</div>`;
                 return;
             }
 
@@ -1231,7 +1325,7 @@
                 const totalAmount = pItems.reduce((acc, curr) => acc + curr.amount, 0);
 
                 const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-500 cursor-pointer hover:shadow-md transition space-y-3";
+                card.className = "bg-white dark:bg-slate-800 p-4 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 border-l-4 border-l-teal-500 cursor-pointer hover:shadow-md transition space-y-3";
                 
                 card.onclick = () => openProjectDetail(p.id);
 
@@ -1354,7 +1448,7 @@
             container.innerHTML = '';
 
             if (pItems.length === 0) {
-                container.innerHTML = `<div class="bg-white dark:bg-slate-800 p-6 text-center text-xs text-slate-400 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">${i18n[currentLang].noTxMsg}</div>`;
+                container.innerHTML = `<div class="bg-white dark:bg-slate-800 p-6 text-center text-xs text-slate-400 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">${i18n[currentLang].noTxMsg}</div>`;
                 return;
             }
 
@@ -1493,6 +1587,17 @@
         function renderDashboard() {
             const total = itemsData.reduce((acc, curr) => acc + curr.amount, 0);
             const now = new Date();
+            
+            // Dynamic Greeting
+            const hour = now.getHours();
+            let greeting = "Good Day!";
+            if (hour < 12) greeting = "Good Morning!";
+            else if (hour < 18) greeting = "Good Afternoon!";
+            else greeting = "Good Evening!";
+            
+            const greetingEl = document.getElementById('dashGreeting');
+            if (greetingEl) greetingEl.innerText = greeting;
+
             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             const thisMonthTotal = itemsData.filter(i => i.date && i.date.startsWith(currentMonthStr)).reduce((acc, curr) => acc + curr.amount, 0);
 
@@ -1500,6 +1605,11 @@
             document.getElementById('dashThisMonth').innerText = `${currentCurrency} ${thisMonthTotal.toLocaleString('id-ID')}`;
             document.getElementById('dashCount').innerText = `${itemsData.length} ${i18n[currentLang].txCount}`;
             document.getElementById('dashProjects').innerText = `${projectsData.length} Projects`;
+
+            // Calculate Avg & Top Category
+            const avgAmount = itemsData.length > 0 ? Math.round(total / itemsData.length) : 0;
+            const avgEl = document.getElementById('dashAvgTx');
+            if (avgEl) avgEl.innerText = `${currentCurrency} ${avgAmount.toLocaleString('id-ID')}`;
 
             const catMap = {};
             itemsData.forEach(item => {
@@ -1510,23 +1620,52 @@
                 catMap[normalizedCat] = (catMap[normalizedCat] || 0) + item.amount;
             });
 
+            // Top Category Finding
+            let topCatName = "-";
+            let maxCatVal = 0;
+            Object.keys(catMap).forEach(c => {
+                if (catMap[c] > maxCatVal) {
+                    maxCatVal = catMap[c];
+                    topCatName = c;
+                }
+            });
+            const topCatEl = document.getElementById('dashTopCategory');
+            if (topCatEl) topCatEl.innerText = topCatName;
+
+            // Render Category Breakdown (Sorted)
             const catContainer = document.getElementById('categoryBreakdown');
             catContainer.innerHTML = '';
-            Object.keys(catMap).forEach(cat => {
-                const percent = total > 0 ? Math.round((catMap[cat] / total) * 100) : 0;
-                catContainer.innerHTML += `
-                    <div>
-                        <div class="flex justify-between text-xs font-semibold mb-1">
-                            <span>${cat}</span>
-                            <span>${currentCurrency} ${catMap[cat].toLocaleString('id-ID')} (${percent}%)</span>
-                        </div>
-                        <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
-                            <div class="bg-teal-500 h-2 rounded-full" style="width: ${percent}%"></div>
-                        </div>
-                    </div>
-                `;
-            });
+            
+            const sortedCategories = Object.keys(catMap).sort((a,b) => catMap[b] - catMap[a]);
 
+            if (sortedCategories.length === 0) {
+                catContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No transactions recorded yet.</p>`;
+            } else {
+                sortedCategories.forEach((cat, idx) => {
+                    const percent = total > 0 ? Math.round((catMap[cat] / total) * 100) : 0;
+                    
+                    // Dynamic accent bar
+                    const colors = ['bg-teal-500', 'bg-purple-500', 'bg-indigo-500', 'bg-sky-500', 'bg-amber-500'];
+                    const barColor = colors[idx % colors.length];
+
+                    catContainer.innerHTML += `
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center text-xs font-medium">
+                                <span class="text-slate-700 dark:text-slate-200 font-semibold flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full ${barColor}"></span>
+                                    ${cat}
+                                </span>
+                                <span class="text-slate-600 dark:text-slate-300 font-bold">${currentCurrency} ${catMap[cat].toLocaleString('id-ID')} <span class="text-[10px] text-slate-400 font-normal">(${percent}%)</span></span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700/60 h-2 rounded-full overflow-hidden">
+                                <div class="${barColor} h-2 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Render Project Breakdown
             const sortedProjects = [...projectsData].sort((a, b) => {
                 const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                 const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -1535,18 +1674,31 @@
 
             const projContainer = document.getElementById('projectBreakdown');
             projContainer.innerHTML = '';
-            sortedProjects.forEach(p => {
-                const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
-                projContainer.innerHTML += `
-                    <div class="flex justify-between items-center p-2.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700 gap-2">
-                        <div class="min-w-0 flex-1 flex items-center gap-1.5">
-                            <span class="font-medium text-xs text-slate-700 dark:text-slate-300 break-words">${p.name}</span>
-                            ${getStatusBadgeHTML(p.status)}
+
+            if (sortedProjects.length === 0) {
+                projContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No projects available.</p>`;
+            } else {
+                sortedProjects.forEach(p => {
+                    const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
+                    const pPercent = total > 0 ? Math.round((pTotal / total) * 100) : 0;
+
+                    projContainer.innerHTML += `
+                        <div onclick="openProjectDetail('${p.id}')" class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/40 hover:bg-teal-50/50 dark:hover:bg-slate-700/80 rounded-2xl border border-slate-100 dark:border-slate-700/60 gap-2 cursor-pointer transition">
+                            <div class="min-w-0 flex-1 space-y-0.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-xs text-slate-800 dark:text-slate-200 truncate">${p.name}</span>
+                                    ${getStatusBadgeHTML(p.status)}
+                                </div>
+                                <p class="text-[10px] text-slate-400 truncate">${p.note || 'No notes'}</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="font-extrabold text-xs text-indigo-950 dark:text-teal-300 block">${currentCurrency} ${pTotal.toLocaleString('id-ID')}</span>
+                                <span class="text-[9px] text-slate-400 font-medium">${pPercent}% of total</span>
+                            </div>
                         </div>
-                        <span class="font-bold text-xs text-indigo-950 dark:text-teal-300 shrink-0">${currentCurrency} ${pTotal.toLocaleString('id-ID')}</span>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
         }
 
         // GESTURE SWIPE BACK
