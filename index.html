@@ -98,7 +98,7 @@
                     <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.2</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.3</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -322,7 +322,7 @@
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.2</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.3</span>
                     </div>
                 </div>
 
@@ -392,7 +392,7 @@
                     </div>
                 </div>
 
-                <!-- COMPACT FILTER PERIOD BAR -->
+                <!-- COMPACT FILTER PERIOD BAR (DEFAULT: ALL TIME) -->
                 <div class="bg-white dark:bg-slate-800 px-3.5 py-2.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div class="flex items-center gap-1.5 font-semibold text-slate-600 dark:text-slate-300">
                         <i class="fa-solid fa-calendar-days text-teal-500 text-sm"></i>
@@ -401,10 +401,10 @@
                     <div class="flex flex-wrap items-center gap-2 min-w-0">
                         <div class="select-custom-wrapper min-w-[130px]">
                             <select id="dashDateFilter" onchange="handleDateFilterChange(this.value)" class="p-1.5 text-xs border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl outline-none font-medium pr-6 w-full">
-                                <option value="all">All Time</option>
+                                <option value="all" selected>All Time</option>
                                 <option value="today">Today</option>
                                 <option value="this_week">This Week</option>
-                                <option value="this_month" selected>This Month</option>
+                                <option value="this_month">This Month</option>
                                 <option value="last_month">Last Month</option>
                                 <option value="custom">Custom Range...</option>
                             </select>
@@ -628,7 +628,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.6.2
+            KomExpense Tracker &bull; Version 2.6.3
         </footer>
     </div>
 
@@ -1713,8 +1713,11 @@
         };
 
         function filterItemsByDateRange(items) {
-            const filterType = document.getElementById('dashDateFilter').value;
+            const filterSelect = document.getElementById('dashDateFilter');
+            const filterType = filterSelect ? filterSelect.value : 'all';
             const now = new Date();
+
+            if (filterType === 'all') return items;
 
             return items.filter(item => {
                 if (!item.date) return false;
@@ -1842,7 +1845,6 @@
                 projContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No expenses available.</p>`;
             } else {
                 sortedProjects.forEach(p => {
-                    // Mengambil total transaksi dari akumulasi seluruh data itemsData
                     const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
                     const pPercent = globalTotal > 0 ? Math.round((pTotal / globalTotal) * 100) : 0;
 
