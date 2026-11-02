@@ -98,7 +98,7 @@
                     <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.1</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.2</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -322,7 +322,7 @@
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.1</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.2</span>
                     </div>
                 </div>
 
@@ -348,7 +348,7 @@
             <!-- VIEW 1: HOME DASHBOARD SUMMARY -->
             <section id="view-dashboard" class="space-y-4">
                 
-                <!-- HERO CARD SUMMARY -->
+                <!-- HERO CARD SUMMARY (TAMPILAN ALL TIME GLOBAL) -->
                 <div class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-950 to-teal-900 text-white p-6 rounded-3xl shadow-xl border border-indigo-800/50 z-0">
                     <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-teal-500/20 rounded-full blur-2xl pointer-events-none"></div>
                     <div class="absolute -left-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl pointer-events-none"></div>
@@ -357,7 +357,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <span id="dashGreeting" class="text-xs font-semibold uppercase tracking-wider text-teal-300/90">Good Day!</span>
-                                <h2 class="text-xs sm:text-sm text-slate-300 font-medium mt-0.5" data-i18n="dashTotalLabel">Total Expenses (Filtered)</h2>
+                                <h2 class="text-xs sm:text-sm text-slate-300 font-medium mt-0.5" data-i18n="dashTotalLabel">Total Expenses</h2>
                             </div>
                             <span class="bg-teal-500/20 border border-teal-400/30 text-teal-300 text-[11px] px-3 py-1 rounded-full font-semibold flex items-center gap-1.5">
                                 <i class="fa-solid fa-shield-halved text-xs"></i> Verified Data
@@ -384,7 +384,7 @@
                                     <i class="fa-solid fa-receipt text-xs"></i>
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-[10px] text-slate-300" data-i18n="dashReceiptCount">Filtered Receipts</p>
+                                    <p class="text-[10px] text-slate-300" data-i18n="dashReceiptCount">Total Receipts</p>
                                     <p id="dashCount" class="text-xs font-bold text-white truncate">0 Transactions</p>
                                 </div>
                             </div>
@@ -392,11 +392,11 @@
                     </div>
                 </div>
 
-                <!-- COMPACT FILTER PERIOD BAR (DIBAWAH HERO CARD) -->
+                <!-- COMPACT FILTER PERIOD BAR -->
                 <div class="bg-white dark:bg-slate-800 px-3.5 py-2.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div class="flex items-center gap-1.5 font-semibold text-slate-600 dark:text-slate-300">
                         <i class="fa-solid fa-calendar-days text-teal-500 text-sm"></i>
-                        <span>Period:</span>
+                        <span>Analytics Filter Period:</span>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 min-w-0">
                         <div class="select-custom-wrapper min-w-[130px]">
@@ -628,7 +628,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.6.1
+            KomExpense Tracker &bull; Version 2.6.2
         </footer>
     </div>
 
@@ -747,9 +747,9 @@
                 logoutBtn: "Logout Account",
                 homeTab: "Home",
                 expensesTab: "Expenses",
-                dashTotalLabel: "Total Expenses (Filtered)",
+                dashTotalLabel: "Total Expenses",
                 dashMonthLabel: "This Month",
-                dashReceiptCount: "Filtered Receipts",
+                dashReceiptCount: "Total Receipts",
                 dashProjCount: "Active Expenses",
                 catBreakdownTitle: "Expenses by Category",
                 projBreakdownTitle: "Summary by Expense",
@@ -817,9 +817,9 @@
                 logoutBtn: "Keluar Akun",
                 homeTab: "Home",
                 expensesTab: "Expenses",
-                dashTotalLabel: "Total Pengeluaran (Filtered)",
+                dashTotalLabel: "Total Pengeluaran",
                 dashMonthLabel: "Bulan Ini",
-                dashReceiptCount: "Filtered Bon",
+                dashReceiptCount: "Total Bon",
                 dashProjCount: "Pos Pengeluaran",
                 catBreakdownTitle: "Pengeluaran per Kategori",
                 projBreakdownTitle: "Ringkasan Pos Pengeluaran",
@@ -1744,8 +1744,11 @@
         }
 
         function renderDashboard() {
+            // Data Terfilter untuk Chart Analytics & Expenses by Category
             const filteredItems = filterItemsByDateRange(itemsData);
-            const total = filteredItems.reduce((acc, curr) => acc + curr.amount, 0);
+            
+            // Total All Time Global (Tidak Di-Filter)
+            const globalTotal = itemsData.reduce((acc, curr) => acc + curr.amount, 0);
             
             const now = new Date();
             const hour = now.getHours();
@@ -1760,15 +1763,19 @@
             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             const thisMonthTotal = itemsData.filter(i => i.date && i.date.startsWith(currentMonthStr)).reduce((acc, curr) => acc + curr.amount, 0);
 
-            document.getElementById('dashTotal').innerText = `${currentCurrency} ${total.toLocaleString('id-ID')}`;
+            // Set Data Total Expenses & Total Receipts (Unfiltered Global)
+            document.getElementById('dashTotal').innerText = `${currentCurrency} ${globalTotal.toLocaleString('id-ID')}`;
             document.getElementById('dashThisMonth').innerText = `${currentCurrency} ${thisMonthTotal.toLocaleString('id-ID')}`;
-            document.getElementById('dashCount').innerText = `${filteredItems.length} ${i18n[currentLang].txCount}`;
+            document.getElementById('dashCount').innerText = `${itemsData.length} ${i18n[currentLang].txCount}`;
             document.getElementById('dashProjects').innerText = `${projectsData.length} ${currentLang === 'id' ? 'Pos' : 'Expenses'}`;
 
-            const avgAmount = filteredItems.length > 0 ? Math.round(total / filteredItems.length) : 0;
+            const avgAmount = itemsData.length > 0 ? Math.round(globalTotal / itemsData.length) : 0;
             document.getElementById('dashAvgTx').innerText = `${currentCurrency} ${avgAmount.toLocaleString('id-ID')}`;
 
+            // Map Kategori Mengikuti Period Filter untuk Chart & Visualisasi
             const catMap = {};
+            const filterTotal = filteredItems.reduce((acc, curr) => acc + curr.amount, 0);
+
             filteredItems.forEach(item => {
                 let normalizedCat = item.category;
                 if (categoryMapNormalization[item.category]) {
@@ -1790,6 +1797,7 @@
             renderCategoryDoughnutChart(catMap);
             renderExpenseTrendBarChart(filteredItems);
 
+            // Render Expenses by Category (Ikut Period Filter)
             const catContainer = document.getElementById('categoryBreakdown');
             catContainer.innerHTML = '';
             
@@ -1799,7 +1807,7 @@
                 catContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No transactions for this filter.</p>`;
             } else {
                 sortedCategories.forEach((cat, idx) => {
-                    const percent = total > 0 ? Math.round((catMap[cat] / total) * 100) : 0;
+                    const percent = filterTotal > 0 ? Math.round((catMap[cat] / filterTotal) * 100) : 0;
                     const colors = ['bg-teal-500', 'bg-purple-500', 'bg-indigo-500', 'bg-sky-500', 'bg-amber-500'];
                     const barColor = colors[idx % colors.length];
 
@@ -1820,6 +1828,7 @@
                 });
             }
 
+            // Render Summary by Expense (TAMPILAN ALL TIME GLOBAL / UNFILTERED)
             const sortedProjects = [...projectsData].sort((a, b) => {
                 const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                 const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -1833,8 +1842,9 @@
                 projContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No expenses available.</p>`;
             } else {
                 sortedProjects.forEach(p => {
-                    const pTotal = filteredItems.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
-                    const pPercent = total > 0 ? Math.round((pTotal / total) * 100) : 0;
+                    // Mengambil total transaksi dari akumulasi seluruh data itemsData
+                    const pTotal = itemsData.filter(i => i.projectId === p.id).reduce((acc, curr) => acc + curr.amount, 0);
+                    const pPercent = globalTotal > 0 ? Math.round((pTotal / globalTotal) * 100) : 0;
 
                     projContainer.innerHTML += `
                         <div onclick="openProjectDetail('${p.id}')" class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/40 hover:bg-teal-50/50 dark:hover:bg-slate-700/80 rounded-2xl border border-slate-100 dark:border-slate-700/60 gap-2 cursor-pointer transition">
