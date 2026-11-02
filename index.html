@@ -1,190 +1,209 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KomExpense Tracker</title>
-    
-    <!-- Favicon Tab Browser -->
-    <link rel="icon" type="image/png" id="appFavicon">
-    <link rel="apple-touch-icon" id="appAppleIcon">
+    <link id="appFavicon" rel="icon" type="image/png" href="./logo.png">
+    <link id="appAppleIcon" rel="apple-touch-icon" href="./logo.png">
 
-    <!-- Script Pre-render Theme -->
-    <script>
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        teal: {
+                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4',
+                            400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e',
+                            800: '#115e59', 900: '#134e4a', 950: '#042f2e'
+                        }
+                    }
+                }
+            }
         }
     </script>
-    <!-- FontAwesome Icons -->
+
+    <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- ExcelJS & FileSaver -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <!-- Chart.js untuk Analytics Grafik -->
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Tesseract.js untuk OCR Auto Scan Struk -->
+    <!-- Tesseract OCR CDN -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    
+    <!-- ExcelJS & FileSaver CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-saver/2.0.5/FileSaver.min.js"></script>
+
     <style>
-        @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            body { background: white; color: black; }
-        }
-        .print-only { display: none; }
-        
         .mobile-input-fix {
-            -webkit-appearance: none !important;
-            -moz-appearance: none !important;
-            appearance: none !important;
-            height: 40px !important;
-            min-height: 40px !important;
-            max-height: 40px !important;
-            border-radius: 0.75rem !important;
-            font-size: 13px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            text-align: center !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
+            width: 100%;
+            border-radius: 0.75rem;
+            padding: 0.625rem;
+            font-size: 0.875rem;
+            background-color: transparent;
         }
-
-        input[type="date"].mobile-input-fix {
-            text-align: center !important;
-            text-align-last: center !important;
-        }
-
         .select-custom-wrapper {
             position: relative;
-            width: 100%;
         }
         .select-custom-wrapper::after {
-            content: "\f0dc";
+            content: "\f107";
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
             position: absolute;
-            right: 12px;
+            right: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #64748b;
             pointer-events: none;
-            font-size: 11px;
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+
+        /* STYLES FITUR SWIPE TO DELETE (IPHONE STYLE) */
+        .swipe-item-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            touch-action: pan-y;
+        }
+        .swipe-delete-btn {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 80px;
+            background-color: #e11d48;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            z-index: 1;
+        }
+        .swipe-content {
+            position: relative;
+            z-index: 2;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
+        }
+        .swipe-content.swiping {
+            transition: none;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 pb-20 md:pb-6 font-sans transition-colors duration-200">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full font-sans antialiased pb-20 md:pb-6 transition-colors duration-200">
 
     <!-- Loading Screen -->
-    <div id="loadingApp" class="fixed inset-0 bg-indigo-950 flex flex-col items-center justify-center p-4 z-50 text-white space-y-3">
-        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-teal-400"></i>
-        <p class="text-sm font-medium text-slate-200">Loading KomExpense Tracker...</p>
+    <div id="loadingApp" class="fixed inset-0 bg-indigo-950 flex flex-col items-center justify-center text-white z-50">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-teal-400 mb-3"></i>
+        <p class="text-sm font-semibold tracking-wider animate-pulse">Loading KomExpense Tracker...</p>
     </div>
 
-    <!-- Auth Section -->
-    <div id="authContainer" class="fixed inset-0 bg-indigo-950 bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
-            <div class="text-center mb-6">
-                <div class="flex justify-center mb-2">
-                    <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
-                </div>
-                <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.5</span></p>
+    <!-- Auth Container -->
+    <div id="authContainer" class="fixed inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-teal-950 flex items-center justify-center p-4 z-40 hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md border border-slate-100 dark:border-slate-700 space-y-5">
+            <div class="text-center space-y-2">
+                <img id="loginLogoImg" src="" class="w-16 h-16 mx-auto object-contain drop-shadow-md" alt="KomExpense Logo">
+                <h2 id="authTitle" class="text-2xl font-extrabold text-indigo-950 dark:text-teal-400">App Login</h2>
+                <p class="text-xs text-slate-400">KomExpense Tracker &bull; Cloud Management</p>
             </div>
-            <form id="authForm" onsubmit="handleAuth(event)">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="emailLabel">Email Address</label>
-                    <input type="email" id="authEmail" required class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition">
+
+            <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300" data-i18n="emailLabel">Email Address</label>
+                    <input type="email" id="authEmail" required class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
-                <div class="mb-2">
-                    <label class="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" data-i18n="passLabel">Password</label>
-                    <input type="password" id="authPassword" required class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300" data-i18n="passLabel">Password</label>
+                        <button type="button" onclick="handleForgotPassword()" class="text-[11px] text-teal-600 dark:text-teal-400 hover:underline" data-i18n="forgotPassBtn">Forgot Password?</button>
+                    </div>
+                    <input type="password" id="authPassword" required class="w-full p-3 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none">
                 </div>
-                <div class="text-right mb-5">
-                    <button type="button" onclick="handleForgotPassword()" class="text-xs text-teal-600 dark:text-teal-400 hover:underline font-medium" data-i18n="forgotPassBtn">Forgot Password?</button>
-                </div>
-                <button type="submit" id="authBtn" class="w-full bg-gradient-to-r from-indigo-900 to-teal-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition shadow-md" data-i18n="loginBtn">Login</button>
+                <button type="submit" id="authBtn" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm shadow-md transition" data-i18n="loginBtn">Login</button>
             </form>
-            <div class="mt-4 text-center text-sm">
-                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-teal-600 dark:text-teal-400 hover:text-teal-700 font-medium underline" data-i18n="toggleRegister">Don't have an account? Register</button>
+
+            <div class="text-center pt-2">
+                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-xs text-teal-600 dark:text-teal-400 font-semibold hover:underline" data-i18n="toggleRegister">Don't have an account? Register</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Profile -->
+    <!-- Profile Modal -->
     <div id="profileModal" class="fixed inset-0 bg-indigo-950 bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-5 sm:p-6 w-full max-w-md space-y-4 border border-slate-100 dark:border-slate-700 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b dark:border-slate-700 pb-3">
-                <h3 class="text-base font-bold text-teal-600 dark:text-teal-400 flex items-center gap-2">
-                    <i class="fa-solid fa-user"></i> <span data-i18n="tabProfile">My Profile</span>
+                <h3 class="text-lg font-bold text-indigo-950 dark:text-teal-400 flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-teal-600"></i> <span data-i18n="tabProfile">My Profile</span>
                 </h3>
-                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-rose-500 text-lg font-bold transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="space-y-4">
-                <div class="flex flex-col items-center justify-center space-y-2 py-2">
-                    <div class="relative">
-                        <img id="userAvatarImg" src="" class="w-20 h-20 rounded-full object-cover border-4 border-teal-500 shadow-md hidden">
-                        <div id="userAvatarPlaceholder" class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-900 to-teal-600 text-white flex items-center justify-center font-bold text-2xl shadow-md">
-                            U
-                        </div>
-                        <button onclick="document.getElementById('avatarFileInput').click()" class="absolute bottom-0 right-0 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 p-2 rounded-full border border-slate-200 dark:border-slate-600 shadow hover:bg-slate-100 transition text-xs" title="Edit Avatar">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-                        <input type="file" id="avatarFileInput" accept="image/*" onchange="uploadUserAvatar(event)" class="hidden">
+
+            <!-- Avatar Header -->
+            <div class="flex flex-col items-center justify-center space-y-2 pt-1">
+                <div class="relative group">
+                    <div id="userAvatarContainer" class="w-20 h-20 rounded-full bg-teal-600 text-white flex items-center justify-center text-2xl font-bold border-4 border-teal-100 dark:border-slate-700 shadow-md overflow-hidden">
+                        <img id="userAvatarImg" src="" class="w-full h-full object-cover hidden">
+                        <span id="userAvatarPlaceholder">U</span>
                     </div>
-                    <span class="text-xs text-slate-400" data-i18n="changeAvatarHint">Click camera icon to change avatar</span>
+                    <label for="avatarFileInput" class="absolute bottom-0 right-0 bg-teal-500 hover:bg-teal-600 text-white p-2 rounded-full cursor-pointer shadow-md transition border-2 border-white dark:border-slate-800">
+                        <i class="fa-solid fa-camera text-xs"></i>
+                    </label>
+                    <input type="file" id="avatarFileInput" accept="image/*" onchange="uploadUserAvatar(event)" class="hidden">
                 </div>
+                <p class="text-[10px] text-slate-400" data-i18n="changeAvatarHint">Click camera icon to change avatar</p>
+            </div>
 
-                <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700 text-center">
-                    <div>
-                        <p class="text-[11px] text-slate-400" data-i18n="totalRecordedTx">Total Transactions</p>
-                        <h4 id="statTotalTx" class="font-bold text-sm text-indigo-950 dark:text-teal-300">0</h4>
-                    </div>
-                    <div>
-                        <p class="text-[11px] text-slate-400" data-i18n="joinedDateLabel">Joined Date</p>
-                        <h4 id="statJoinedDate" class="font-bold text-sm text-indigo-950 dark:text-teal-300">-</h4>
-                    </div>
+            <!-- Stats Mini Bar -->
+            <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-700/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 text-center">
+                <div>
+                    <span class="block text-[10px] text-slate-400" data-i18n="totalRecordedTx">Total Transactions</span>
+                    <span id="statTotalTx" class="text-sm font-bold text-teal-600 dark:text-teal-400">0</span>
                 </div>
-
-                <form onsubmit="saveProfileInfo(event)" class="space-y-3 pt-1">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" data-i18n="fullNameLabel">Full Name</label>
-                        <input type="text" id="profileFullName" class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" data-i18n="emailLabel">Email Login</label>
-                        <input type="email" id="profileEmailDisplay" disabled class="w-full p-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl text-sm outline-none cursor-not-allowed">
-                    </div>
-                    <button type="submit" id="saveProfileBtn" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold shadow-sm transition" data-i18n="updateProfileBtn">Update Profile Name</button>
-                </form>
-
-                <div class="border-t dark:border-slate-700 pt-3">
-                    <button onclick="toggleChangePassSection()" class="text-xs font-bold text-teal-600 dark:text-teal-400 flex items-center justify-between w-full">
-                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-key"></i> <span data-i18n="changePasswordHeader">Change Password</span></span>
-                        <i id="changePassArrow" class="fa-solid fa-chevron-down transition-transform"></i>
-                    </button>
-                    
-                    <form id="changePassForm" onsubmit="handleChangePassword(event)" class="space-y-3 mt-3 hidden">
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate-600 dark:text-slate-300 mb-1" data-i18n="newPassLabel">New Password</label>
-                            <input type="password" id="newPasswordInput" required minlength="6" class="w-full p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-xs outline-none">
-                        </div>
-                        <button type="submit" id="changePassBtn" class="w-full py-2 bg-indigo-900 hover:bg-indigo-950 text-white rounded-xl text-xs font-semibold transition" data-i18n="saveNewPassBtn">Save New Password</button>
-                    </form>
+                <div>
+                    <span class="block text-[10px] text-slate-400" data-i18n="joinedDateLabel">Joined Date</span>
+                    <span id="statJoinedDate" class="text-sm font-bold text-slate-700 dark:text-slate-200">-</span>
                 </div>
             </div>
 
+            <!-- Update Name Form -->
+            <form onsubmit="saveProfileInfo(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300" data-i18n="emailLabel">Email Address</label>
+                    <input type="text" id="profileEmailDisplay" disabled class="w-full p-2.5 border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 rounded-xl text-xs font-medium cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-slate-700 dark:text-slate-300" data-i18n="fullNameLabel">Full Name</label>
+                    <input type="text" id="profileFullName" required class="w-full p-2.5 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-teal-500 outline-none">
+                </div>
+                <button type="submit" id="saveProfileBtn" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm" data-i18n="updateProfileBtn">Update Profile Name</button>
+            </form>
+
+            <!-- Change Password Section -->
             <div class="pt-2 border-t dark:border-slate-700">
-                <button onclick="logout()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition border border-rose-100 dark:border-rose-900/50">
+                <button onclick="toggleChangePassSection()" class="w-full flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-teal-600 transition">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-key text-amber-500"></i> <span data-i18n="changePasswordHeader">Change Password</span></span>
+                    <i class="fa-solid fa-chevron-down transition-transform duration-200" id="changePassArrow"></i>
+                </button>
+
+                <form id="changePassForm" onsubmit="handleChangePassword(event)" class="hidden space-y-2 mt-3 pt-2 border-t border-dashed dark:border-slate-700">
+                    <div>
+                        <label class="block text-[11px] font-semibold mb-1 text-slate-600 dark:text-slate-400" data-i18n="newPassLabel">New Password</label>
+                        <input type="password" id="newPasswordInput" required minlength="6" class="w-full p-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl text-xs outline-none">
+                    </div>
+                    <button type="submit" id="changePassBtn" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-sm" data-i18n="saveNewPassBtn">Save New Password</button>
+                </form>
+            </div>
+
+            <!-- Logout -->
+            <div class="pt-2 border-t dark:border-slate-700">
+                <button onclick="logout()" class="w-full py-2.5 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border border-rose-200 dark:border-rose-900/50">
                     <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logoutBtn">Logout Account</span>
                 </button>
             </div>
@@ -301,7 +320,7 @@
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-4 w-full max-w-lg space-y-3 relative border border-slate-100 dark:border-slate-700">
             <div class="flex justify-between items-center border-b dark:border-slate-700 pb-2">
                 <h3 class="font-bold text-indigo-950 dark:text-teal-400 text-sm flex items-center gap-2"><i class="fa-solid fa-image text-teal-600"></i> <span data-i18n="receiptTitle">Receipt Attachment</span></h3>
-                <button onclick="closeReceiptModal()" class="text-slate-400 hover:text-red-500 p-1 text-lg font-bold transition"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeReceiptModal()" class="text-slate-400 hover:text-rose-500 p-1 text-lg font-bold transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="max-h-[75vh] overflow-y-auto flex justify-center bg-slate-50 dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
                 <img id="modalReceiptImg" src="" alt="Struk Bon" class="max-w-full h-auto rounded-lg shadow-sm">
@@ -322,7 +341,7 @@
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.5</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.6</span>
                     </div>
                 </div>
 
@@ -621,18 +640,21 @@
                 </div>
 
                 <div class="space-y-2">
-                    <h3 class="font-bold text-indigo-950 dark:text-slate-200 text-sm border-b border-slate-200 dark:border-slate-700 pb-1" data-i18n="txListHeader">Transaction Details List</h3>
+                    <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-1">
+                        <h3 class="font-bold text-indigo-950 dark:text-slate-200 text-sm" data-i18n="txListHeader">Transaction Details List</h3>
+                        <span class="text-[10px] text-slate-400 font-medium" data-i18n="swipeHint"><i class="fa-solid fa-hand-pointer text-teal-500"></i> Swipe left to delete</span>
+                    </div>
                     <div id="itemListContainer" class="space-y-2"></div>
                 </div>
             </section>
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.6.5
+            KomExpense Tracker &bull; Version 2.6.6
         </footer>
     </div>
 
-    <!-- Firebase Modular SDKs -->
+    <!-- Firebase Modular SDKs & Application Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, updatePassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -766,6 +788,7 @@
                 backToExpenses: "Back to Expenses List",
                 addTxBtn: "Add Transaction",
                 txListHeader: "Transaction Details List",
+                swipeHint: "Swipe left to delete",
                 noNotes: "No notes",
                 txCount: "Transactions",
                 viewReceipt: "View Receipt",
@@ -843,6 +866,7 @@
                 backToExpenses: "Kembali ke Daftar Expenses",
                 addTxBtn: "Add Transaction",
                 txListHeader: "List Rincian Transaksi",
+                swipeHint: "Geser kiri untuk menghapus",
                 noNotes: "Tidak ada catatan",
                 txCount: "Transaksi",
                 viewReceipt: "Lihat Struk Bon",
@@ -911,7 +935,7 @@
             customCategories.forEach((cat, idx) => {
                 const badge = document.createElement('span');
                 badge.className = "text-[11px] bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-200 px-2 py-0.5 rounded-md font-medium flex items-center gap-1 border border-teal-200 dark:border-teal-700";
-                badge.innerHTML = `${cat} <button onclick="deleteCustomCategory(${idx})" class="text-teal-600 dark:text-teal-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>`;
+                badge.innerHTML = `${cat} <button onclick="deleteCustomCategory(${idx})" class="text-teal-600 dark:text-teal-300 hover:text-rose-500"><i class="fa-solid fa-xmark"></i></button>`;
                 container.appendChild(badge);
             });
         }
@@ -1470,7 +1494,7 @@
             reader.readAsDataURL(file);
         };
 
-        // SMART OCR ANALYSIS V2.6.5 (MULTILINGUAL OCR + ROBUST DATE & CATEGORY MATCHING)
+        // SMART OCR ANALYSIS V2.6.5
         async function runOCRAnalysis(imageData) {
             const loadingBox = document.getElementById('ocrLoading');
             const progressText = document.getElementById('ocrProgressText');
@@ -1535,7 +1559,6 @@
                 let foundDate = null;
                 const monthNames = "JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|OKT|MEI|AGU|DES";
                 
-                // Formats: DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, DD MMM YYYY
                 const patterns = [
                     new RegExp(`(\\d{1,2})[\\/\\.-](\\d{1,2})[\\/\\.-](\\d{2,4})`),
                     new RegExp(`(\\d{4})[\\/\\.-](\\d{1,2})[\\/\\.-](\\d{1,2})`),
@@ -1653,6 +1676,7 @@
             }
         };
 
+        // RENDER ITEM DENGAN FITUR SWIPE-TO-DELETE GAYA IPHONE
         function renderProjectItems(projectId) {
             const pItems = itemsData.filter(i => i.projectId === projectId);
             const total = pItems.reduce((acc, curr) => acc + curr.amount, 0);
@@ -1675,23 +1699,89 @@
             });
 
             pItems.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm flex justify-between items-center text-xs border border-slate-100 dark:border-slate-700";
-                card.innerHTML = `
-                    <div class="space-y-0.5">
-                        <span class="font-bold text-indigo-950 dark:text-slate-100 text-sm">${item.category} - ${currentCurrency} ${item.amount.toLocaleString('id-ID')}</span>
-                        <p class="text-slate-400">${item.date} ${item.note ? '| ' + item.note : ''}</p>
-                        ${item.receipt ? `<button onclick="openReceiptModal('${item.receipt}')" class="text-teal-600 dark:text-teal-400 hover:underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> ${i18n[currentLang].viewReceipt}</button>` : ''}
+                const wrapper = document.createElement('div');
+                wrapper.className = "swipe-item-container shadow-sm border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800";
+                
+                wrapper.innerHTML = `
+                    <div class="swipe-delete-btn cursor-pointer hover:bg-rose-600 transition" onclick="deleteItem('${item.id}')">
+                        <i class="fa-solid fa-trash mr-1"></i> Delete
                     </div>
-                    <button onclick="deleteItem('${item.id}')" class="text-slate-300 hover:text-rose-500 p-2 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-lg transition"><i class="fa-solid fa-trash text-sm"></i></button>
+                    <div class="swipe-content bg-white dark:bg-slate-800 p-3.5 flex justify-between items-center text-xs" id="swipe-item-${item.id}">
+                        <div class="space-y-0.5">
+                            <span class="font-bold text-indigo-950 dark:text-slate-100 text-sm">${item.category} - ${currentCurrency} ${item.amount.toLocaleString('id-ID')}</span>
+                            <p class="text-slate-400">${item.date} ${item.note ? '| ' + item.note : ''}</p>
+                            ${item.receipt ? `<button onclick="openReceiptModal('${item.receipt}')" class="text-teal-600 dark:text-teal-400 hover:underline font-semibold block mt-1"><i class="fa-solid fa-paperclip"></i> ${i18n[currentLang].viewReceipt}</button>` : ''}
+                        </div>
+                        <button onclick="deleteItem('${item.id}')" class="text-slate-300 hover:text-rose-500 p-2 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-lg transition shrink-0"><i class="fa-solid fa-trash text-sm"></i></button>
+                    </div>
                 `;
-                container.appendChild(card);
+
+                container.appendChild(wrapper);
+
+                // Attach iOS Swipe Touch Event Handlers
+                const swipeContent = wrapper.querySelector('.swipe-content');
+                attachSwipeGesture(swipeContent, item.id);
             });
+        }
+
+        // LOGIKA GESTURE SLIDE TO DELETE GAYA IPHONE
+        function attachSwipeGesture(element, itemId) {
+            let startX = 0;
+            let currentX = 0;
+            let isSwiping = false;
+            const maxSwipe = -80; // Lebar tombol hapus
+
+            element.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+                element.classList.add('swiping');
+            }, { passive: true });
+
+            element.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                const touchX = e.touches[0].clientX;
+                const diffX = touchX - startX;
+
+                // Hanya izinkan swipe ke kiri
+                if (diffX < 0) {
+                    currentX = Math.max(diffX, -120); // batas over-swipe
+                    element.style.transform = `translateX(${currentX}px)`;
+                } else if (currentX < 0) {
+                    // Geser kembali ke kanan jika posisi sebelumnya terbuka
+                    const newX = Math.min(0, currentX + diffX);
+                    element.style.transform = `translateX(${newX}px)`;
+                }
+            }, { passive: true });
+
+            element.addEventListener('touchend', () => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                element.classList.remove('swiping');
+
+                if (currentX < -50) {
+                    // Terbuka sepenuhnya (Snap)
+                    element.style.transform = `translateX(${maxSwipe}px)`;
+                    currentX = maxSwipe;
+                    
+                    // Jika digeser sangat jauh (over-swipe > 110px), langsung picu aksi hapus
+                    if (currentX <= -110) {
+                        deleteItem(itemId);
+                    }
+                } else {
+                    // Kembali ke posisi awal
+                    element.style.transform = 'translateX(0px)';
+                    currentX = 0;
+                }
+            }, { passive: true });
         }
 
         window.deleteItem = async (id) => {
             if (confirm(currentLang === 'id' ? "Hapus rincian transaksi ini?" : "Delete this transaction item?")) {
                 await deleteDoc(doc(db, "expenses", id));
+            } else {
+                // Reset posisi swipe jika dibatalkan
+                const itemEl = document.getElementById(`swipe-item-${id}`);
+                if (itemEl) itemEl.style.transform = 'translateX(0px)';
             }
         };
 
