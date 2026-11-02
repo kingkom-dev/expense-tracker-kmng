@@ -98,7 +98,7 @@
                     <img id="loginLogoImg" src="" class="w-20 h-20 object-contain drop-shadow-md" alt="KomExpense Logo">
                 </div>
                 <h2 id="authTitle" class="text-2xl font-bold text-indigo-900 dark:text-teal-400" data-i18n="loginTitle">App Login</h2>
-                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.3</span></p>
+                <p class="text-xs text-slate-400 font-medium mt-1">KomExpense Tracker <span class="bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-teal-200 dark:border-teal-700">v2.6.4</span></p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="mb-4">
@@ -236,7 +236,7 @@
                         <i class="fa-solid fa-wand-magic-sparkles text-teal-500 text-lg animate-pulse"></i>
                         <div>
                             <p class="text-xs font-bold text-slate-800 dark:text-teal-300">Smart OCR Auto-Scan</p>
-                            <p class="text-[10px] text-slate-400">Upload foto struk, tanggal & nominal terisi otomatis!</p>
+                            <p class="text-[10px] text-slate-400">Upload foto struk, tanggal, kategori & nominal terisi otomatis!</p>
                         </div>
                     </div>
                 </div>
@@ -322,7 +322,7 @@
                     <img id="headerLogoImg" src="" class="w-10 h-10 sm:w-11 sm:h-11 object-contain shrink-0 drop-shadow" alt="KomExpense Logo">
                     <div class="flex flex-col leading-tight">
                         <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">KomExpense Tracker</h1>
-                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.3</span>
+                        <span class="text-[9px] sm:text-[10px] text-teal-200/80 font-medium tracking-wider">v2.6.4</span>
                     </div>
                 </div>
 
@@ -628,7 +628,7 @@
         </main>
 
         <footer class="text-center text-xs text-slate-400 my-6 no-print">
-            KomExpense Tracker &bull; Version 2.6.3
+            KomExpense Tracker &bull; Version 2.6.4
         </footer>
     </div>
 
@@ -1456,6 +1456,7 @@
             reader.readAsDataURL(file);
         };
 
+        // SMART OCR ANALYSIS V2.6.4 (NOMINAL + FLEXIBLE DATE + KEYWORD CATEGORY)
         async function runOCRAnalysis(imageData) {
             const loadingBox = document.getElementById('ocrLoading');
             const progressText = document.getElementById('ocrProgressText');
@@ -1467,10 +1468,18 @@
                 const ret = await worker.recognize(imageData);
                 await worker.terminate();
 
-                const text = ret.data.text;
+                const text = ret.data.text || "";
                 console.log("Extracted OCR Text:\n", text);
 
+                if (!text.trim()) {
+                    progressText.innerText = "Teks tidak terbaca. Pastikan foto struk jelas.";
+                    return;
+                }
+
                 const lines = text.split('\n');
+                const upperText = text.toUpperCase();
+
+                // 1. DETEKSI NOMINAL (AMOUNT)
                 let detectedAmount = 0;
 
                 lines.forEach(line => {
@@ -1501,29 +1510,90 @@
                 }
 
                 if (detectedAmount > 0) {
-                    document.getElementById('itemAmount').value = detectedAmount;
-                    document.getElementById('itemAmountFormatted').value = Number(detectedAmount).toLocaleString('id-ID');
+                    const amountHidden = document.getElementById('itemAmount');
+                    const amountFormatted = document.getElementById('itemAmountFormatted');
+                    amountHidden.value = detectedAmount;
+                    amountFormatted.value = Number(detectedAmount).toLocaleString('id-ID');
+                    amountFormatted.dispatchEvent(new Event('input', { bubbles: true }));
                 }
 
-                const dateMatch = text.match(/(\d{2})[\/\.-](\d{2})[\/\.-](\d{4})/) || text.match(/(\d{4})[\/\.-](\d{2})[\/\.-](\d{2})/);
+                // 2. DETEKSI TANGGAL FLEKSIBEL
+                const dateRegex = /(\d{1,2})[\/\.-](\d{1,2})[\/\.-](\d{2,4})|(\d{4})[\/\.-](\d{1,2})[\/\.-](\d{1,2})|(\d{1,2})\s+(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|OKT|MEI|AGU|DES)\w*\s+(\d{2,4})/i;
+                const dateMatch = text.match(dateRegex);
+
                 if (dateMatch) {
                     try {
-                        let parsedDate;
-                        if (dateMatch[1].length === 4) {
-                            parsedDate = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
-                        } else {
-                            parsedDate = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
+                        let y, m, d;
+                        if (dateMatch[1] && dateMatch[2] && dateMatch[3]) { // Format DD/MM/YYYY
+                            d = dateMatch[1].padStart(2, '0');
+                            m = dateMatch[2].padStart(2, '0');
+                            y = dateMatch[3].length === 2 ? `20${dateMatch[3]}` : dateMatch[3];
+                        } else if (dateMatch[4] && dateMatch[5] && dateMatch[6]) { // Format YYYY-MM-DD
+                            y = dateMatch[4];
+                            m = dateMatch[5].padStart(2, '0');
+                            d = dateMatch[6].padStart(2, '0');
+                        } else if (dateMatch[7] && dateMatch[8] && dateMatch[9]) { // Format DD MMM YYYY
+                            d = dateMatch[7].padStart(2, '0');
+                            y = dateMatch[9].length === 2 ? `20${dateMatch[9]}` : dateMatch[9];
+                            const monthMap = { JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', MEI: '05', JUN: '06', JUL: '07', AUG: '08', AGU: '08', SEP: '09', OCT: '10', OKT: '10', NOV: '11', DEC: '12', DES: '12' };
+                            m = monthMap[dateMatch[8].toUpperCase().substring(0, 3)] || '01';
                         }
-                        document.getElementById('itemDate').value = parsedDate;
-                    } catch (e) {}
+
+                        if (y && m && d) {
+                            const formattedDate = `${y}-${m}-${d}`;
+                            const dateInput = document.getElementById('itemDate');
+                            dateInput.value = formattedDate;
+                            dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    } catch (e) {
+                        console.error("Date Parsing Error:", e);
+                    }
+                }
+
+                // 3. DETEKSI KATEGORI OTOMATIS (KEYWORD MATCHING)
+                const categoryKeywords = {
+                    "Fuel": ["PERTAMAX", "PERTALITE", "SOLAR", "DEXLITE", "SPBU", "SHELL", "BP", "V-POWER", "BENSIN", "FUEL", "PUMP"],
+                    "Bensin": ["PERTAMAX", "PERTALITE", "SOLAR", "DEXLITE", "SPBU", "SHELL", "BP", "V-POWER", "BENSIN", "FUEL", "PUMP"],
+                    "Meal": ["RESTO", "RESTAURANT", "CAFE", "COFFEE", "WARUNG", "KEDAI", "KOPITIAM", "FOOD", "BAKSO", "MCDONALDS", "KFC", "MAKAN"],
+                    "Makan": ["RESTO", "RESTAURANT", "CAFE", "COFFEE", "WARUNG", "KEDAI", "KOPITIAM", "FOOD", "BAKSO", "MCDONALDS", "KFC", "MAKAN"],
+                    "Toll": ["TOL", "MARGA", "JASA MARGA", "E-TOLL", "ETOL", "EMONEY", "TAPHOUSE", "GERBANG TOL"],
+                    "Tol": ["TOL", "MARGA", "JASA MARGA", "E-TOLL", "ETOL", "EMONEY", "TAPHOUSE", "GERBANG TOL"],
+                    "Parking": ["PARKIR", "PARKING", "VALET", "SECURE PARKING", "SKY PARKING"],
+                    "Parkir": ["PARKIR", "PARKING", "VALET", "SECURE PARKING", "SKY PARKING"],
+                    "Hotel / Lodging": ["HOTEL", "INNO", "RESORT", "GUESTHOUSE", "HOMESTAY", "VILLA", "LODGING"],
+                    "Akomodasi / Hotel": ["HOTEL", "INNO", "RESORT", "GUESTHOUSE", "HOMESTAY", "VILLA", "LODGING"],
+                    "Transport / Ticket": ["TIKET", "TICKET", "GARUDA", "LION", "CITI LINK", "GRAB", "GOJEK", "TAXI", "KERETA", "KAI"],
+                    "Transportasi / Tiket": ["TIKET", "TICKET", "GARUDA", "LION", "CITI LINK", "GRAB", "GOJEK", "TAXI", "KERETA", "KAI"],
+                    "Office Supplies": ["ATK", "ALAT TULIS", "PAPER", "GRAMEDIA", "PRINT", "FOTOKOPI", "INTERNET", "INDOMARET", "ALFAMART"],
+                    "ATK & Operasional": ["ATK", "ALAT TULIS", "PAPER", "GRAMEDIA", "PRINT", "FOTOKOPI", "INTERNET", "INDOMARET", "ALFAMART"]
+                };
+
+                let detectedCategory = "";
+                for (const [catName, keywords] of Object.entries(categoryKeywords)) {
+                    if (keywords.some(kw => upperText.includes(kw))) {
+                        detectedCategory = catName;
+                        break;
+                    }
+                }
+
+                if (detectedCategory) {
+                    const catSelect = document.getElementById('itemCategory');
+                    for (let option of catSelect.options) {
+                        if (option.value.toLowerCase() === detectedCategory.toLowerCase()) {
+                            catSelect.value = option.value;
+                            catSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                            break;
+                        }
+                    }
                 }
 
                 progressText.innerText = detectedAmount > 0 
                     ? `Auto-Fill Berhasil: ${currentCurrency} ${detectedAmount.toLocaleString('id-ID')}` 
-                    : "OCR selesai. Silakan periksa kembali nominal.";
+                    : "OCR selesai. Silakan periksa kembali detail form.";
+
             } catch (err) {
                 console.error("OCR Error:", err);
-                progressText.innerText = "Selesai membaca. Silakan periksa atau isi nominal manual.";
+                progressText.innerText = "Gagal memproses OCR. Masukkan data secara manual.";
             } finally {
                 setTimeout(() => loadingBox.classList.add('hidden'), 3000);
             }
